@@ -1,0 +1,13 @@
+{
+  "name": "stadstuin-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev:frontend": "npm workspace frontend dev",
+    "dev:backend": "npm workspace backend run"
+  }
+}
