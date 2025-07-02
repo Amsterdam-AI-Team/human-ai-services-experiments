@@ -1,0 +1,1 @@
+HUGGING_CACHE = "/home/azureuser/cloudfiles/code//hugging_cache"  
