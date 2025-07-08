@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+openai>=1.0
+numpy
+python-multipart
+sentence-transformers
+openai-whisper
+python-slugify
+langchain-openai
+langchain
