@@ -2,15 +2,15 @@ from __future__ import annotations
 from dotenv import load_dotenv
 load_dotenv()
 
-import whisper                                   
+import whisper                                 
 from sentence_transformers import SentenceTransformer
-from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, File, UploadFile, Body, Depends
+from fastapi import FastAPI, File, UploadFile, Body
 from uuid import uuid4
 
 import numpy as np
-from models import build_step_model, ChatRequest, ChatResponse
+from models import (build_step_model, ChatRequest,
+                    ChatResponse, AnalyzeResponse)
 from intents import INTENTS
 from templates import make_chain
 
@@ -18,7 +18,6 @@ import os
 
 import tempfile
 import asyncio
-from typing import Dict, Any
 
 
 
@@ -77,10 +76,7 @@ _INTENT_EMBS = np.vstack([_embed(obj["intent"]) for obj in INTENTS])
 # ---------------------------------------------------------------------------
 
 
-class AnalyzeResponse(BaseModel):
-    transcript: str
-    match: Dict[str, Any]
-    similarity: float
+
 
 # ---------------------------------------------------------------------------
 # /analyze route – core pipeline

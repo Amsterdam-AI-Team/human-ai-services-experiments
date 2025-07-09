@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, create_model
 from slugify import slugify
-
+from typing import Dict, Any
 
 def build_step_model(intent: dict) -> type[BaseModel]:
     """Create a Pydantic class with one bool per step title."""
@@ -24,3 +24,8 @@ class ChatResponse(BaseModel):
     reply: str
     checklist: dict
     finished: bool
+
+class AnalyzeResponse(BaseModel):
+    transcript: str
+    match: Dict[str, Any]
+    similarity: float
