@@ -5,7 +5,7 @@ load_dotenv()
 import whisper                                 
 from sentence_transformers import SentenceTransformer
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, File, UploadFile, Body
+from fastapi import FastAPI, File, UploadFile, Body, HTTPException
 from uuid import uuid4
 
 import numpy as np
@@ -151,7 +151,6 @@ async def chat(data: ChatRequest = Body(...)):
     # 4. run chain (async)
     chain_input = {"message": data.message, "history": session["history"]}
     step_obj: StepModel = await session["chain"](chain_input)
-
 
     # 5. update session state
     session["history"].append({"role": "user", "content": data.message})
