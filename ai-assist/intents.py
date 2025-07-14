@@ -10,22 +10,27 @@ INTENTS: List[Dict[str, Any]] = [
         "intentcode": "create_objection_parking_fine",
         "steps": [
             {
-                "title": "Doe het op tijd",
+                "title": "De datum van de bon",
                 "description": (
-                    "Binnen 2 weken voorkom je extra kosten. Uiterlijk 6 weken na "
-                    "de datum van de boete mag je nog bezwaar maken"
+                    "Vraag de gebruiker naar de datum waarop de parkeerboete is uitgeschreven. "
+                    "Deze informatie is nodig om te controleren of het bezwaar binnen de wettelijke termijn wordt ingediend."
                 ),
             },
             {
-                "title": "Wat heb je nodig",
-                "items": [
-                    "Boetemerk of bonnummer",
-                    "Kenteken",
-                    "Reden van bezwaar",
-                    "Eventueel bewijs",
-                ],
+                "title": "Het kenteken van de auto",
+                "description": (
+                    "Vraag de gebruiker naar het kenteken van de auto waarvoor de parkeerboete is uitgeschreven. "
+                    "Dit helpt om de boete te koppelen aan het juiste voertuig."
+                ),
             },
-        ],
+            {
+                "title": "De reden van je bezwaar",
+                "description": (
+                    "Vraag de gebruiker naar de reden waarom hij of zij bezwaar wil maken tegen de parkeerboete. "
+                    "Dit kan bijvoorbeeld zijn omdat de boete onterecht is of omdat er een fout is gemaakt."
+                ),
+            },
+        ]
     },
     {"intent": "Ik wil mijn adres wijzigen in de gemeentelijke administratie",
      "intentcode": "update_address_municipal_records",

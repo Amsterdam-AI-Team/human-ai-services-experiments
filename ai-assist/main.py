@@ -146,7 +146,7 @@ async def chat(data: ChatRequest = Body(...)):
 
     # 3. build chain once per session
     if "chain" not in session:
-        session["chain"] = make_chain(StepModel)
+        session["chain"] = make_chain(StepModel, session)
 
     # 4. run chain (async)
     chain_input = {"message": data.message, "history": session["history"]}
@@ -156,6 +156,7 @@ async def chat(data: ChatRequest = Body(...)):
     session["history"].append({"role": "user", "content": data.message})
     session["history"].append({"role": "assistant", "content": step_obj.vragen or ""})
     session["checklist"] = step_obj.model_dump(exclude={"vragen"})
+    session["draft"] = step_obj.draft
     finished = all(session["checklist"].values())
 
     return ChatResponse(
