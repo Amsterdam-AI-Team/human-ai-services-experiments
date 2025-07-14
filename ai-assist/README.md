@@ -90,7 +90,7 @@ The service will listen on **0.0.0.0:8000**. In examples below, replace `localho
 Health check:
 
 ```bash
-curl http://128.251.225.11:8000/ping
+curl http://128.251.225.11/ping
 # -> {"status":"ok"}
 ```
 
@@ -99,7 +99,7 @@ curl http://128.251.225.11:8000/ping
 Transcribe an audio file, detect the user intent, and return similarity score.
 
 ```bash
-curl -X POST http://128.251.225.11:8000/analyze \
+curl -X POST http://128.251.225.11/analyze \
   -F file=@/path/to/audio.wav
 ```
 
@@ -118,7 +118,7 @@ curl -X POST http://128.251.225.11:8000/analyze \
 Drive a structured conversation. Provide `session_id` to maintain state, `intentcode` to select the workflow, and the user `message`.
 
 ```bash
-curl -X POST http://128.251.225.11:8000/chat \
+curl -X POST http://128.251.225.11/chat \
   -H "Content-Type: application/json" \
   -d '{
         "session_id": null,
@@ -152,7 +152,7 @@ Below is a complete 4‑turn example. All requests use `session_id="abcd-1234-uu
 1. **Start** (ask date)
 
 ```bash
-curl -X POST http://128.251.225.11:8000/chat \
+curl -X POST http://128.251.225.11/chat \
   -H "Content-Type: application/json" \
   -d '{
         "session_id": "abcd-1234-uuid",
@@ -164,7 +164,7 @@ curl -X POST http://128.251.225.11:8000/chat \
 2. **Supply date**
 
 ```bash
-curl -X POST http://128.251.225.11:8000/chat \
+curl -X POST http://128.251.225.11/chat \
   -H "Content-Type: application/json" \
   -d '{
         "session_id": "abcd-1234-uuid",
@@ -176,7 +176,7 @@ curl -X POST http://128.251.225.11:8000/chat \
 3. **Provide plate**
 
 ```bash
-curl -X POST http://128.251.225.11:8000/chat \
+curl -X POST http://128.251.225.11/chat \
   -H "Content-Type: application/json" \
   -d '{
         "session_id": "abcd-1234-uuid",
@@ -188,7 +188,7 @@ curl -X POST http://128.251.225.11:8000/chat \
 4. **Give reason**
 
 ```bash
-curl -X POST http://128.251.225.11:8000/chat \
+curl -X POST http://128.251.225.11/chat \
   -H "Content-Type: application/json" \
   -d '{
         "session_id": "abcd-1234-uuid",
