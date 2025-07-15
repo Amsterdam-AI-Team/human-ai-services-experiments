@@ -67,6 +67,7 @@ AZURE_OPENAI_API_KEY=your_api_key_here
 OPENAI_API_VERSION=2025-01-01-preview
 AZURE_OPENAI_DEPLOYMENT_NAME=gpt-4o
 WHISPER_MODEL_NAME=base
+DATABASE_URL=url
 # Optionally, SSH SOCKS proxy for WSL networking
 SSH_SOCKS_PROXY=socks5h://localhost:1080
 ```
@@ -100,7 +101,7 @@ Transcribe an audio file, detect the user intent, and return similarity score.
 
 ```bash
 curl -X POST http://128.251.225.11/analyze \
-  -F file=@/path/to/audio.wav
+  -F file=@/path/to/audio.wav;type=audio/mpeg
 ```
 
 **Response**:
@@ -113,28 +114,45 @@ curl -X POST http://128.251.225.11/analyze \
 }
 ```
 
-### `POST /chat`
+### `POST /chat`
 
-Drive a structured conversation. Provide `session_id` to maintain state, `intentcode` to select the workflow, and the user `message`.
+Starts or continues a guided conversation.  **Two request modes are supported:**
+
+| Mode        | Content‑Type          | Required fields         | Optional                    | Notes                                                      |
+| ----------- | --------------------- | ----------------------- | --------------------------- | ---------------------------------------------------------- |
+| *JSON*      | `application/json`    | `intentcode`, `message` | `session_id`                | For plain text messages – easiest for front‑ends           |
+| *Multipart* | `multipart/form‑data` | `intentcode`            | `session_id`, `message`, `` | Use when sending an audio clip – Whisper will be run first |
+
+---
+
+#### 1. JSON (text‑only)
 
 ```bash
-curl -X POST http://128.251.225.11/chat \
-  -H "Content-Type: application/json" \
-  -d '{
-        "session_id": null,
-        "intentcode": "create_objection_parking_fine",
-        "message": "Goedemorgen, ik wil bezwaar maken op mijn parkeerboete."
-      }'
+curl -X POST http://localhost:8000/chat \
+     -H "Content-Type: application/json" \
+     -d '{
+           "intentcode": "create_objection_parking_fine",
+           "message": "Goedemorgen, ik wil bezwaar maken."
+         }'
 ```
 
-**Partial Response**:
+#### 2. Multipart with audio
+
+```bash
+# note the   file=@…  part name **must** be   audio
+curl -X POST http://localhost:8000/chat \
+     -F intentcode=create_objection_parking_fine \
+     -F audio=@/path/to/boete_recording.mp3;type=audio/mpeg \
+     -F message=""                       # optional fall‑back / caption \
+     -F session_id=$(uuidgen)             # optional; server generates one
+```
 
 ```json
 {
-  "session_id": "<generated-uuid>",
+  "session_id": "<uuid>",
   "reply": "Wat is de datum van de parkeerboete?",
   "checklist": {
-    "draft": "",
+    "draft": "",                       // running document draft
     "de-datum-van-de-bon": false,
     "het-kenteken-van-de-auto": false,
     "de-reden-van-je-bezwaar": false
@@ -144,6 +162,7 @@ curl -X POST http://128.251.225.11/chat \
 ```
 
 ---
+
 
 ## Session Flow Example
 

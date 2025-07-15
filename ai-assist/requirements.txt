@@ -8,3 +8,6 @@ openai-whisper
 python-slugify
 langchain-openai
 langchain
+asyncpg>=0.29
+sqlalchemy[asyncio]>=2.0
+psycopg2-binary>=2.9
