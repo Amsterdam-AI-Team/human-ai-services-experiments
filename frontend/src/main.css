@@ -1,0 +1,36 @@
+@import '@amsterdam/design-system-assets/font/index.css';
+@import '@amsterdam/design-system-css/dist/index.css';
+@import '@amsterdam/design-system-tokens/dist/index.css';
+@import '@amsterdam/design-system-tokens/dist/compact.css';
+/* TODO: compact styles do not seem to take effect for e.g. the typography: font sizes are still responsive while they should be constant */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body, textarea {
+    margin: 0;
+    padding: 0;
+    font-family: 'Amsterdam Sans', Arial, Helvetica, sans-serif;
+    line-height: 1.5;
+}
+
+p {
+    font-size: var(--ams-typography-body-text-font-size);
+}
+
+h1 {
+    font-size: var(--ams-typography-heading-1-font-size);
+}
+
+h2 {
+    font-size: var(--ams-typography-heading-2-font-size);
+}
+
+h3 {
+    font-size: var(--ams-typography-heading-3-font-size);
+}
+
+h4 {
+    font-size: var(--ams-typography-heading-4-font-size);
+}
