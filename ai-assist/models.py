@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, create_model
 from slugify import slugify
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 
 def build_step_model(intent: dict) -> type[BaseModel]:
@@ -46,7 +46,12 @@ class ChatResponse(BaseModel):
     finished: bool
 
 
+class IntentMatch(BaseModel):
+    """A single intent + similarity pair."""
+    intent: Dict[str, Any]
+    similarity: float = Field(..., ge=-1.0, le=1.0)
+
+
 class AnalyzeResponse(BaseModel):
     transcript: str
-    match: Dict[str, Any]
-    similarity: float
+    matches: List[IntentMatch]

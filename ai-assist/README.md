@@ -97,22 +97,55 @@ curl http://128.251.225.11/ping
 
 ### `POST /analyze`
 
-Transcribe an audio file, detect the user intent, and return similarity score.
+> **Purpose** – Upload a Dutch audio clip.
+> Whisper transcribes it locally, we embed the text with RobBERT and
+> return the *N* most similar intents (cosine‑similarity).
+
+| Parameter | Location  | Type      | Default | Description                                                                                        |
+| --------- | --------- | --------- | ------- | -------------------------------------------------------------------------------------------------- |
+| `file`    | form‑data | `audio/*` | —       | Audio recording (WAV, MP3, …); **must** have a MIME‑type that starts with `audio/`                 |
+| `top_k`   | query     | `int`     | `1`     | Number of best matches to return.<br>Values above the total number of intents are silently capped. |
+
+#### Example – return **three** best intents
 
 ```bash
-curl -X POST http://128.251.225.11/analyze \
-  -F file=@/path/to/audio.wav;type=audio/mpeg
+curl -X POST "http://128.251.225.11/analyze?top_k=3" \
+  -F "file=@/path/to/boete_recording.mp3;type=audio/mpeg"
 ```
 
-**Response**:
+**Response**
 
 ```json
 {
-  "transcript": "Ik wil bezwaar maken op mijn parkeerboete",
-  "match": { "intent": "Ik wil bezwaar maken...", "intentcode": "create_objection_parking_fine", ...},
-  "similarity": 0.92
+  "transcript": "Ik wil bezwaar maken op mijn parkeerboete.",
+  "matches": [
+    {
+      "intent": {
+        "intentcode": "create_objection_parking_fine",
+        "...": "…"            // full intent object
+      },
+      "similarity": 0.92
+    },
+    {
+      "intent": {
+        "intentcode": "update_address_municipal_records",
+        "...": "…"
+      },
+      "similarity": 0.41
+    },
+    {
+      "intent": {
+        "intentcode": "another_intent_code",
+        "...": "…"
+      },
+      "similarity": 0.33
+    }
+  ]
 }
 ```
+
+
+
 
 ### `POST /chat`
 
@@ -162,7 +195,6 @@ curl -X POST http://localhost:8000/chat \
 ```
 
 ---
-
 
 ## Session Flow Example
 

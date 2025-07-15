@@ -5,12 +5,13 @@ load_dotenv()
 import whisper                                 
 from sentence_transformers import SentenceTransformer
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Request
+from fastapi import (FastAPI, File,
+                     UploadFile, Form,
+                     HTTPException, Request, Query)
 from uuid import uuid4
 
 import numpy as np
-from models import (build_step_model, ChatRequest,
-                    ChatResponse, AnalyzeResponse)
+from models import (build_step_model, ChatResponse, AnalyzeResponse)
 from intents import INTENTS
 from templates import make_chain
 
@@ -109,40 +110,45 @@ async def _store_message(session_id: str, role: str, content: str):
 
 
 @app.post("/analyze", response_model=AnalyzeResponse)
-async def analyze(file: UploadFile = File(...)):
-    """Upload an audio file ➜ local Whisper transcript ➜ embed & cosine-match ➜ best intent."""
-
+async def analyze(
+    file: UploadFile = File(...),
+    top_k: int = Query(1, ge=1, description="Return the K best matches"),
+) -> AnalyzeResponse:
+    """
+    • Accepts a single *audio/* upload.
+    • Optional query/form field **top_k** (default = 1) returns the K best‑scoring intents.
+    """
     if not file.content_type.startswith("audio/"):
-        raise HTTPException(400, detail="Uploaded file must be audio/*.")
+        raise HTTPException(400, detail="Uploaded file must be audio/*")
 
-    # 1️⃣ Persist upload to a temp file so Whisper can read it
+    # 1️⃣ save upload
     with tempfile.NamedTemporaryFile(delete=False, suffix=".tmp") as tmp:
         tmp.write(await file.read())
         tmp_path = tmp.name
 
     try:
-        # 2️⃣ Run Whisper in a thread so the event loop stays responsive
+        # 2️⃣ transcribe in background thread
         loop = asyncio.get_running_loop()
-        text: str = await loop.run_in_executor(None, _transcribe, tmp_path)
-        if not text:
-            raise RuntimeError("Whisper returned empty transcription")
+        text = await loop.run_in_executor(None, _transcribe, tmp_path)
 
-        # 3️⃣ Embed & cosine‑match
-        q_vec = _embed(text)
-        sims = np.dot(_INTENT_EMBS, q_vec)  # dot = cosine (unit‑norm vectors)
-        best_idx = int(np.argmax(sims))
-        best_sim = float(sims[best_idx])
-        best_intent = INTENTS[best_idx]
+        # 3️⃣ similarity search
+        q_vec = _embedder.encode(text, convert_to_numpy=True, normalize_embeddings=True)
+        sims = np.dot(_INTENT_EMBS, q_vec)     # shape = (n_intents,)
 
-        return AnalyzeResponse(transcript=text, match=best_intent, similarity=best_sim)
+        # -- FIX ---------------------------------------------------------------
+        k = max(1, min(top_k, len(sims))) 
+        top_idx = sims.argsort()[-k:][::-1]    # laatste k indices, hoog → laag
+        # ---------------------------------------------------------------------
 
-    except Exception as exc:
-        raise HTTPException(500, detail=str(exc))
+        matches = [
+            {"intent": INTENTS[i], "similarity": float(sims[i])}
+            for i in top_idx
+        ]
+
+        return AnalyzeResponse(transcript=text, matches=matches)
+
     finally:
-        try:
-            os.remove(tmp_path)
-        except OSError:
-            pass
+        os.remove(tmp_path)
 
 # ---------------------------------------------------------------------------
 # Health check
