@@ -209,3 +209,6 @@ cython_debug/
 
 # Secrets
 my_secrets.py
+
+node_modules
+.next
