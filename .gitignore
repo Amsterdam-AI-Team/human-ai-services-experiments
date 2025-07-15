@@ -212,3 +212,4 @@ my_secrets.py
 
 node_modules
 .next
+.svelte-kit
