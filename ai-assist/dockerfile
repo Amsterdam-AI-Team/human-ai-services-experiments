@@ -1,0 +1,10 @@
+FROM postgres:16
+
+ENV POSTGRES_DB=aifutures
+ENV POSTGRES_USER=aifutures
+ENV POSTGRES_PASSWORD=aifutures
+
+# Expose the default Postgres port
+EXPOSE 5432
+
+CMD ["postgres"]
