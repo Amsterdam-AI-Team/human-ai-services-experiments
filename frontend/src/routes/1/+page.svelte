@@ -12,7 +12,7 @@
 			text="Voor nu kan ons prototype je alleen helpen met een paar scenario's: parkeerboetes, verhuizingen, en X, Y en Z. Probeer het alvast uit!"
 		/>
 
-		<SingleRecordingSection />
+		<SingleRecordingSection endpoint="analyze" />
 	</div>
 </main> 
 
