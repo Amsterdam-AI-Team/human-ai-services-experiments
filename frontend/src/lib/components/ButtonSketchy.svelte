@@ -1,16 +1,9 @@
 <script>
-	import { createEventDispatcher } from 'svelte';
-
-	export let text = 'Button';
-	export let minWidth = '280px';
-	export let height = '100px';
-	export let disabled = false;
-
-	const dispatch = createEventDispatcher();
+	let { text = 'Button', minWidth = '280px', height = '100px', disabled = false, onclick } = $props();
 
 	function handleClick(event) {
-		if (!disabled) {
-			dispatch('click', { text, event });
+		if (!disabled && onclick) {
+			onclick(event);
 		}
 	}
 </script>
@@ -18,7 +11,7 @@
 <button
 	class="svg-button"
 	style="min-width: {minWidth}; height: {height};"
-	on:click={handleClick}
+	onclick={handleClick}
 	{disabled}
 >
 	<svg

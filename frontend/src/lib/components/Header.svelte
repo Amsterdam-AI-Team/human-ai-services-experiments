@@ -97,8 +97,8 @@
 	@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
 
 	.header {
-		height: 100px;
-		min-height: 100px;
+		height: 140px;
+		min-height: 140px;
 		background: transparent;
 	}
 

@@ -122,7 +122,7 @@
 				<div class="record-button-wrapper">
 					<button
 						class="record-button"
-						on:click={toggleRecording}
+						onclick={toggleRecording}
 						class:recording={isRecording}
 						disabled={isTranscribing}
 					>

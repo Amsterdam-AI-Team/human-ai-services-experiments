@@ -1,9 +1,6 @@
 <!-- MainMessage.svelte -->
 <script>
-	export let headerText = '';
-	export let mainText = '';
-	export let subtitle = '';
-	export let center = false;
+	let { headerText = '', mainText = '', subtitle = '', center = false } = $props();
 </script>
 
 <div class="message-container" class:center>
