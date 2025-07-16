@@ -1,18 +1,22 @@
 <script>
-	let { logo = '/images/wallet.svg', linkText = 'Parkeerboete betalen', href = '#' } = $props();
+	let {
+		logo = "/images/wallet.svg",
+		linkText = "Parkeerboete betalen",
+		href = "#",
+	} = $props();
 </script>
 
 <div class="sketchy-card">
 	<img src="/images/card-border-sketchy.svg" alt="" class="card-border" />
-	
+
 	<div class="card-content">
-		<div class="logo-container">
-			<img src={logo} alt="" class="logo" />
+		<div class="icon-container">
+			<img src={logo} alt="" class="icon" />
 		</div>
-		
+
 		<a {href} class="card-link">
 			{linkText}
-			<img src="/images/chevron-left.svg" alt="" class="chevron" />
+			<img src="/images/chevron-right.svg" alt="" class="chevron" />
 		</a>
 	</div>
 </div>
@@ -22,7 +26,7 @@
 		position: relative;
 		display: inline-block;
 		width: 280px;
-		height: 200px;
+		/* height: 200px; */
 	}
 
 	.card-border {
@@ -42,35 +46,38 @@
 		height: 100%;
 		display: flex;
 		flex-direction: column;
-		justify-content: space-between;
-		align-items: center;
+		justify-content: flex-start;
+		align-items: flex-start;
 		box-sizing: border-box;
+		gap: .5rem;
 	}
 
-	.logo-container {
-		flex: 1;
+	.icon-container {
 		display: flex;
 		align-items: center;
-		justify-content: center;
+		justify-content: flex-start;
 	}
-
-	.logo {
-		width: 64px;
-		height: 64px;
+	
+	.icon {
+		width: 20px;
+		height: 20px;
 		object-fit: contain;
 	}
-
+	
 	.card-link {
-		display: flex;
-		align-items: center;
-		gap: 8px;
 		color: #004699;
-		text-decoration: none;
-		font-family: 'Amsterdam Sans';
+		text-decoration: underline;
+		text-underline-offset: 0.25em;
+		font-family: "Amsterdam Sans";
 		font-weight: 400;
 		font-size: 1.125rem;
 		line-height: 1.2;
 		transition: color 0.1s ease;
+		text-align: left;
+		align-self: flex-start;
+		display: flex;
+		align-items: center;
+		gap: 0.1rem;
 	}
 
 	.card-link:hover {
@@ -78,13 +85,8 @@
 	}
 
 	.chevron {
-		width: 16px;
-		height: 16px;
-		transform: rotate(180deg);
-		transition: transform 0.1s ease;
-	}
-
-	.card-link:hover .chevron {
-		transform: rotate(180deg) translateX(2px);
+		width: 1.4rem;
+		height: 1.4rem;
+		object-fit: contain;
 	}
 </style>
