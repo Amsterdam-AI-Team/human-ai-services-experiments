@@ -4,6 +4,12 @@ export async function POST({ request }) {
 	try {
 		const formData = await request.formData();
 		
+		// If intentcode is provided, add it to the FormData before forwarding
+		const intentcode = formData.get('intentcode');
+		if (intentcode) {
+			// The FormData already contains the intentcode, so we can forward it as-is
+		}
+		
 		const response = await fetch(`${AI_API_ENDPOINT}/chat`, {
 			method: 'POST',
 			body: formData

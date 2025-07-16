@@ -2,8 +2,9 @@
 <script lang="ts">
 	import { sendToEndpoint, type EndpointType } from '$lib/utils/apiHelpers';
 	import { addApiResponse } from '$lib/stores/apiStore';
+	import { getSessionId } from '$lib/stores/sessionStore';
 
-	let { endpoint = 'analyze' as EndpointType } = $props();
+	let { endpoint = 'analyze' as EndpointType, intentcode = null } = $props();
 
 	let isAnalyzing = $state(false);
 	let isRecording = $state(false);
@@ -14,7 +15,25 @@
 		// Send audio to the specified endpoint
 		isAnalyzing = true;
 		const formData = new FormData();
-		formData.append('file', audioBlob, 'recording.wav');
+		
+		// TODO: API inconsistency - different endpoints expect different field names
+		// analyze endpoint expects 'file', chat/chatAudio endpoints expect 'audio'
+		// When API becomes consistent, this can be simplified to always use the same field name
+		const audioFieldName = endpoint === 'analyze' ? 'file' : 'audio';
+		formData.append(audioFieldName, audioBlob, 'recording.wav');
+		
+		// Add intentcode to FormData if provided
+		if (intentcode) {
+			formData.append('intentcode', intentcode);
+		}
+		
+		// Add session_id to FormData if it exists and endpoint is chatAudio
+		if (endpoint === 'chatAudio') {
+			const currentSessionId = getSessionId();
+			if (currentSessionId) {
+				formData.append('session_id', currentSessionId);
+			}
+		}
 
 		try {
 			const result = await sendToEndpoint(endpoint, formData);

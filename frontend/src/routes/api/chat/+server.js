@@ -2,12 +2,14 @@ import { AI_API_ENDPOINT } from '$env/static/private';
 
 export async function POST({ request }) {
 	try {
-		const { message } = await request.json();
+		const { message, intentcode } = await request.json();
+		
+		const requestBody = { message, ...(intentcode && { intentcode }) };
 		
 		const response = await fetch(`${AI_API_ENDPOINT}/chat`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ message })
+			body: JSON.stringify(requestBody)
 		});
 		
 		const result = await response.json();
