@@ -4,7 +4,7 @@ export async function POST({ request }) {
 	try {
 		const formData = await request.formData();
 
-		const response = await fetch(`${AI_API_ENDPOINT}/analyze?top_k=3`, {
+		const response = await fetch(`${AI_API_ENDPOINT}/analyze?top_k=6`, {
 			method: 'POST',
 			body: formData
 		});

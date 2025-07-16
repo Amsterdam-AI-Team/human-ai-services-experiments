@@ -3,6 +3,23 @@
 	import CalloutBubble from '$lib/components/CalloutBubble.svelte';
 	import SingleRecordingSection from '$lib/components/SingleRecordingSection.svelte';
 	import ApiDebugger from '$lib/components/ApiDebugger.svelte';
+	import { apiResponses } from '$lib/stores/apiStore';
+	import { goto } from '$app/navigation';
+
+	// Watch for analyze responses and redirect if similarity is low
+	$effect(() => {
+		const responses = $apiResponses;
+		const latestAnalyzeResponse = responses
+			.filter(r => r.endpoint === 'analyze')
+			.slice(-1)[0];
+		
+		if (latestAnalyzeResponse?.data?.matches) {
+			const maxSimilarity = Math.max(...latestAnalyzeResponse.data.matches.map(match => match.similarity));
+			if (maxSimilarity <= 0.5) {
+				goto('/1/choose');
+			}
+		}
+	});
 </script>
 
 <main class="app">
@@ -39,6 +56,7 @@
 		width: 1200px;
 		margin: auto;
 	}
+
 
 	@media (max-width: 768px) {
 		.content {
