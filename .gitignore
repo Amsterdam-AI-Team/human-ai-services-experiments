@@ -57,7 +57,9 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+# Python libraries (don't ignore SvelteKit's src/lib)
+ai-assist/lib/
+stadstuin/lib/
 lib64/
 parts/
 sdist/
