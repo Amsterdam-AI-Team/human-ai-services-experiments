@@ -2,6 +2,7 @@
 	import MainMessage from '$lib/components/MainMessage.svelte';
 	import CalloutBubble from '$lib/components/CalloutBubble.svelte';
 	import SingleRecordingSection from '$lib/components/SingleRecordingSection.svelte';
+	import ApiDebugger from '$lib/components/ApiDebugger.svelte';
 </script>
 
 <main class="app">
@@ -13,6 +14,8 @@
 		/>
 
 		<SingleRecordingSection endpoint="analyze" />
+		
+		<ApiDebugger endpoint="analyze" />
 	</div>
 </main> 
 

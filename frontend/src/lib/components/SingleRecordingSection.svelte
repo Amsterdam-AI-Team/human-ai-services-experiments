@@ -1,10 +1,10 @@
 <!-- SingleRecordingSection.svelte -->
 <script lang="ts">
 	import { sendToEndpoint, type EndpointType } from '$lib/utils/apiHelpers';
+	import { addApiResponse } from '$lib/stores/apiStore';
 
 	let { endpoint = 'analyze' as EndpointType } = $props();
 
-	let apiResponse = $state('');
 	let isAnalyzing = $state(false);
 	let isRecording = $state(false);
 	let mediaRecorder = $state<MediaRecorder | null>(null);
@@ -19,10 +19,13 @@
 		try {
 			const result = await sendToEndpoint(endpoint, formData);
 			console.log('API response:', result);
-			apiResponse = JSON.stringify(result, null, 2);
+			
+			// Store the response in the store
+			addApiResponse(endpoint, result);
 		} catch (error) {
 			console.error('API error:', error);
-			apiResponse = `Error: ${error instanceof Error ? error.message : 'Unknown error'}`;
+			// Store error in the store as well
+			addApiResponse(endpoint, { error: error instanceof Error ? error.message : 'Unknown error' });
 		} finally {
 			isAnalyzing = false;
 		}
@@ -83,12 +86,6 @@
 		</button>
 	</div>
 	
-	{#if apiResponse}
-		<div class="api-response">
-			<h3>API Response:</h3>
-			<pre>{apiResponse}</pre>
-		</div>
-	{/if}
 </div>
 
 <style>
@@ -141,29 +138,4 @@
 		}
 	}
 
-	.api-response {
-		margin-top: 2rem;
-		padding: 1rem;
-		background: #f8f9fa;
-		border: 1px solid #dee2e6;
-		border-radius: 8px;
-		max-width: 600px;
-		width: 100%;
-	}
-
-	.api-response h3 {
-		margin: 0 0 1rem 0;
-		color: #333;
-	}
-
-	.api-response pre {
-		background: #ffffff;
-		padding: 1rem;
-		border-radius: 4px;
-		overflow-x: auto;
-		font-size: 0.9rem;
-		margin: 0;
-		white-space: pre-wrap;
-		word-wrap: break-word;
-	}
 </style>
