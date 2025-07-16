@@ -1,6 +1,6 @@
 <!-- ApiDebugger.svelte -->
 <script lang="ts">
-	import { apiResponses } from '$lib/stores/apiStore';
+	import { apiResponses, clearApiResponsesForEndpoint } from '$lib/stores/apiStore';
 
 	let { endpoint } = $props<{
 		endpoint?: string;
@@ -28,7 +28,14 @@
 {#if latestResponse}
 	<div class="api-debugger">
 		<div class="debugger-header">
-			<h3>🐛 API Debug</h3>
+			<div class="header-top">
+				<h3>🐛 API Debug</h3>
+				{#if endpoint}
+					<button onclick={() => clearApiResponsesForEndpoint(endpoint)} class="clear-button">
+						Clear {endpoint} responses
+					</button>
+				{/if}
+			</div>
 			<div class="endpoint-info">
 				<span class="endpoint-label">Endpoint:</span>
 				<code class="endpoint-value">{latestResponse.endpoint}</code>
@@ -95,11 +102,33 @@
 		border-bottom: 1px solid #dee2e6;
 	}
 
+	.header-top {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 0.5rem;
+	}
+
 	.debugger-header h3 {
 		margin: 0;
 		color: #333;
 		font-size: 1.1rem;
 		font-weight: 600;
+	}
+
+	.clear-button {
+		padding: 0.25rem 0.5rem;
+		background-color: #dc3545;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 0.75rem;
+		font-weight: 500;
+	}
+
+	.clear-button:hover {
+		background-color: #c82333;
 	}
 
 	.endpoint-info, .timestamp {
