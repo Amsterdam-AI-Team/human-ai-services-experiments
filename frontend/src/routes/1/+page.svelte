@@ -32,9 +32,9 @@
 
 		<SingleRecordingSection endpoint="analyze" />
 		
-		<ApiDebugger endpoint="analyze" />
 	</div>
 </main> 
+<ApiDebugger endpoint="analyze" />
 
 <style>
 	.app {
