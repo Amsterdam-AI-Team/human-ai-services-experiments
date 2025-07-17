@@ -21,7 +21,6 @@
 		border-radius: 20px;
 		cursor: pointer;
 		transition: all 0.2s ease;
-		font-size: 0.9rem;
 		color: #333;
 		text-decoration: none;
 		white-space: nowrap;
@@ -37,12 +36,14 @@
 	}
 
 	.pill-icon {
-		width: 16px;
-		height: 16px;
+		width: 24px;
+		height: 24px;
 		object-fit: contain;
 	}
 
 	.pill-text {
-		font-weight: 500;
+		font-family: "Amsterdam Sans", sans-serif;
+		font-size: 0.9rem;
+		font-weight: 700;
 	}
 </style>

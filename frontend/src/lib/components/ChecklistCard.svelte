@@ -37,15 +37,15 @@
 
 	<div class="checklist-items">
 		{#each items as item (item.id)}
-			<label class="checklist-item">
+			<div class="checklist-item">
 				<input 
 					type="checkbox" 
 					bind:checked={item.checked}
-					onchange={() => handleCheckboxChange(item.id, item.checked)}
+					disabled
 				/>
 				<span class="checkmark"></span>
 				<span class="item-text">{item.text}</span>
-			</label>
+			</div>
 		{/each}
 	</div>
 
@@ -95,7 +95,7 @@
 		display: flex;
 		align-items: center;
 		gap: 0.75rem;
-		cursor: pointer;
+		cursor: default;
 		font-size: 0.9rem;
 		color: #553c9a;
 		line-height: 1.4;

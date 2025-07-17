@@ -124,6 +124,12 @@
 		return latest.data?.checklist || null;
 	});
 
+	// Get the latest draft text from checklist
+	const draftText = $derived(() => {
+		const checklist = latestChecklist();
+		return checklist?.draft || '';
+	});
+
 	// Sync checklist state with backend responses
 	$effect(() => {
 		const backendChecklist = latestChecklist();
@@ -216,6 +222,8 @@
 							class="field-input"
 							placeholder="Omschrijf je situatie"
 							rows="6"
+							value={draftText()}
+							readonly
 						></textarea>
 					</div>
 				</div>

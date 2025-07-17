@@ -1,6 +1,9 @@
 <!-- ApiDebugger.svelte -->
 <script lang="ts">
-	import { apiResponses, clearApiResponsesForEndpoint } from '$lib/stores/apiStore';
+	import {
+		apiResponses,
+		clearApiResponsesForEndpoint,
+	} from "$lib/stores/apiStore";
 
 	let { endpoint } = $props<{
 		endpoint?: string;
@@ -8,9 +11,9 @@
 
 	// Get responses, optionally filtered by endpoint
 	const responses = $derived(
-		endpoint 
-			? $apiResponses.filter(r => r.endpoint === endpoint)
-			: $apiResponses
+		endpoint
+			? $apiResponses.filter((r) => r.endpoint === endpoint)
+			: $apiResponses,
 	);
 
 	// Get the latest response for display
@@ -31,7 +34,10 @@
 			<div class="header-top">
 				<h3>🐛 API Debug</h3>
 				{#if endpoint}
-					<button onclick={() => clearApiResponsesForEndpoint(endpoint)} class="clear-button">
+					<button
+						onclick={() => clearApiResponsesForEndpoint(endpoint)}
+						class="clear-button"
+					>
 						Clear {endpoint} responses
 					</button>
 				{/if}
@@ -42,7 +48,9 @@
 			</div>
 			<div class="timestamp">
 				<span class="timestamp-label">Last updated:</span>
-				<span class="timestamp-value">{formatTimestamp(latestResponse.timestamp)}</span>
+				<span class="timestamp-value"
+					>{formatTimestamp(latestResponse.timestamp)}</span
+				>
 			</div>
 		</div>
 
@@ -56,15 +64,22 @@
 
 		{#if responses.length > 1}
 			<details class="response-history">
-				<summary>View History ({responses.length - 1} previous)</summary>
+				<summary>View History ({responses.length - 1} previous)</summary
+				>
 				<div class="history-list">
 					{#each responses.slice(0, -1).reverse() as response}
 						<div class="history-item">
 							<div class="history-header">
-								<span class="history-timestamp">{formatTimestamp(response.timestamp)}</span>
-								<code class="history-endpoint">{response.endpoint}</code>
+								<span class="history-timestamp"
+									>{formatTimestamp(response.timestamp)}</span
+								>
+								<code class="history-endpoint"
+									>{response.endpoint}</code
+								>
 							</div>
-							<pre class="history-json">{formatJson(response.data)}</pre>
+							<pre class="history-json">{formatJson(
+									response.data,
+								)}</pre>
 						</div>
 					{/each}
 				</div>
@@ -77,7 +92,9 @@
 			<span class="empty-icon">📡</span>
 			<p class="empty-text">No API responses yet</p>
 			{#if endpoint}
-				<p class="empty-subtext">Waiting for responses from <code>{endpoint}</code></p>
+				<p class="empty-subtext">
+					Waiting for responses from <code>{endpoint}</code>
+				</p>
 			{/if}
 		</div>
 	</div>
@@ -90,7 +107,9 @@
 		border-radius: 8px;
 		padding: 1rem;
 		margin: 1rem 0;
-		font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+		font-family:
+			"SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas,
+			"Courier New", monospace;
 	}
 
 	.debugger-header {
@@ -131,14 +150,16 @@
 		background-color: #c82333;
 	}
 
-	.endpoint-info, .timestamp {
+	.endpoint-info,
+	.timestamp {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
 		font-size: 0.85rem;
 	}
 
-	.endpoint-label, .timestamp-label {
+	.endpoint-label,
+	.timestamp-label {
 		color: #666;
 		font-weight: 500;
 	}
@@ -293,8 +314,9 @@
 		.api-debugger {
 			font-size: 0.9rem;
 		}
-		
-		.response-json, .history-json {
+
+		.response-json,
+		.history-json {
 			font-size: 0.75rem;
 		}
 	}
