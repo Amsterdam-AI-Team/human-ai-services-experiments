@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import MainMessage from '$lib/components/MainMessage.svelte';
 	import CalloutBubble from '$lib/components/CalloutBubble.svelte';
 	import SingleRecordingSection from '$lib/components/SingleRecordingSection.svelte';
@@ -14,8 +14,13 @@
 			.slice(-1)[0];
 		
 		if (latestAnalyzeResponse?.data?.matches) {
-			const maxSimilarity = Math.max(...latestAnalyzeResponse.data.matches.map(match => match.similarity));
-			if (maxSimilarity <= 0.5) {
+			const highestMatch = latestAnalyzeResponse.data.matches.reduce((prev: any, current: any) => 
+				(prev.similarity > current.similarity) ? prev : current
+			);
+			
+			if (highestMatch.similarity > 0.5) {
+				goto(`/1/construct/${highestMatch.intent.intentcode}`);
+			} else {
 				goto('/1/choose');
 			}
 		}
