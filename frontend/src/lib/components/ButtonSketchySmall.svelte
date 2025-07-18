@@ -1,7 +1,13 @@
-<script>
-	let { text = 'Button', disabled = false, onclick } = $props();
+<script lang="ts">
+	interface Props {
+		text?: string;
+		disabled?: boolean;
+		onclick?: (event: MouseEvent) => void;
+	}
 
-	function handleClick(event) {
+	let { text = 'Button', disabled = false, onclick }: Props = $props();
+
+	function handleClick(event: MouseEvent) {
 		if (!disabled && onclick) {
 			onclick(event);
 		}

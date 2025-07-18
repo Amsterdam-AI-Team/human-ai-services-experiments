@@ -5,9 +5,10 @@
 	import ButtonSketchySmall from '$lib/components/ButtonSketchySmall.svelte';
 	import ApiDebugger from '$lib/components/ApiDebugger.svelte';
 	import SingleRecordingSection from '$lib/components/SingleRecordingSection.svelte';
-	import { apiResponses, addApiResponse } from '$lib/stores/apiStore';
+	import { apiResponses, addApiResponse, clearApiResponses } from '$lib/stores/apiStore';
 	import { setSessionId, getSessionId, clearSession, sessionData } from '$lib/stores/sessionStore';
 	import { page } from '$app/state';
+	import { goto } from '$app/navigation';
 
 
 	// Get intentcode from URL slug
@@ -156,6 +157,15 @@
 		checkedItems = new Set(checkedItems); // Trigger reactivity
 	}
 
+	function handleBezwaarVersturen() {
+		// Clear all stores
+		clearApiResponses();
+		clearSession();
+		
+		// Navigate back to /1
+		goto('/1');
+	}
+
 </script>
 
 <main class="app">
@@ -229,7 +239,7 @@
 				</div>
 
 				<div class="submit-section">
-					<ButtonSketchySmall text="Bezwaar versturen" />
+					<ButtonSketchySmall text="Bezwaar versturen" onclick={handleBezwaarVersturen} />
 				</div>
 			</div>
 		</div>
