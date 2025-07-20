@@ -1,11 +1,16 @@
 <script lang="ts">
+	import { _ } from 'svelte-i18n';
+	
 	interface Props {
-		text?: string;
+		text?: string | null;
 		disabled?: boolean;
 		onclick?: (event: MouseEvent) => void;
 	}
 
-	let { text = 'Button', disabled = false, onclick }: Props = $props();
+	let { text = null, disabled = false, onclick }: Props = $props();
+	
+	// Use translation for default text if no text provided
+	const buttonText = $derived(text || $_('buttons.button'));
 
 	function handleClick(event: MouseEvent) {
 		if (!disabled && onclick) {
@@ -43,7 +48,7 @@
 		/>
 	</svg>
 
-	<span class="button-text">{text}</span>
+	<span class="button-text">{buttonText}</span>
 </button>
 
 <style>

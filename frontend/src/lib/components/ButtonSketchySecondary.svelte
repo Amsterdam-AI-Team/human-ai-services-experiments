@@ -1,7 +1,21 @@
-<script>
-	let { text = 'Terug', icon = '/images/back-arrow.svg', minWidth = '200px', height = '60px', disabled = false, onclick } = $props();
+<script lang="ts">
+	import { _ } from 'svelte-i18n';
+	
+	interface Props {
+		text?: string | null;
+		icon?: string;
+		minWidth?: string;
+		height?: string;
+		disabled?: boolean;
+		onclick?: (event: MouseEvent) => void;
+	}
+	
+	let { text = null, icon = '/images/back-arrow.svg', minWidth = '200px', height = '60px', disabled = false, onclick }: Props = $props();
+	
+	// Use translation for default text if no text provided
+	const buttonText = $derived(text || $_('buttons.back'));
 
-	function handleClick(event) {
+	function handleClick(event: MouseEvent) {
 		if (!disabled && onclick) {
 			onclick(event);
 		}
@@ -45,7 +59,7 @@
 
 	<div class="button-content">
 		<img src={icon} alt="" class="button-icon" />
-		<span class="button-text">{text}</span>
+		<span class="button-text">{buttonText}</span>
 	</div>
 </button>
 

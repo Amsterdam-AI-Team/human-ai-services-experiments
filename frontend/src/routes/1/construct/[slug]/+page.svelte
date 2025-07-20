@@ -245,14 +245,14 @@
 				/>
 
 				<div class="form-section">
-					<h2>Dit ga je opsturen:</h2>
+					<h2>{$_('concept1.construct.formTitle')}</h2>
 					
 					<div class="form-field">
-						<label class="field-label" for="bezwaar-textarea">Betreft: Bezwaar tegen parkeerboete</label>
+						<label class="field-label" for="bezwaar-textarea">{$_('concept1.construct.formLabel')}</label>
 						<textarea 
 							id="bezwaar-textarea"
 							class="field-input"
-							placeholder="Omschrijf je situatie"
+							placeholder={$_('concept1.construct.formPlaceholder')}
 							rows="6"
 							value={draftText()}
 							readonly
@@ -261,7 +261,7 @@
 				</div>
 
 				<div class="submit-section">
-					<ButtonSketchySmall text="Bezwaar versturen" onclick={handleBezwaarVersturen} />
+					<ButtonSketchySmall text={$_('buttons.submit')} onclick={handleBezwaarVersturen} />
 				</div>
 			</div>
 		</div>

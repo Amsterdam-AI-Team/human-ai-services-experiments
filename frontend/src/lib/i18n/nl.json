@@ -25,7 +25,9 @@
   "buttons": {
     "start": "Ja, start →",
     "continue": "aanvragen →",
-    "submit": "Bezwaar versturen"
+    "submit": "Bezwaar versturen",
+    "back": "Terug",
+    "button": "Button"
   },
   "messages": {
     "help": "Hoe kunnen we je helpen?",
@@ -62,7 +64,10 @@
     "construct": {
       "loadingAI": "AI is processing your request",
       "senderAI": "Gemeente AI-agent:",
-      "backButton": "terug"
+      "backButton": "terug",
+      "formTitle": "Dit ga je opsturen:",
+      "formLabel": "Betreft: Bezwaar tegen parkeerboete",
+      "formPlaceholder": "Omschrijf je situatie"
     }
   }
 }

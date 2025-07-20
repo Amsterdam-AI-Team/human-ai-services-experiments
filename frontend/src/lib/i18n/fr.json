@@ -25,7 +25,9 @@
   "buttons": {
     "start": "Oui, commencer →",
     "continue": "soumettre la demande →",
-    "submit": "Soumettre l'objection"
+    "submit": "Soumettre l'objection",
+    "back": "Retour",
+    "button": "Bouton"
   },
   "messages": {
     "help": "Comment pouvons-nous vous aider?",
@@ -62,7 +64,10 @@
     "construct": {
       "loadingAI": "L'IA traite votre demande",
       "senderAI": "Agent IA municipal:",
-      "backButton": "retour"
+      "backButton": "retour",
+      "formTitle": "Voici ce que vous allez soumettre:",
+      "formLabel": "Objet: Objection contre l'amende de stationnement",
+      "formPlaceholder": "Décrivez votre situation"
     }
   }
 }
