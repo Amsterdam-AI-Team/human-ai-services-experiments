@@ -4,9 +4,11 @@
 	import SingleRecordingSection from '$lib/components/SingleRecordingSection.svelte';
 	import ApiDebugger from '$lib/components/ApiDebugger.svelte';
 	import { apiResponses } from '$lib/stores/apiStore';
+	import { configStore } from '$lib/stores/configStore';
 	import { goto } from '$app/navigation';
 
-	// Watch for analyze responses and redirect if similarity is low
+	// Watch for analyze responses and redirect based on configurable similarity threshold
+	// To modify the threshold, use: configStore.setSimilarityThreshold(0.7) or update configStore.ts
 	$effect(() => {
 		const responses = $apiResponses;
 		const latestAnalyzeResponse = responses
@@ -18,7 +20,7 @@
 				(prev.similarity > current.similarity) ? prev : current
 			);
 			
-			if (highestMatch.similarity > 0.5) {
+			if (highestMatch.similarity > $configStore.similarityThreshold) {
 				goto(`/1/construct/${highestMatch.intent.intentcode}`);
 			} else {
 				goto('/1/choose');
