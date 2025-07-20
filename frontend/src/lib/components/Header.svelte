@@ -5,11 +5,6 @@
 	const currentRoute = $derived(page.route.id);
 	let selectedOption = $state('auto');
 	
-	// Debug: log the current route
-	$effect(() => {
-		console.log('Current route:', currentRoute, 'URL:', page.url.pathname);
-	});
-	
 	// Set default language based on route
 	$effect(() => {
 		if (currentRoute === '/1/construct') {

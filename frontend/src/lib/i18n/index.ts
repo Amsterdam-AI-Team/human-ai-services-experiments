@@ -20,7 +20,6 @@ export async function initI18n() {
     // Wait for the locale to be loaded
     await waitLocale('nl');
     isInitialized = true;
-    console.log('i18n initialized successfully');
   } catch (error) {
     console.error('Failed to initialize i18n:', error);
     throw error;
