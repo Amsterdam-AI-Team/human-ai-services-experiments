@@ -16,7 +16,7 @@ export function setLanguage(languageCode: LanguageCode) {
   }
 }
 
-// Load saved language preference
+// Load saved language preference (only for manual overrides)
 export function loadSavedLanguage(): LanguageCode {
   if (typeof localStorage !== 'undefined') {
     const saved = localStorage.getItem('preferred-language') as LanguageCode;
@@ -24,11 +24,32 @@ export function loadSavedLanguage(): LanguageCode {
       return saved;
     }
   }
-  return 'nl'; // Default to Dutch
+  return 'nl'; // Always default to Dutch
 }
 
-// Initialize language on app start
+// Initialize language on app start - always Dutch unless manually changed
 export function initLanguage() {
   const savedLang = loadSavedLanguage();
   setLanguage(savedLang);
+}
+
+// Function for API-driven language switching (future use with Whisper)
+export function setLanguageFromAPI(languageCode: LanguageCode, confidence?: number) {
+  console.log(`API detected language: ${languageCode} (confidence: ${confidence})`);
+  
+  // You can add confidence threshold logic here
+  // if (confidence && confidence < 0.8) {
+  //   console.log('Low confidence, not switching language');
+  //   return;
+  // }
+  
+  setLanguage(languageCode);
+  // Note: This won't persist to localStorage - only manual switches persist
+}
+
+// Helper function to check if detected language differs from current
+export function shouldSwitchLanguage(detectedLang: LanguageCode): boolean {
+  let current: LanguageCode = 'nl';
+  currentLanguage.subscribe(lang => current = lang)();
+  return detectedLang !== current && ['nl', 'en', 'fr'].includes(detectedLang);
 }
