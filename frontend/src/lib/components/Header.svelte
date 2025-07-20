@@ -1,5 +1,5 @@
 <!-- Header.svelte -->
-<script>
+<script lang="ts">
 	import { page } from '$app/state';
 	import { setLanguage, currentLanguage } from '$lib/stores/languageStore';
 	import type { LanguageCode } from '$lib/i18n';
@@ -9,8 +9,8 @@
 	// Map current language to dropdown value
 	const dropdownValue = $derived($currentLanguage);
 
-	function handleDropdownChange(event) {
-		const value = event.target.value;
+	function handleDropdownChange(event: Event) {
+		const value = (event.target as HTMLSelectElement).value;
 		
 		// Handle supported languages
 		if (value === 'nl' || value === 'en' || value === 'fr') {
@@ -43,7 +43,7 @@
 					<select
 						class="sketchy-dropdown"
 						value={dropdownValue}
-						on:change={handleDropdownChange}
+						onchange={handleDropdownChange}
 					>
 						<option value="auto">Language: auto</option>
 						<option value="nl">Nederlands</option>
@@ -76,7 +76,7 @@
 			<select
 				class="sketchy-dropdown"
 				value={dropdownValue}
-				on:change={handleDropdownChange}
+				onchange={handleDropdownChange}
 			>
 				<option value="auto">Language: auto</option>
 				<option value="nl">Nederlands</option>
