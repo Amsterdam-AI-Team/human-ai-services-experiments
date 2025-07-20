@@ -1,22 +1,28 @@
 <!-- Header.svelte -->
 <script>
 	import { page } from '$app/state';
+	import { setLanguage, currentLanguage } from '$lib/stores/languageStore';
+	import type { LanguageCode } from '$lib/i18n';
 	
 	const currentRoute = $derived(page.route.id);
-	let selectedOption = $state('auto');
 	
-	// Set default language based on route
-	$effect(() => {
-		if (currentRoute === '/1/construct') {
-			selectedOption = 'nl';
-		} else {
-			selectedOption = 'auto';
-		}
-	});
+	// Map current language to dropdown value
+	const dropdownValue = $derived($currentLanguage);
 
 	function handleDropdownChange(event) {
-		selectedOption = event.target.value;
-		console.log('Selected:', selectedOption);
+		const value = event.target.value;
+		
+		// Handle supported languages
+		if (value === 'nl' || value === 'en' || value === 'fr') {
+			setLanguage(value as LanguageCode);
+		} else if (value === 'auto') {
+			// 'Auto' means default to Dutch for now
+			setLanguage('nl');
+		} else {
+			// For unsupported languages, show message and revert to current language
+			alert(`${value} is not yet supported. Coming soon!`);
+			// The dropdown will automatically revert due to reactive dropdownValue
+		}
 	}
 </script>
 
@@ -36,7 +42,7 @@
 				<div class="dropdown-container">
 					<select
 						class="sketchy-dropdown"
-						bind:value={selectedOption}
+						value={dropdownValue}
 						on:change={handleDropdownChange}
 					>
 						<option value="auto">Language: auto</option>
@@ -69,7 +75,7 @@
 		<div class="dropdown-container">
 			<select
 				class="sketchy-dropdown"
-				bind:value={selectedOption}
+				value={dropdownValue}
 				on:change={handleDropdownChange}
 			>
 				<option value="auto">Language: auto</option>
