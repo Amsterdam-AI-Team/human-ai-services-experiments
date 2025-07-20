@@ -64,7 +64,7 @@
 			<img src="/images/logo-sketchy.svg" alt="Logo" class="logo" />
 		</div>
 
-		{#if currentRoute === '/1'}
+			{#if currentRoute === '/1' || currentRoute === '/'}
 			<div class="dropdown-container">
 				<select
 					class="sketchy-dropdown"

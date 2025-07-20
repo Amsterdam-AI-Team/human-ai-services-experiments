@@ -2,15 +2,9 @@
 	import { _ } from 'svelte-i18n';
 	import MainMessage from '$lib/components/MainMessage.svelte';
 	import ButtonSketchy from '$lib/components/ButtonSketchy.svelte';
-	import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
 </script>
 
 <main class="home-page">
-	<!-- Language Switcher for testing -->
-	<div class="language-switcher-container">
-		<LanguageSwitcher />
-	</div>
-
 	<div class="hero-section">
 		<MainMessage 
 			center 
@@ -52,10 +46,6 @@
 		padding: 2rem;
 	}
 
-	.language-switcher-container {
-		align-self: flex-end;
-		margin-bottom: 2rem;
-	}
 
 	.hero-section {
 		flex: 0 0 auto;
