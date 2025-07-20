@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { _ } from 'svelte-i18n';
 	import { apiResponses, clearApiResponses } from "$lib/stores/apiStore";
 	import { goto } from "$app/navigation";
 	import SketchyCard from "$lib/components/SketchyCard.svelte";
@@ -40,9 +41,9 @@
 <main class="app">
 	<div class="content">
 		<div class="page-header">
-			<h1>We weten niet zeker wat je bedoeld</h1>
+			<h1>{$_('concept1.choose.title')}</h1>
 			<p class="subtitle">
-				We hoorden je zeggen: {transcript} We weten daarmee niet precies wat je wil :) Je kan de volgende dingen doen:
+				{$_('concept1.choose.subtitle', { values: { transcript } })}
 			</p>
 		</div>
 

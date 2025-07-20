@@ -1,5 +1,6 @@
 <!-- Header.svelte -->
 <script lang="ts">
+	import { _ } from 'svelte-i18n';
 	import { page } from '$app/state';
 	import { setLanguage, currentLanguage } from '$lib/stores/languageStore';
 	import type { LanguageCode } from '$lib/i18n';
@@ -34,7 +35,7 @@
 					<img src="/images/logo-sketchy.svg" alt="Logo" class="logo" />
 					<a href="/1" class="back-button">
 						<img src="/images/chevron-left.svg" alt="Back" class="back-arrow" />
-						<span class="back-text">terug</span>
+						<span class="back-text">{$_('concept1.construct.backButton')}</span>
 					</a>
 				</div>
 			</div>

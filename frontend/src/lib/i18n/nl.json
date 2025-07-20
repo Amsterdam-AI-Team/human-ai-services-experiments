@@ -50,5 +50,19 @@
     "audioTranscription": "Audio transcriptie",
     "chatSending": "Sending transcript to chat",
     "apiCall": "API call"
+  },
+  "concept1": {
+    "mainHelp": "Hoe kunnen we je helpen?",
+    "helpSubtitle": "Comment pouvons-nous vous aider?",
+    "callout": "Voor nu kan ons prototype je alleen helpen met een paar scenario's: parkeerboetes, verhuizingen, en X, Y en Z. Probeer het alvast uit!",
+    "choose": {
+      "title": "We weten niet zeker wat je bedoeld",
+      "subtitle": "We hoorden je zeggen: {transcript} We weten daarmee niet precies wat je wil :) Je kan de volgende dingen doen:"
+    },
+    "construct": {
+      "loadingAI": "AI is processing your request",
+      "senderAI": "Gemeente AI-agent:",
+      "backButton": "terug"
+    }
   }
 }

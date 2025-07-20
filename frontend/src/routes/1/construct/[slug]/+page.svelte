@@ -5,6 +5,7 @@
 	import ButtonSketchySmall from '$lib/components/ButtonSketchySmall.svelte';
 	import ApiDebugger from '$lib/components/ApiDebugger.svelte';
 	import SingleRecordingSection from '$lib/components/SingleRecordingSection.svelte';
+	import { _ } from 'svelte-i18n';
 	import { apiResponses, addApiResponse, clearApiResponses } from '$lib/stores/apiStore';
 	import { setSessionId, getSessionId, clearSession, sessionData } from '$lib/stores/sessionStore';
 	import { handleApiError, showError, showWarning, showInfo } from '$lib/stores/errorStore';
@@ -195,7 +196,7 @@
 				{#if isSendingChat}
 					<div class="loading-indicator">
 						<div class="loading-dots">
-							<span>AI is processing your request</span>
+							<span>{$_('concept1.construct.loadingAI')}</span>
 							<div class="dots">
 								<span>.</span>
 								<span>.</span>
@@ -210,7 +211,7 @@
 						<ChatMessage 
 							type="gemeente-ai" 
 							content={response.data.reply}
-							sender="Gemeente AI-agent:"
+							sender={$_('concept1.construct.senderAI')}
 						/>
 					{/if}
 				{/each}
@@ -220,7 +221,7 @@
 						<ChatMessage 
 							type="gemeente-ai" 
 							content={response.data.reply}
-							sender="Gemeente AI-agent:"
+							sender={$_('concept1.construct.senderAI')}
 						/>
 					{/if}
 				{/each}

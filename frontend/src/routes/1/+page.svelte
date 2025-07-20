@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { _ } from 'svelte-i18n';
 	import MainMessage from '$lib/components/MainMessage.svelte';
 	import CalloutBubble from '$lib/components/CalloutBubble.svelte';
 	import SingleRecordingSection from '$lib/components/SingleRecordingSection.svelte';
@@ -31,10 +32,10 @@
 
 <main class="app">
 	<div class="content">
-		<MainMessage center mainText="Hoe kunnen we je helpen?" subtitle="Comment pouvons-nous vous aider?" />
+		<MainMessage center mainText={$_('concept1.mainHelp')} subtitle={$_('concept1.helpSubtitle')} />
 
 		<CalloutBubble
-			text="Voor nu kan ons prototype je alleen helpen met een paar scenario's: parkeerboetes, verhuizingen, en X, Y en Z. Probeer het alvast uit!"
+			text={$_('concept1.callout')}
 		/>
 
 		<SingleRecordingSection endpoint="analyze" />
