@@ -5,6 +5,11 @@
 	const currentRoute = $derived(page.route.id);
 	let selectedOption = $state('auto');
 	
+	// Debug: log the current route
+	$effect(() => {
+		console.log('Current route:', currentRoute, 'URL:', page.url.pathname);
+	});
+	
 	// Set default language based on route
 	$effect(() => {
 		if (currentRoute === '/1/construct') {
@@ -60,36 +65,36 @@
 			</div>
 		</div>
 	{:else}
+		<!-- Default header for all other routes including homepage -->
 		<div class="logo-container">
 			<img src="/images/logo-sketchy.svg" alt="Logo" class="logo" />
 		</div>
 
-			{#if currentRoute === '/1' || currentRoute === '/'}
-			<div class="dropdown-container">
-				<select
-					class="sketchy-dropdown"
-					bind:value={selectedOption}
-					on:change={handleDropdownChange}
-				>
-					<option value="auto">Language: auto</option>
-					<option value="nl">Nederlands</option>
-					<option value="en">English</option>
-					<option value="fr">Français</option>
-					<option value="ar">العربية</option>
-					<option value="tr">Türkçe</option>
-					<option value="es">Español</option>
-					<option value="de">Deutsch</option>
-					<option value="it">Italiano</option>
-					<option value="pt">Português</option>
-					<option value="pl">Polski</option>
-					<option value="ru">Русский</option>
-					<option value="zh">中文</option>
-					<option value="hi">हिन्दी</option>
-					<option value="ja">日本語</option>
-					<option value="ko">한국어</option>
-				</select>
-			</div>
-		{/if}
+		<!-- Always show language dropdown on non-construct pages -->
+		<div class="dropdown-container">
+			<select
+				class="sketchy-dropdown"
+				bind:value={selectedOption}
+				on:change={handleDropdownChange}
+			>
+				<option value="auto">Language: auto</option>
+				<option value="nl">Nederlands</option>
+				<option value="en">English</option>
+				<option value="fr">Français</option>
+				<option value="ar">العربية</option>
+				<option value="tr">Türkçe</option>
+				<option value="es">Español</option>
+				<option value="de">Deutsch</option>
+				<option value="it">Italiano</option>
+				<option value="pt">Português</option>
+				<option value="pl">Polski</option>
+				<option value="ru">Русский</option>
+				<option value="zh">中文</option>
+				<option value="hi">हिन्दी</option>
+				<option value="ja">日本語</option>
+				<option value="ko">한국어</option>
+			</select>
+		</div>
 	{/if}
 </header>
 
