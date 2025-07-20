@@ -7,7 +7,7 @@
 	import SingleRecordingSection from '$lib/components/SingleRecordingSection.svelte';
 	import { apiResponses, addApiResponse, clearApiResponses } from '$lib/stores/apiStore';
 	import { setSessionId, getSessionId, clearSession, sessionData } from '$lib/stores/sessionStore';
-	import { handleApiError } from '$lib/stores/errorStore';
+	import { handleApiError, showError, showWarning, showInfo } from '$lib/stores/errorStore';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 
@@ -264,9 +264,25 @@
 	</div>
 	
 	<!-- Debug components -->
-	<button onclick={clearSession} style="margin: 1rem; padding: 0.5rem; background: #ff4444; color: white; border: none; border-radius: 4px; cursor: pointer;">
-		Clear Session ID: {$sessionData.sessionId ? $sessionData.sessionId.substring(0, 8) + '...' : 'None'}
-	</button>
+	<div style="display: flex; gap: 1rem; margin: 1rem; flex-wrap: wrap;">
+		<button onclick={clearSession} style="padding: 0.5rem; background: #ff4444; color: white; border: none; border-radius: 4px; cursor: pointer;">
+			Clear Session ID: {$sessionData.sessionId ? $sessionData.sessionId.substring(0, 8) + '...' : 'None'}
+		</button>
+		
+		<!-- Error Display Test Buttons -->
+		<button onclick={() => showError('Dit is een test foutmelding')} style="padding: 0.5rem; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer;">
+			Test Error
+		</button>
+		<button onclick={() => showWarning('Dit is een test waarschuwing')} style="padding: 0.5rem; background: #d97706; color: white; border: none; border-radius: 4px; cursor: pointer;">
+			Test Warning
+		</button>
+		<button onclick={() => showInfo('Dit is een test informatie bericht')} style="padding: 0.5rem; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer;">
+			Test Info
+		</button>
+		<button onclick={() => handleApiError(new Error('API verbinding mislukt'), 'Test API call')} style="padding: 0.5rem; background: #7c2d12; color: white; border: none; border-radius: 4px; cursor: pointer;">
+			Test API Error
+		</button>
+	</div>
 </main>
 <ApiDebugger endpoint="analyze" />
 <ApiDebugger endpoint="chat" />
