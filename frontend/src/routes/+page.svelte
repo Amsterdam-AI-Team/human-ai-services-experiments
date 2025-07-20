@@ -7,32 +7,32 @@
 	<div class="hero-section">
 		<MainMessage 
 			center 
-			headerText="Welcome to AI Services Prototype"
-			mainText="Explore our experimental AI-powered municipal services"
-			subtitle="Choose a concept to get started"
+			headerText="Welkom bij de AI Services Prototype"
+			mainText="Ontdek onze experimentele AI-aangedreven gemeentelijke diensten"
+			subtitle="Kies een concept om te beginnen"
 		/>
 	</div>
 
-	<nav class="concept-navigation" aria-label="Main navigation">
+	<nav class="concept-navigation" aria-label="Hoofdnavigatie">
 		<section class="concept-card">
-			<h2>Concept 1: Intent Analysis</h2>
-			<p>AI-powered intent recognition and form construction for municipal services. Record your voice and let our AI understand what you need.</p>
+			<h2>Concept 1: Intentie Analyse</h2>
+			<p>AI-gestuurde intentieherkenning en formulierconstructie voor gemeentelijke diensten. Neem je stem op en laat onze AI begrijpen wat je nodig hebt.</p>
 			<a href="/1" class="concept-link">
-				<ButtonSketchy text="Try Concept 1 →" />
+				<ButtonSketchy text="Probeer Concept 1 →" />
 			</a>
 		</section>
 
 		<section class="concept-card">
-			<h2>Concept 2: Voice Recording</h2>
-			<p>Voice-to-text transcription and AI assistance for municipal requests. Perfect for accessibility and hands-free interaction.</p>
+			<h2>Concept 2: Spraakopname</h2>
+			<p>Spraak-naar-tekst transcriptie en AI-assistentie voor gemeentelijke verzoeken. Perfect voor toegankelijkheid en handsfree interactie.</p>
 			<a href="/2" class="concept-link">
-				<ButtonSketchy text="Try Concept 2 →" />
+				<ButtonSketchy text="Probeer Concept 2 →" />
 			</a>
 		</section>
 	</nav>
 
 	<footer class="development-info">
-		<p><small>This is a prototype for experimental AI municipal services. For testing purposes only.</small></p>
+		<p><small>Dit is een prototype voor experimentele AI gemeentelijke diensten. Alleen voor testdoeleinden.</small></p>
 	</footer>
 </main>
 
