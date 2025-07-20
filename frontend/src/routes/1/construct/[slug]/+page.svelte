@@ -318,6 +318,7 @@
 	.pill-container {
 		display: flex;
 		justify-content: flex-start;
+		margin-top: 15px;
 		margin-bottom: 1rem;
 	}
 
