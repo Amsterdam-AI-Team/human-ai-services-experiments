@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { _ } from 'svelte-i18n';
 	import { errorStore, type AppError } from '$lib/stores/errorStore';
 
 	function dismissError(id: string) {
@@ -34,7 +35,7 @@
 					<button 
 						class="error-dismiss" 
 						onclick={() => dismissError(error.id)}
-						aria-label="Dismiss error"
+						aria-label={$_('errors.dismissLabel')}
 					>
 						✕
 					</button>

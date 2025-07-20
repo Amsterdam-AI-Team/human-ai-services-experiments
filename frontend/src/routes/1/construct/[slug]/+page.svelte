@@ -8,7 +8,7 @@
 	import { _ } from 'svelte-i18n';
 	import { apiResponses, addApiResponse, clearApiResponses } from '$lib/stores/apiStore';
 	import { setSessionId, getSessionId, clearSession, sessionData } from '$lib/stores/sessionStore';
-	import { handleApiError, showError, showWarning, showInfo } from '$lib/stores/errorStore';
+	import { handleApiError, showTranslatedError, showTranslatedWarning, showTranslatedInfo } from '$lib/stores/errorStore';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 
@@ -81,7 +81,7 @@
 				setSessionId(result.session_id);
 			}
 		} catch (error) {
-			handleApiError(error, 'Sending transcript to chat');
+			handleApiError(error, 'chatSending');
 		} finally {
 			isSendingChat = false;
 		}
@@ -274,16 +274,16 @@
 		</button>
 		
 		<!-- Error Display Test Buttons -->
-		<button onclick={() => showError('Dit is een test foutmelding')} style="padding: 0.5rem; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer;">
+		<button onclick={() => showTranslatedError('errors.testError')} style="padding: 0.5rem; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer;">
 			Test Error
 		</button>
-		<button onclick={() => showWarning('Dit is een test waarschuwing')} style="padding: 0.5rem; background: #d97706; color: white; border: none; border-radius: 4px; cursor: pointer;">
+		<button onclick={() => showTranslatedWarning('errors.testWarning')} style="padding: 0.5rem; background: #d97706; color: white; border: none; border-radius: 4px; cursor: pointer;">
 			Test Warning
 		</button>
-		<button onclick={() => showInfo('Dit is een test informatie bericht')} style="padding: 0.5rem; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer;">
+		<button onclick={() => showTranslatedInfo('errors.testInfo')} style="padding: 0.5rem; background: #2563eb; color: white; border: none; border-radius: 4px; cursor: pointer;">
 			Test Info
 		</button>
-		<button onclick={() => handleApiError(new Error('API verbinding mislukt'), 'Test API call')} style="padding: 0.5rem; background: #7c2d12; color: white; border: none; border-radius: 4px; cursor: pointer;">
+		<button onclick={() => handleApiError(new Error($_('errors.apiConnectionFailed')), 'apiCall')} style="padding: 0.5rem; background: #7c2d12; color: white; border: none; border-radius: 4px; cursor: pointer;">
 			Test API Error
 		</button>
 	</div>

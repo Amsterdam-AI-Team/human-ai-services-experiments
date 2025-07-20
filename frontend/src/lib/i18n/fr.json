@@ -51,7 +51,13 @@
     "transcriptionFailed": "La transcription a échoué. Veuillez essayer d'enregistrer à nouveau.",
     "audioTranscription": "Transcription audio",
     "chatSending": "Envoi de la transcription au chat",
-    "apiCall": "Appel API"
+    "apiCall": "Appel API",
+    "apiConnectionFailed": "Connexion API échouée",
+    "unknownError": "Erreur inconnue survenue",
+    "testError": "Ceci est un message d'erreur de test",
+    "testWarning": "Ceci est un message d'avertissement de test",
+    "testInfo": "Ceci est un message d'information de test",
+    "dismissLabel": "Fermer l'erreur"
   },
   "concept1": {
     "mainHelp": "Comment pouvons-nous vous aider?",

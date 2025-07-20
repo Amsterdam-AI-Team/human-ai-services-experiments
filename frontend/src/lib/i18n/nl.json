@@ -50,8 +50,14 @@
     "microphoneAccess": "Microfoon toegang",
     "transcriptionFailed": "Transcriptie is mislukt. Probeer opnieuw op te nemen.",
     "audioTranscription": "Audio transcriptie",
-    "chatSending": "Sending transcript to chat",
-    "apiCall": "API call"
+    "chatSending": "Transcript naar chat versturen",
+    "apiCall": "API aanroep",
+    "apiConnectionFailed": "API verbinding mislukt",
+    "unknownError": "Onbekende fout opgetreden",
+    "testError": "Dit is een test foutmelding",
+    "testWarning": "Dit is een test waarschuwing",
+    "testInfo": "Dit is een test informatie bericht",
+    "dismissLabel": "Foutmelding sluiten"
   },
   "concept1": {
     "mainHelp": "Hoe kunnen we je helpen?",

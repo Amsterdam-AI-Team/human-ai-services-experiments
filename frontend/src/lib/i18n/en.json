@@ -51,7 +51,13 @@
     "transcriptionFailed": "Transcription failed. Please try recording again.",
     "audioTranscription": "Audio transcription",
     "chatSending": "Sending transcript to chat",
-    "apiCall": "API call"
+    "apiCall": "API call",
+    "apiConnectionFailed": "API connection failed",
+    "unknownError": "Unknown error occurred",
+    "testError": "This is a test error message",
+    "testWarning": "This is a test warning message",
+    "testInfo": "This is a test info message",
+    "dismissLabel": "Dismiss error"
   },
   "concept1": {
     "mainHelp": "How can we help you?",
