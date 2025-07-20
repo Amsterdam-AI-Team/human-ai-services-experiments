@@ -336,6 +336,7 @@
 		padding: 1rem 0;
 		border-top: 1px solid #e9ecef;
 		background-color: #f8f9fa;
+		margin-bottom: 50px; /* Move record button 50px higher */
 	}
 
 
