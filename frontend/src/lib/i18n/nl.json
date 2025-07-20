@@ -1,0 +1,54 @@
+{
+  "welcome": {
+    "header": "Welkom bij de AI Services Prototype",
+    "main": "Ontdek onze experimentele AI-aangedreven gemeentelijke diensten",
+    "subtitle": "Kies een concept om te beginnen"
+  },
+  "navigation": {
+    "main": "Hoofdnavigatie"
+  },
+  "concepts": {
+    "concept1": {
+      "title": "Concept 1: Intentie Analyse",
+      "description": "AI-gestuurde intentieherkenning en formulierconstructie voor gemeentelijke diensten. Neem je stem op en laat onze AI begrijpen wat je nodig hebt.",
+      "button": "Probeer Concept 1 →"
+    },
+    "concept2": {
+      "title": "Concept 2: Spraakopname",
+      "description": "Spraak-naar-tekst transcriptie en AI-assistentie voor gemeentelijke verzoeken. Perfect voor toegankelijkheid en handsfree interactie.",
+      "button": "Probeer Concept 2 →"
+    }
+  },
+  "footer": {
+    "disclaimer": "Dit is een prototype voor experimentele AI gemeentelijke diensten. Alleen voor testdoeleinden."
+  },
+  "buttons": {
+    "start": "Ja, start →",
+    "continue": "aanvragen →",
+    "submit": "Bezwaar versturen"
+  },
+  "messages": {
+    "help": "Hoe kunnen we je helpen?",
+    "helpSubtitle": "Comment pouvons-nous vous aider?",
+    "aiMessage": "Inkomend bericht van jouw persoonlijke AI-agent:",
+    "subsidyQuestion": "Misschien heb je wel recht op subsidie voor het buurtfeest, zal ik dit proberen aan te vragen?",
+    "ideas": "Wat voor ideeën heb je al voor het buurtfeest? Dan nemen we die mee.",
+    "callout": "Voor nu kan ons prototype je alleen helpen met een paar scenario's: parkeerboetes, verhuizingen, en X, Y en Z. Probeer het alvast uit!"
+  },
+  "recording": {
+    "startRecording": "Klik om te starten met opnemen",
+    "transcribing": "Bezig met transcriberen...",
+    "addRecording": "Voeg een opname toe of ga door met aanvragen",
+    "placeholder": "Transcriptie verschijnt hier..."
+  },
+  "ai": {
+    "processing": "AI is processing your request"
+  },
+  "errors": {
+    "microphoneAccess": "Microfoon toegang",
+    "transcriptionFailed": "Transcriptie is mislukt. Probeer opnieuw op te nemen.",
+    "audioTranscription": "Audio transcriptie",
+    "chatSending": "Sending transcript to chat",
+    "apiCall": "API call"
+  }
+}

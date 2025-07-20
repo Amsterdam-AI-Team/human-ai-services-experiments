@@ -1,0 +1,54 @@
+{
+  "welcome": {
+    "header": "Bienvenue au Prototype de Services IA",
+    "main": "Explorez nos services municipaux expérimentaux alimentés par l'IA",
+    "subtitle": "Choisissez un concept pour commencer"
+  },
+  "navigation": {
+    "main": "Navigation principale"
+  },
+  "concepts": {
+    "concept1": {
+      "title": "Concept 1: Analyse d'Intention",
+      "description": "Reconnaissance d'intention alimentée par l'IA et construction de formulaires pour les services municipaux. Enregistrez votre voix et laissez notre IA comprendre ce dont vous avez besoin.",
+      "button": "Essayer Concept 1 →"
+    },
+    "concept2": {
+      "title": "Concept 2: Enregistrement Vocal",
+      "description": "Transcription vocal-texte et assistance IA pour les demandes municipales. Parfait pour l'accessibilité et l'interaction mains libres.",
+      "button": "Essayer Concept 2 →"
+    }
+  },
+  "footer": {
+    "disclaimer": "Ceci est un prototype pour des services municipaux IA expérimentaux. Uniquement à des fins de test."
+  },
+  "buttons": {
+    "start": "Oui, commencer →",
+    "continue": "soumettre la demande →",
+    "submit": "Soumettre l'objection"
+  },
+  "messages": {
+    "help": "Comment pouvons-nous vous aider?",
+    "helpSubtitle": "Comment pouvons-nous vous aider?",
+    "aiMessage": "Message entrant de votre agent IA personnel:",
+    "subsidyQuestion": "Peut-être avez-vous droit à une subvention pour la fête de quartier, dois-je essayer de faire une demande?",
+    "ideas": "Quelles idées avez-vous déjà pour la fête de quartier? Alors nous les prendrons en compte.",
+    "callout": "Pour l'instant, notre prototype ne peut vous aider qu'avec quelques scénarios: contraventions de stationnement, déménagements, et X, Y et Z. Essayez-le déjà!"
+  },
+  "recording": {
+    "startRecording": "Cliquez pour commencer l'enregistrement",
+    "transcribing": "Transcription en cours...",
+    "addRecording": "Ajoutez un enregistrement ou continuez avec la demande",
+    "placeholder": "La transcription apparaîtra ici..."
+  },
+  "ai": {
+    "processing": "L'IA traite votre demande"
+  },
+  "errors": {
+    "microphoneAccess": "Accès au microphone",
+    "transcriptionFailed": "La transcription a échoué. Veuillez essayer d'enregistrer à nouveau.",
+    "audioTranscription": "Transcription audio",
+    "chatSending": "Envoi de la transcription au chat",
+    "apiCall": "Appel API"
+  }
+}

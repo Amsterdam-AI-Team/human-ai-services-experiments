@@ -1,38 +1,45 @@
 <script lang="ts">
+	import { _ } from 'svelte-i18n';
 	import MainMessage from '$lib/components/MainMessage.svelte';
 	import ButtonSketchy from '$lib/components/ButtonSketchy.svelte';
+	import LanguageSwitcher from '$lib/components/LanguageSwitcher.svelte';
 </script>
 
 <main class="home-page">
+	<!-- Language Switcher for testing -->
+	<div class="language-switcher-container">
+		<LanguageSwitcher />
+	</div>
+
 	<div class="hero-section">
 		<MainMessage 
 			center 
-			headerText="Welkom bij de AI Services Prototype"
-			mainText="Ontdek onze experimentele AI-aangedreven gemeentelijke diensten"
-			subtitle="Kies een concept om te beginnen"
+			headerText={$_('welcome.header')}
+			mainText={$_('welcome.main')}
+			subtitle={$_('welcome.subtitle')}
 		/>
 	</div>
 
-	<nav class="concept-navigation" aria-label="Hoofdnavigatie">
+	<nav class="concept-navigation" aria-label={$_('navigation.main')}>
 		<section class="concept-card">
-			<h2>Concept 1: Intentie Analyse</h2>
-			<p>AI-gestuurde intentieherkenning en formulierconstructie voor gemeentelijke diensten. Neem je stem op en laat onze AI begrijpen wat je nodig hebt.</p>
+			<h2>{$_('concepts.concept1.title')}</h2>
+			<p>{$_('concepts.concept1.description')}</p>
 			<a href="/1" class="concept-link">
-				<ButtonSketchy text="Probeer Concept 1 →" />
+				<ButtonSketchy text={$_('concepts.concept1.button')} />
 			</a>
 		</section>
 
 		<section class="concept-card">
-			<h2>Concept 2: Spraakopname</h2>
-			<p>Spraak-naar-tekst transcriptie en AI-assistentie voor gemeentelijke verzoeken. Perfect voor toegankelijkheid en handsfree interactie.</p>
+			<h2>{$_('concepts.concept2.title')}</h2>
+			<p>{$_('concepts.concept2.description')}</p>
 			<a href="/2" class="concept-link">
-				<ButtonSketchy text="Probeer Concept 2 →" />
+				<ButtonSketchy text={$_('concepts.concept2.button')} />
 			</a>
 		</section>
 	</nav>
 
 	<footer class="development-info">
-		<p><small>Dit is een prototype voor experimentele AI gemeentelijke diensten. Alleen voor testdoeleinden.</small></p>
+		<p><small>{$_('footer.disclaimer')}</small></p>
 	</footer>
 </main>
 
@@ -43,6 +50,11 @@
 		display: flex;
 		flex-direction: column;
 		padding: 2rem;
+	}
+
+	.language-switcher-container {
+		align-self: flex-end;
+		margin-bottom: 2rem;
 	}
 
 	.hero-section {
