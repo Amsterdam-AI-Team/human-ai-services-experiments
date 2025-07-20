@@ -40,7 +40,7 @@
 			<div class="checklist-item">
 				<input 
 					type="checkbox" 
-					bind:checked={item.checked}
+					checked={item.checked}
 					disabled
 				/>
 				<span class="checkmark"></span>
