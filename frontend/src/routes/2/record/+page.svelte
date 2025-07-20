@@ -1,10 +1,10 @@
-<script>
+<script lang="ts">
 	import MainMessage from '$lib/components/MainMessage.svelte';
 	import ButtonSketchy from '$lib/components/ButtonSketchy.svelte';
 
 	let isRecording = $state(false);
-	let mediaRecorder = $state();
-	let audioChunks = $state([]);
+	let mediaRecorder = $state<MediaRecorder | undefined>();
+	let audioChunks = $state<Blob[]>([]);
 	let transcriptionText = $state('');
 	let isTranscribing = $state(false);
 

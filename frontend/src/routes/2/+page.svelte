@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import MainMessage from '$lib/components/MainMessage.svelte';
 	import ButtonSketchy from '$lib/components/ButtonSketchy.svelte';
 </script>

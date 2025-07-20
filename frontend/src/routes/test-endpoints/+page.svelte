@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import SingleRecordingSection from '$lib/components/SingleRecordingSection.svelte';
 </script>
 
