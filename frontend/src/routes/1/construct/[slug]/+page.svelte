@@ -7,6 +7,7 @@
 	import SingleRecordingSection from '$lib/components/SingleRecordingSection.svelte';
 	import { apiResponses, addApiResponse, clearApiResponses } from '$lib/stores/apiStore';
 	import { setSessionId, getSessionId, clearSession, sessionData } from '$lib/stores/sessionStore';
+	import { handleApiError } from '$lib/stores/errorStore';
 	import { page } from '$app/state';
 	import { goto } from '$app/navigation';
 
@@ -78,7 +79,7 @@
 				setSessionId(result.session_id);
 			}
 		} catch (error) {
-			console.error('Failed to send transcript to chat:', error);
+			handleApiError(error, 'Sending transcript to chat');
 		}
 	}
 

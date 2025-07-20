@@ -1,6 +1,7 @@
 <script lang="ts">
 	import MainMessage from '$lib/components/MainMessage.svelte';
 	import ButtonSketchy from '$lib/components/ButtonSketchy.svelte';
+	import { handleApiError, showError } from '$lib/stores/errorStore';
 
 	let isRecording = $state(false);
 	let mediaRecorder = $state<MediaRecorder | undefined>();
@@ -32,7 +33,7 @@
 					});
 				})
 				.catch((error) => {
-					console.error('Error accessing microphone:', error);
+					handleApiError(error, 'Microphone access');
 				});
 		}
 	}
@@ -79,10 +80,10 @@
 					transcriptionText = result.transcription;
 				}
 			} else {
-				console.error('Transcription failed:', result);
+				showError('Transcription failed. Please try recording again.');
 			}
 		} catch (error) {
-			console.error('Transcription error:', error);
+			handleApiError(error, 'Audio transcription');
 		} finally {
 			isTranscribing = false;
 		}
