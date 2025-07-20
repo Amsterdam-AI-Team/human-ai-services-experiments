@@ -224,7 +224,10 @@
 						/>
 					{/if}
 				{/each}
-
+			</div>
+			
+			<!-- Recording section fixed at bottom -->
+			<div class="recording-section">
 				<SingleRecordingSection endpoint="chatAudio" intentcode={intentcode} />
 			</div>
 		</div>
@@ -290,17 +293,15 @@
 
 <style>
 	.app {
-		/* uncomment this when you remove the apidebugger :) */
-		/* height: calc(100vh - 140px); */
 		background-color: #f8f9fa;
 		display: flex;
 		flex-direction: column;
+		min-height: calc(100vh - 70px); /* Account for header */
 	}
 
 	.layout {
-		flex: 1;
 		display: flex;
-		height: 100%;
+		height: calc(100vh - 70px); /* Fixed height for the main layout */
 	}
 
 	.left-section {
@@ -309,6 +310,7 @@
 		display: flex;
 		flex-direction: column;
 		padding: 0rem 2rem;
+		height: 100%;
 		overflow: hidden;
 		gap: 1rem;
 	}
@@ -323,9 +325,17 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		justify-content: flex-end;
 		gap: 1rem;
-		margin-bottom: 1rem;
+		overflow-y: auto; /* Make chat area scrollable */
+		min-height: 0; /* Allow flexbox to shrink */
+		padding-bottom: 1rem;
+	}
+
+	.recording-section {
+		flex-shrink: 0; /* Don't shrink the recording section */
+		padding: 1rem 0;
+		border-top: 1px solid #e9ecef;
+		background-color: #f8f9fa;
 	}
 
 
