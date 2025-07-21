@@ -1,6 +1,5 @@
 <script lang="ts">
 	import '../main.css';
-	import { onMount } from 'svelte';
 	import { isLoading } from 'svelte-i18n';
 	import { initI18n } from '$lib/i18n';
 	import { initLanguage } from '$lib/stores/languageStore';
@@ -11,15 +10,17 @@
 	let i18nReady = $state(false);
 
 	// Initialize i18n on app start
-	onMount(async () => {
-		try {
-			await initI18n();
-			initLanguage();
-			i18nReady = true;
-		} catch (error) {
-			console.error('Failed to initialize i18n:', error);
-			i18nReady = true; // Show page anyway
-		}
+	$effect(() => {
+		(async () => {
+			try {
+				await initI18n();
+				initLanguage();
+				i18nReady = true;
+			} catch (error) {
+				console.error('Failed to initialize i18n:', error);
+				i18nReady = true; // Show page anyway
+			}
+		})();
 	});
 </script>
 
