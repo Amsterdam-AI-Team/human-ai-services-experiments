@@ -2,6 +2,7 @@
 	import MainMessage from '$lib/components/MainMessage.svelte';
 	import ButtonSketchy from '$lib/components/ButtonSketchy.svelte';
 	import { handleApiError, showTranslatedError } from '$lib/stores/errorStore';
+	import { _ } from 'svelte-i18n';
 
 	let isRecording = $state(false);
 	let mediaRecorder = $state<MediaRecorder | undefined>();
@@ -54,8 +55,8 @@
 	}
 
 	const displayText = $derived(isTranscribing 
-		? 'Bezig met transcriberen...' 
-		: (transcriptionText.length > 0 ? 'Voeg een opname toe of ga door met aanvragen' : 'Klik om te starten met opnemen'));
+		? $_('recording.transcribing') 
+		: (transcriptionText.length > 0 ? $_('recording.addRecording') : $_('recording.startRecording')));
 
 	async function transcribeAudio(audioBlob) {
 		isTranscribing = true;
@@ -97,8 +98,8 @@
 
 	<div class="content">
 		<MainMessage
-			headerText="Inkomend bericht van jouw persoonlijke AI-agent:"
-			mainText="Wat voor ideeën heb je al voor het buurtfeest? Dan nemen we die mee."
+			headerText={$_('messages.aiMessage')}
+			mainText={$_('messages.ideas')}
 		/>
 
 		<div class="tags">
@@ -116,7 +117,7 @@
 				class="ams-text-area"
 				dir="auto"
 				bind:value={transcriptionText}
-				placeholder="Transcriptie verschijnt hier..."
+				placeholder={$_('recording.placeholder')}
 			></textarea>
 			<p>{displayText}</p>
 			<div class="button-container">
@@ -137,7 +138,7 @@
 					{/if}
 				</div>
 				{#if transcriptionText.length > 0}
-					<ButtonSketchy text="aanvragen →" />
+					<ButtonSketchy text={$_('buttons.continue')} />
 				{/if}
 			</div>
 		</div>

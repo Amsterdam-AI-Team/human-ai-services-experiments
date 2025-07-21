@@ -1,16 +1,17 @@
 <script lang="ts">
 	import MainMessage from '$lib/components/MainMessage.svelte';
 	import ButtonSketchy from '$lib/components/ButtonSketchy.svelte';
+	import { _ } from 'svelte-i18n';
 </script>
 
 <main class="app">
 	<div class="content">
 		<MainMessage
-			headerText="Inkomend bericht van jouw persoonlijke AI-agent:"
-			mainText="Misschien heb je wel recht op subsidie voor het buurtfeest, zal ik dit proberen aan te vragen?"
+			headerText={$_('messages.aiMessage')}
+			mainText={$_('messages.subsidyQuestion')}
 		/>
 		<a href="/2/record">
-			<ButtonSketchy text="Ja, start →" />
+			<ButtonSketchy text={$_('buttons.start')} />
 		</a>
 	</div>
 </main>
