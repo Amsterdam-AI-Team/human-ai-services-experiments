@@ -2,7 +2,7 @@ from __future__ import annotations
 from dotenv import load_dotenv
 load_dotenv()
 
-import whisper                                 
+import whisper
 from sentence_transformers import SentenceTransformer
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import (FastAPI, File,
@@ -11,16 +11,21 @@ from fastapi import (FastAPI, File,
 from uuid import uuid4
 
 import numpy as np
-from models import (build_step_model, ChatResponse, AnalyzeResponse)
+from models import (build_step_model, ChatResponse,
+                    AnalyzeResponse, YapAccumResponse,
+                    YapStartRequest, YapStartResponse,
+                    YapNextResponse)
+
 from intents import INTENTS
-from templates import make_chain
+from templates import (make_chain, _yap_check_finished,
+                       _yap_generate)
 
 import os
 
 import tempfile
 import asyncio
 import asyncpg
-import re          # add at the top
+import re
 
 if "AZURE_OPENAI_API_KEY" not in os.environ:
     print("❌  Missing Azure OpenAI API key")
@@ -54,6 +59,7 @@ app.add_middleware(
 
 # naive in-memory store; swap with redis client.get/set
 SESSIONS: dict[str, dict] = {}
+YAP_SESSIONS: dict[str, dict] = {}
 
 # ---------------------------------------------------------------------------
 # Local embedding model (DL ~430 MB, loads once)
@@ -103,6 +109,14 @@ async def _store_message(session_id: str, role: str, content: str):
         await conn.execute(
             "INSERT INTO chat_log (session_id, role, content) VALUES ($1,$2,$3)",
             session_id, role, content,
+        )
+
+
+async def _store_yap(session_id: str, speaker: str, content: str) -> None:
+    async with app.state.pool.acquire() as conn:
+        await conn.execute(
+            "INSERT INTO yap_log (session_id, speaker, content) VALUES ($1,$2,$3)",
+            session_id, speaker, content,
         )
 # ---------------------------------------------------------------------------
 # /analyze route – core pipeline
@@ -253,4 +267,151 @@ async def chat(
         reply=step_obj.vragen[0] if step_obj.vragen else "Alle stappen zijn afgerond!",
         checklist=session["checklist"],
         finished=finished,
+    )
+
+
+@app.post("/yap", response_model=YapAccumResponse)
+async def yap_accumulate(
+    request: Request,
+    text: str | None = Form(None),
+    audio: UploadFile | None = File(None),
+    append: str | None = Form(None),
+):
+    """
+    Accumuleer audio naar tekst. Opties:
+      • multipart met `audio` en optioneel bestaand `text`
+      • multipart zonder audio maar met `append`
+      • JSON: {"text": "...", "append": "..."}
+    """
+    # JSON fallback ----------------------------------------------------------
+    if request.headers.get("content-type", "").startswith("application/json") and audio is None:
+        body = await request.json()
+        text = body.get("text", "")
+        append = body.get("append", "")
+
+    base_text = text or ""
+
+    if audio is not None:
+        ct = (audio.content_type or "").lower()
+        if not (ct.startswith("audio") or ct == "application/octet-stream"):
+            raise HTTPException(400, detail="Uploaded file must be audio/*")
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".tmp") as tmp:
+            tmp.write(await audio.read())
+            tmp_path = tmp.name
+
+        try:
+            loop = asyncio.get_running_loop()
+            new_text = await loop.run_in_executor(None, _transcribe, tmp_path)
+            print(new_text)
+        finally:
+            os.remove(tmp_path)
+
+        if base_text:
+            base_text = base_text.rstrip() + "\n" + new_text.strip()
+        else:
+            base_text = new_text.strip()
+
+    elif append:
+        if base_text:
+            base_text = base_text.rstrip() + "\n" + append.strip()
+        else:
+            base_text = append.strip()
+    else:
+        # no audio, no append: just echo provided text
+        base_text = base_text.strip()
+
+    return YapAccumResponse(text=base_text)
+
+
+# ---------------------------------------------------------------------------
+#  /yap/start  – bewaar sessie direct in Postgres
+# ---------------------------------------------------------------------------
+@app.post("/yap/start", response_model=YapStartResponse)
+async def yap_start(req: YapStartRequest):
+    sid = str(uuid4())
+
+    # 1. burger opent gesprek
+    opening = (
+        "Ik wil graag subsidie aanvragen voor een buurtfeest. Details:\n"
+        f"{req.text}"
+    )
+    msgs = [{"speaker": "burger", "message": opening}]
+
+    # 2. gemeente‑reactie
+    gemeente_reply = await _yap_generate("gemeente", req.text, msgs)
+    msgs.append({"speaker": "gemeente", "message": gemeente_reply})
+
+    # 3. cache in RAM  ✅ transcript back
+    YAP_SESSIONS[sid] = {
+        "transcript": req.text,      # <── added line
+        "messages": msgs,
+        "turn": 3,                   # volgende = burger
+        "finished": False,
+        "draft": None,
+    }
+
+    # 4. persist two rows + the transcript once
+    await _store_yap(sid, "system", f"TRANSCRIPT::{req.text}")   # optional
+    await _store_yap(sid, "burger", opening)
+    await _store_yap(sid, "gemeente", gemeente_reply)
+
+    finished, draft = _yap_check_finished(msgs)
+    if finished:
+        YAP_SESSIONS[sid]["finished"] = True
+        YAP_SESSIONS[sid]["draft"] = draft
+
+    return YapStartResponse(
+        yap_session_id=sid,
+        messages=msgs,
+        finished=finished,
+        draft=draft,
+    )
+
+
+@app.post("/yap/next", response_model=YapNextResponse)
+async def yap_next(
+    yap_session_id: str = Query(..., description="ID from /yap/start"),
+):
+    if yap_session_id not in YAP_SESSIONS:
+        raise HTTPException(404, detail="Unknown yap_session_id")
+
+    sess = YAP_SESSIONS[yap_session_id]
+
+    if sess["finished"]:
+        # Nothing more to say; just echo final state
+        last = sess["messages"][-1]
+        return YapNextResponse(
+            yap_session_id=yap_session_id,
+            messages=sess["messages"],
+            speaker=last["speaker"],
+            message=last["message"],
+            finished=True,
+            draft=sess["draft"],
+        )
+
+    # Whose turn?
+    role = "burger" if sess["turn"] % 2 == 0 else "gemeente"
+    # NB: we started turn=1 after burger opening + gemeente reply, adjust if changed.
+    # Safer: infer from last speaker:
+    if sess["messages"]:
+        last_speaker = sess["messages"][-1]["speaker"]
+        role = "burger" if last_speaker == "gemeente" else "gemeente"
+
+    new_msg = await _yap_generate(role, sess["transcript"], sess["messages"])
+    sess["messages"].append({"speaker": role, "message": new_msg})
+    sess["turn"] += 1
+
+    finished, draft = _yap_check_finished(sess["messages"])
+    if finished:
+        sess["finished"] = True
+        sess["draft"] = draft
+
+    return YapNextResponse(
+        yap_session_id=yap_session_id,
+        messages=sess["messages"],
+        speaker=role,
+        message=new_msg,
+        finished=sess["finished"],
+        draft=sess["draft"],
     )

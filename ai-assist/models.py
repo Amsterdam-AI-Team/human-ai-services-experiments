@@ -1,6 +1,11 @@
 from pydantic import BaseModel, Field, create_model
 from slugify import slugify
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional, Literal
+
+
+# --------------------------------------------------------------
+# Scenario 1: Een laag over interactie
+# --------------------------------------------------------------
 
 
 def build_step_model(intent: dict) -> type[BaseModel]:
@@ -55,3 +60,38 @@ class IntentMatch(BaseModel):
 class AnalyzeResponse(BaseModel):
     transcript: str
     matches: List[IntentMatch]
+
+
+# --------------------------------------------------------------
+# Scenario 2: Agent flow
+# --------------------------------------------------------------
+
+class YapAccumRequest(BaseModel):
+    """Used only when calling /yap with JSON (no file)."""
+    text: str = Field("", description="Existing accumulated text (optional)")
+    append: str = Field("", description="Text to append")
+
+
+class YapAccumResponse(BaseModel):
+    text: str = Field(..., description="Full accumulated transcript after append")
+
+
+class YapStartRequest(BaseModel):
+    text: str = Field(..., description="Full accumulated transcript to seed the session")
+    intentcode: Optional[str] = Field(None, description="Optional intent/workflow tag")
+
+
+class YapStartResponse(BaseModel):
+    yap_session_id: str
+    messages: List[Dict[str, Any]]  # [{speaker, message}]
+    finished: bool = False
+    draft: Optional[str] = None
+
+
+class YapNextResponse(BaseModel):
+    yap_session_id: str
+    messages: List[Dict[str, Any]]  # full running chat
+    speaker: Literal["burger", "gemeente"]
+    message: str
+    finished: bool
+    draft: Optional[str] = None
