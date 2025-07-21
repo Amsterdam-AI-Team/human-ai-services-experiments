@@ -103,13 +103,13 @@
 		/>
 
 		<div class="tags">
-			<span class="tag">🎉&nbsp;&nbsp;50 mensen</span>
-			<span class="tag">🍾&nbsp;&nbsp;Champagnefontijn</span>
-			<span class="tag">🎯&nbsp;&nbsp;Spelletjesmiddag</span>
-			<span class="tag">🎵&nbsp;&nbsp;Grote band</span>
-			<span class="tag">🎆&nbsp;&nbsp;Vuurwerkshow</span>
-			<span class="tag">🍖&nbsp;&nbsp;Sparerib BBQ</span>
-			<span class="tag">🚗&nbsp;&nbsp;Autoshow</span>
+			<span class="tag">🎉&nbsp;&nbsp;{$_('concept2.tags.people')}</span>
+			<span class="tag">🍾&nbsp;&nbsp;{$_('concept2.tags.champagne')}</span>
+			<span class="tag">🎯&nbsp;&nbsp;{$_('concept2.tags.games')}</span>
+			<span class="tag">🎵&nbsp;&nbsp;{$_('concept2.tags.band')}</span>
+			<span class="tag">🎆&nbsp;&nbsp;{$_('concept2.tags.fireworks')}</span>
+			<span class="tag">🍖&nbsp;&nbsp;{$_('concept2.tags.bbq')}</span>
+			<span class="tag">🚗&nbsp;&nbsp;{$_('concept2.tags.carshow')}</span>
 		</div>
 
 		<div class="recording-section">

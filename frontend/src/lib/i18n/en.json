@@ -75,5 +75,16 @@
       "formLabel": "Subject: Appeal against parking fine",
       "formPlaceholder": "Describe your situation"
     }
+  },
+  "concept2": {
+    "tags": {
+      "people": "50 people",
+      "champagne": "Champagne fountain",
+      "games": "Games afternoon",
+      "band": "Big band",
+      "fireworks": "Fireworks show",
+      "bbq": "Spare rib BBQ",
+      "carshow": "Car show"
+    }
   }
 }

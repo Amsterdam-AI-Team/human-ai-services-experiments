@@ -75,5 +75,16 @@
       "formLabel": "Betreft: Bezwaar tegen parkeerboete",
       "formPlaceholder": "Omschrijf je situatie"
     }
+  },
+  "concept2": {
+    "tags": {
+      "people": "50 mensen",
+      "champagne": "Champagnefontijn",
+      "games": "Spelletjesmiddag",
+      "band": "Grote band",
+      "fireworks": "Vuurwerkshow",
+      "bbq": "Sparerib BBQ",
+      "carshow": "Autoshow"
+    }
   }
 }

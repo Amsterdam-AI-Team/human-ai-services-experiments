@@ -75,5 +75,16 @@
       "formLabel": "Objet: Objection contre l'amende de stationnement",
       "formPlaceholder": "Décrivez votre situation"
     }
+  },
+  "concept2": {
+    "tags": {
+      "people": "50 personnes",
+      "champagne": "Fontaine de champagne",
+      "games": "Après-midi de jeux",
+      "band": "Grand orchestre",
+      "fireworks": "Feu d'artifice",
+      "bbq": "BBQ côtes levées",
+      "carshow": "Salon automobile"
+    }
   }
 }
