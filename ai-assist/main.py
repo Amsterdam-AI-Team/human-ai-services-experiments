@@ -31,6 +31,8 @@ import logging
 if "AZURE_OPENAI_API_KEY" not in os.environ:
     print("❌  Missing Azure OpenAI API key")
 
+logging.basicConfig(level=logging.INFO)
+logging.info("Environment variables loaded:")
 for var in [
     "AZURE_OPENAI_ENDPOINT",
     "AZURE_OPENAI_API_KEY",
@@ -39,7 +41,7 @@ for var in [
     "WHISPER_MODEL_NAME",
     "DATABASE_URL",
 ]:
-    print(f"{var}={os.getenv(var)}")
+    logging.info(f"{var}={os.getenv(var)}")
 
 
 # ---------------------------------------------------------------------------
