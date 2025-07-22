@@ -26,9 +26,21 @@ import tempfile
 import asyncio
 import asyncpg
 import re
+import logging
 
 if "AZURE_OPENAI_API_KEY" not in os.environ:
     print("❌  Missing Azure OpenAI API key")
+
+for var in [
+    "AZURE_OPENAI_ENDPOINT",
+    "AZURE_OPENAI_API_KEY",
+    "OPENAI_API_VERSION",
+    "AZURE_OPENAI_DEPLOYMENT_NAME",
+    "WHISPER_MODEL_NAME",
+    "DATABASE_URL",
+]:
+    print(f"{var}={os.getenv(var)}")
+
 
 # ---------------------------------------------------------------------------
 # Initialise local Whisper model (loaded once at startup)
