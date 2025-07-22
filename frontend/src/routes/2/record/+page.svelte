@@ -62,24 +62,26 @@
 		isTranscribing = true;
 
 		const formData = new FormData();
-		formData.append('audio', audioBlob);
+		formData.append('audio', audioBlob, 'recording.wav');
+		
+		// Add existing transcript for incremental building
+		if (transcriptionText.length > 0) {
+			formData.append('text', transcriptionText);
+			console.log('Sending existing transcript:', transcriptionText);
+		}
 
 		try {
-			const response = await fetch('/2/record/transcribe', {
+			const response = await fetch('/api/yap', {
 				method: 'POST',
 				body: formData
 			});
 
 			const result = await response.json();
-			console.log('Server response:', result);
+			console.log('YAP API response:', result);
 
-			if (result.success && result.transcription) {
-				// Append transcription to existing text
-				if (transcriptionText.length > 0) {
-					transcriptionText += ' ' + result.transcription;
-				} else {
-					transcriptionText = result.transcription;
-				}
+			if (result.text) {
+				// Replace the entire transcript with the accumulated result
+				transcriptionText = result.text;
 			} else {
 				showTranslatedError('errors.transcriptionFailed');
 			}
