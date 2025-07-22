@@ -1,16 +1,19 @@
 <script lang="ts">
-	import MainMessage from '$lib/components/MainMessage.svelte';
-	import ButtonSketchy from '$lib/components/ButtonSketchy.svelte';
-	import { handleApiError, showTranslatedError } from '$lib/stores/errorStore';
-	import { sendToEndpoint } from '$lib/utils/apiHelpers';
-	import { addApiResponse } from '$lib/stores/apiStore';
-	import { _ } from 'svelte-i18n';
-	import { goto } from '$app/navigation';
+	import MainMessage from "$lib/components/MainMessage.svelte";
+	import ButtonSketchy from "$lib/components/ButtonSketchy.svelte";
+	import {
+		handleApiError,
+		showTranslatedError,
+	} from "$lib/stores/errorStore";
+	import { sendToEndpoint } from "$lib/utils/apiHelpers";
+	import { addApiResponse } from "$lib/stores/apiStore";
+	import { _ } from "svelte-i18n";
+	import { goto } from "$app/navigation";
 
 	let isRecording = $state(false);
 	let mediaRecorder = $state<MediaRecorder | undefined>();
 	let audioChunks = $state<Blob[]>([]);
-	let transcriptionText = $state('');
+	let transcriptionText = $state("");
 	let isTranscribing = $state(false);
 
 	function startRecording() {
@@ -22,13 +25,15 @@
 					mediaRecorder.start();
 					isRecording = true;
 
-					mediaRecorder.addEventListener('dataavailable', (event) => {
+					mediaRecorder.addEventListener("dataavailable", (event) => {
 						audioChunks.push(event.data);
 					});
 
-					mediaRecorder.addEventListener('stop', async () => {
-						const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-						console.log('Recording stopped', audioBlob);
+					mediaRecorder.addEventListener("stop", async () => {
+						const audioBlob = new Blob(audioChunks, {
+							type: "audio/wav",
+						});
+						console.log("Recording stopped", audioBlob);
 						audioChunks = [];
 						isRecording = false;
 
@@ -37,13 +42,13 @@
 					});
 				})
 				.catch((error) => {
-					handleApiError(error, 'microphoneAccess');
+					handleApiError(error, "microphoneAccess");
 				});
 		}
 	}
 
 	function stopRecording() {
-		if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+		if (mediaRecorder && mediaRecorder.state !== "inactive") {
 			mediaRecorder.stop();
 			mediaRecorder.stream.getTracks().forEach((track) => track.stop());
 		}
@@ -57,44 +62,48 @@
 		}
 	}
 
-	const displayText = $derived(isTranscribing 
-		? $_('recording.transcribing') 
-		: (transcriptionText.length > 0 ? $_('recording.addRecording') : $_('recording.startRecording')));
+	const displayText = $derived(
+		isTranscribing
+			? $_("recording.transcribing")
+			: transcriptionText.length > 0
+				? $_("recording.addRecording")
+				: $_("recording.startRecording"),
+	);
 
 	async function transcribeAudio(audioBlob) {
 		isTranscribing = true;
 
 		const formData = new FormData();
-		formData.append('audio', audioBlob, 'recording.wav');
-		
+		formData.append("audio", audioBlob, "recording.wav");
+
 		// Add existing transcript for incremental building
 		if (transcriptionText.length > 0) {
-			formData.append('text', transcriptionText);
-			console.log('Sending existing transcript:', transcriptionText);
+			formData.append("text", transcriptionText);
+			console.log("Sending existing transcript:", transcriptionText);
 		}
 
 		try {
-			const result = await sendToEndpoint('yap', formData);
-			console.log('YAP API response:', result);
-			
+			const result = await sendToEndpoint("yap", formData);
+			console.log("YAP API response:", result);
+
 			// Store the response in the API store
-			addApiResponse('yap', result);
+			addApiResponse("yap", result);
 
 			if (result.text) {
 				// Replace the entire transcript with the accumulated result
 				transcriptionText = result.text;
 			} else {
-				showTranslatedError('errors.transcriptionFailed');
+				showTranslatedError("errors.transcriptionFailed");
 			}
 		} catch (error) {
-			handleApiError(error, 'audioTranscription');
+			handleApiError(error, "audioTranscription");
 		} finally {
 			isTranscribing = false;
 		}
 	}
 
 	function handleContinue() {
-		goto('/2/agents-chat');
+		goto("/2/agents-chat");
 	}
 </script>
 
@@ -105,18 +114,22 @@
 
 	<div class="content">
 		<MainMessage
-			headerText={$_('messages.aiMessage')}
-			mainText={$_('messages.ideas')}
+			headerText={$_("messages.aiMessage")}
+			mainText={$_("messages.ideas")}
 		/>
 
 		<div class="tags">
-			<span class="tag">🎉&nbsp;&nbsp;{$_('concept2.tags.people')}</span>
-			<span class="tag">🍾&nbsp;&nbsp;{$_('concept2.tags.champagne')}</span>
-			<span class="tag">🎯&nbsp;&nbsp;{$_('concept2.tags.games')}</span>
-			<span class="tag">🎵&nbsp;&nbsp;{$_('concept2.tags.band')}</span>
-			<span class="tag">🎆&nbsp;&nbsp;{$_('concept2.tags.fireworks')}</span>
-			<span class="tag">🍖&nbsp;&nbsp;{$_('concept2.tags.bbq')}</span>
-			<span class="tag">🚗&nbsp;&nbsp;{$_('concept2.tags.carshow')}</span>
+			<span class="tag">🎉&nbsp;&nbsp;{$_("concept2.tags.people")}</span>
+			<span class="tag"
+				>🍾&nbsp;&nbsp;{$_("concept2.tags.champagne")}</span
+			>
+			<span class="tag">🎯&nbsp;&nbsp;{$_("concept2.tags.games")}</span>
+			<span class="tag">🎵&nbsp;&nbsp;{$_("concept2.tags.band")}</span>
+			<span class="tag"
+				>🎆&nbsp;&nbsp;{$_("concept2.tags.fireworks")}</span
+			>
+			<span class="tag">🍖&nbsp;&nbsp;{$_("concept2.tags.bbq")}</span>
+			<span class="tag">🚗&nbsp;&nbsp;{$_("concept2.tags.carshow")}</span>
 		</div>
 
 		<div class="recording-section">
@@ -124,7 +137,7 @@
 				class="ams-text-area"
 				dir="auto"
 				bind:value={transcriptionText}
-				placeholder={$_('recording.placeholder')}
+				placeholder={$_("recording.placeholder")}
 			></textarea>
 			<p>{displayText}</p>
 			<div class="button-container">
@@ -136,7 +149,9 @@
 						disabled={isTranscribing}
 					>
 						<img
-							src={isRecording ? '/images/record-button-stop.svg' : '/images/record-button.svg'}
+							src={isRecording
+								? "/images/record-button-stop.svg"
+								: "/images/record-button.svg"}
 							alt="Record button"
 						/>
 					</button>
@@ -145,7 +160,10 @@
 					{/if}
 				</div>
 				{#if transcriptionText.length > 0}
-					<ButtonSketchy text={$_('buttons.continue')} onclick={handleContinue} />
+					<ButtonSketchy
+						text={$_("buttons.continue")}
+						onclick={handleContinue}
+					/>
 				{/if}
 			</div>
 		</div>

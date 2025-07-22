@@ -1,17 +1,26 @@
 <script lang="ts">
-	import MainMessage from '$lib/components/MainMessage.svelte';
-	import ButtonSketchy from '$lib/components/ButtonSketchy.svelte';
-	import { _ } from 'svelte-i18n';
+	import MainMessage from "$lib/components/MainMessage.svelte";
+	import ButtonSketchy from "$lib/components/ButtonSketchy.svelte";
+	import { _ } from "svelte-i18n";
+	import {
+		apiResponses,
+		addApiResponse,
+		clearApiResponsesForEndpoint,
+	} from "$lib/stores/apiStore";
+
+	clearApiResponsesForEndpoint('yap')
+	clearApiResponsesForEndpoint('yapStart')
+	clearApiResponsesForEndpoint('yapNext')
 </script>
 
 <main class="app">
 	<div class="content">
 		<MainMessage
-			headerText={$_('messages.aiMessage')}
-			mainText={$_('messages.subsidyQuestion')}
+			headerText={$_("messages.aiMessage")}
+			mainText={$_("messages.subsidyQuestion")}
 		/>
 		<a href="/2/record">
-			<ButtonSketchy text={$_('buttons.start')} />
+			<ButtonSketchy text={$_("buttons.start")} />
 		</a>
 	</div>
 </main>
