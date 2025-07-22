@@ -2,6 +2,8 @@
 	import MainMessage from '$lib/components/MainMessage.svelte';
 	import ButtonSketchy from '$lib/components/ButtonSketchy.svelte';
 	import { handleApiError, showTranslatedError } from '$lib/stores/errorStore';
+	import { sendToEndpoint } from '$lib/utils/apiHelpers';
+	import { addApiResponse } from '$lib/stores/apiStore';
 	import { _ } from 'svelte-i18n';
 
 	let isRecording = $state(false);
@@ -71,13 +73,11 @@
 		}
 
 		try {
-			const response = await fetch('/api/yap', {
-				method: 'POST',
-				body: formData
-			});
-
-			const result = await response.json();
+			const result = await sendToEndpoint('yap', formData);
 			console.log('YAP API response:', result);
+			
+			// Store the response in the API store
+			addApiResponse('yap', result);
 
 			if (result.text) {
 				// Replace the entire transcript with the accumulated result

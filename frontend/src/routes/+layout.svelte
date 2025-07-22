@@ -5,6 +5,7 @@
 	import { initLanguage } from '$lib/stores/languageStore';
 	import Header from '$lib/components/Header.svelte';
 	import ErrorDisplay from '$lib/components/ErrorDisplay.svelte';
+	import { apiResponses } from '$lib/stores/apiStore';
 
 	let { children } = $props();
 	let i18nReady = $state(false);
@@ -21,6 +22,11 @@
 				i18nReady = true; // Show page anyway
 			}
 		})();
+	});
+
+	// Debug: Log API store changes
+	$effect(() => {
+		console.log('📊 API Store:', $apiResponses);
 	});
 </script>
 
