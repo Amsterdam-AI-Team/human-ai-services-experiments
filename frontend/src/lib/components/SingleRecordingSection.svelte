@@ -17,7 +17,7 @@
 		const formData = new FormData();
 		
 		// TODO: API inconsistency - different endpoints expect different field names
-		// analyze endpoint expects 'file', chat/chatAudio endpoints expect 'audio'
+		// analyze endpoint expects 'file', chat/yap endpoints expect 'audio'
 		// When API becomes consistent, this can be simplified to always use the same field name
 		const audioFieldName = endpoint === 'analyze' ? 'file' : 'audio';
 		formData.append(audioFieldName, audioBlob, 'recording.wav');
@@ -27,8 +27,8 @@
 			formData.append('intentcode', intentcode);
 		}
 		
-		// Add session_id to FormData if it exists and endpoint is chatAudio
-		if (endpoint === 'chatAudio') {
+		// Add session_id to FormData if it exists and endpoint is chat (using FormData mode)
+		if (endpoint === 'chat') {
 			const currentSessionId = getSessionId();
 			if (currentSessionId) {
 				formData.append('session_id', currentSessionId);

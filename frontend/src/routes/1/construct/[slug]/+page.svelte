@@ -41,10 +41,6 @@
 		return intent?.intent?.intent || 'Formulier';
 	});
 
-	// Get chatAudio responses for AI replies
-	const chatAudioResponses = $derived(() => {
-		return $apiResponses.filter(r => r.endpoint === 'chatAudio');
-	});
 
 	// Get chat endpoint responses for AI replies
 	const chatResponses = $derived(() => {
@@ -124,7 +120,7 @@
 
 	// Get the latest checklist state from chat responses
 	const latestChecklist = $derived(() => {
-		const responses = [...chatResponses(), ...chatAudioResponses()];
+		const responses = chatResponses();
 		if (responses.length === 0) return null;
 		
 		const latest = responses[responses.length - 1];
@@ -216,20 +212,11 @@
 					{/if}
 				{/each}
 
-				{#each chatAudioResponses() as response}
-					{#if response.data?.reply}
-						<ChatMessage 
-							type="gemeente-ai" 
-							content={response.data.reply}
-							sender={$_('concept1.construct.senderAI')}
-						/>
-					{/if}
-				{/each}
 			</div>
 			
 			<!-- Recording section fixed at bottom -->
 			<div class="recording-section">
-				<SingleRecordingSection endpoint="chatAudio" intentcode={intentcode} />
+				<SingleRecordingSection endpoint="chat" intentcode={intentcode} />
 			</div>
 		</div>
 		<div class="right-section">
@@ -290,7 +277,6 @@
 </main>
 <ApiDebugger endpoint="analyze" />
 <ApiDebugger endpoint="chat" />
-<ApiDebugger endpoint="chatAudio" />
 
 <style>
 	.app {

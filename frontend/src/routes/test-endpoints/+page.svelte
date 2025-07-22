@@ -13,9 +13,9 @@
 		</div>
 		
 		<div class="endpoint-section">
-			<h2>Chat Audio Endpoint</h2>
-			<p>Sends audio to /api/chatAudio for chat processing</p>
-			<SingleRecordingSection endpoint="chatAudio" />
+			<h2>Chat Endpoint (Audio)</h2>
+			<p>Sends audio to /api/chat for chat processing</p>
+			<SingleRecordingSection endpoint="chat" />
 		</div>
 	</div>
 </main>

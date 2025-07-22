@@ -2,17 +2,12 @@ import { AI_API_ENDPOINT } from '$env/static/private';
 
 export async function POST({ request }) {
 	try {
-		const formData = await request.formData();
+		const jsonData = await request.json();
 		
-		// If intentcode is provided, add it to the FormData before forwarding
-		const intentcode = formData.get('intentcode');
-		if (intentcode) {
-			// The FormData already contains the intentcode, so we can forward it as-is
-		}
-		
-		const response = await fetch(`${AI_API_ENDPOINT}/chat`, {
+		const response = await fetch(`${AI_API_ENDPOINT}/yap/start`, {
 			method: 'POST',
-			body: formData
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(jsonData)
 		});
 		
 		const result = await response.json();
