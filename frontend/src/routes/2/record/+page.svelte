@@ -5,6 +5,7 @@
 	import { sendToEndpoint } from '$lib/utils/apiHelpers';
 	import { addApiResponse } from '$lib/stores/apiStore';
 	import { _ } from 'svelte-i18n';
+	import { goto } from '$app/navigation';
 
 	let isRecording = $state(false);
 	let mediaRecorder = $state<MediaRecorder | undefined>();
@@ -91,6 +92,10 @@
 			isTranscribing = false;
 		}
 	}
+
+	function handleContinue() {
+		goto('/2/agents-chat');
+	}
 </script>
 
 <main class="app">
@@ -140,7 +145,7 @@
 					{/if}
 				</div>
 				{#if transcriptionText.length > 0}
-					<ButtonSketchy text={$_('buttons.continue')} />
+					<ButtonSketchy text={$_('buttons.continue')} onclick={handleContinue} />
 				{/if}
 			</div>
 		</div>
