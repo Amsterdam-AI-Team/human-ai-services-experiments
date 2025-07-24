@@ -62,7 +62,7 @@
 					const loading = get(isLoading);
 					const message = !loading && translator ? translator('errors.transcriptionTimeout') : 'Transcribing took longer than 20 seconds, please try again';
 					reject(new Error(message));
-				}, 20000);
+				}, 30000);
 			});
 
 			// Race between API call and timeout
