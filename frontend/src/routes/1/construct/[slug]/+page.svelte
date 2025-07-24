@@ -164,8 +164,8 @@
 		clearApiResponses();
 		clearSession();
 		
-		// Navigate back to /1
-		goto('/1');
+		// Navigate to /1/end
+		goto('/1/end');
 	}
 
 </script>
