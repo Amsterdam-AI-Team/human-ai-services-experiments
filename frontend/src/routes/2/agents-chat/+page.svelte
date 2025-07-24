@@ -47,6 +47,10 @@
 	let isLoading = $state(false);
 	let currentStep = $state(0); // For animating the process steps
 	let isFinished = $state(false);
+	
+	// Chat scrolling references
+	let chatContainer: HTMLElement;
+	let shouldAutoScroll = $state(true);
 
 	// Process steps for animation
 	const processSteps = [
@@ -161,6 +165,25 @@
 		}, 1000); // Change step every second
 	}
 
+	// Auto-scroll to bottom when new messages arrive
+	$effect(() => {
+		if (chatContainer && shouldAutoScroll && conversation.length > 0) {
+			requestAnimationFrame(() => {
+				chatContainer.scrollTop = chatContainer.scrollHeight;
+			});
+		}
+	});
+
+	// Handle scroll to detect if user scrolled up
+	function handleScroll() {
+		if (!chatContainer) return;
+		
+		const { scrollTop, scrollHeight, clientHeight } = chatContainer;
+		const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
+		shouldAutoScroll = isAtBottom;
+	}
+
+
 	let approvedResult = $state({
 		title: 'Goedgekeurde subsidie: Buurtfeest "Samen aan Tafel" – €750',
 		description:
@@ -215,44 +238,48 @@
 			{/each}
 		</div>
 
-		<div class="conversation">
-			{#each conversation as message}
-				<div class="message-wrapper">
-					<ChatMessage
-						type={message.type === "user-message"
-							? "user-message"
-							: "gemeente-ai"}
-						content={message.content}
-						sender={message.sender}
-					/>
-					{#if message.actions}
-						<div class="message-actions">
-							{#each message.actions as action}
-								<button
-									class="action-button"
-									onclick={() => handleAction(action)}
-								>
-									📝 {action}
-								</button>
-							{/each}
-						</div>
-					{/if}
-				</div>
-			{/each}
-		</div>
-
-		{#if isLoading && !isFinished}
-			<div class="loading-indicator">
-				<div class="loading-dots">
-					<span>Gesprek wordt opgebouwd</span>
-					<div class="dots">
-						<span>.</span>
-						<span>.</span>
-						<span>.</span>
+		<div class="conversation-container" bind:this={chatContainer} onscroll={handleScroll}>
+			<div class="conversation">
+				{#each conversation as message}
+					<div class="message-wrapper">
+						<ChatMessage
+							type={message.type === "user-message"
+								? "user-message"
+								: "gemeente-ai"}
+							content={message.content}
+							sender={message.sender}
+						/>
+						{#if message.actions}
+							<div class="message-actions">
+								{#each message.actions as action}
+									<button
+										class="action-button"
+										onclick={() => handleAction(action)}
+									>
+										📝 {action}
+									</button>
+								{/each}
+							</div>
+						{/if}
 					</div>
-				</div>
+				{/each}
+
+				{#if isLoading && !isFinished}
+					<div class="message-wrapper">
+						<div class="loading-indicator">
+							<div class="loading-dots">
+								<span>Gesprek wordt opgebouwd</span>
+								<div class="dots">
+									<span>.</span>
+									<span>.</span>
+									<span>.</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				{/if}
 			</div>
-		{/if}
+		</div>
 
 		<div class="final-action">
 			<button class="primary-button">↗ onderhandeling bekijken</button>
@@ -347,17 +374,41 @@
 		font-weight: 600;
 	}
 
+	.conversation-container {
+		max-height: 60vh;
+		overflow-y: auto;
+		display: flex;
+		flex-direction: column-reverse;
+		scroll-behavior: smooth;
+		margin-bottom: 2rem;
+		border: 1px solid #e5e7eb;
+		border-radius: 8px;
+		padding: 1rem;
+		background: #ffffff;
+	}
+
 	.conversation {
 		display: flex;
 		flex-direction: column;
 		gap: 1.5rem;
-		margin-bottom: 2rem;
 	}
 
 	.message-wrapper {
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
+		animation: slideInFromBottom 0.3s ease-out;
+	}
+
+	@keyframes slideInFromBottom {
+		from {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 
 	.message-actions {

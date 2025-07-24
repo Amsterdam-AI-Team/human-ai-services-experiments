@@ -106,6 +106,10 @@
 	// Track if we've already sent the transcript to chat
 	let hasSentTranscript = $state(false);
 	let isSendingChat = $state(false);
+	
+	// Chat scrolling references
+	let chatContainer: HTMLElement;
+	let shouldAutoScroll = $state(true);
 
 	// Send transcript to chat when it becomes available, but only if no chat messages exist yet
 	$effect(() => {
@@ -183,6 +187,28 @@
 		checkedItems = new Set(checkedItems); // Trigger reactivity
 	}
 
+	// Auto-scroll to bottom when new messages arrive
+	$effect(() => {
+		const messages = chatResponses();
+		const transcript = initialTranscript();
+		
+		if (chatContainer && shouldAutoScroll && (messages.length > 0 || transcript)) {
+			requestAnimationFrame(() => {
+				chatContainer.scrollTop = chatContainer.scrollHeight;
+			});
+		}
+	});
+
+	// Handle scroll to detect if user scrolled up
+	function handleScroll() {
+		if (!chatContainer) return;
+		
+		const { scrollTop, scrollHeight, clientHeight } = chatContainer;
+		const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
+		shouldAutoScroll = isAtBottom;
+	}
+
+
 	function handleBezwaarVersturen() {
 		// Clear all stores
 		clearApiResponses();
@@ -204,42 +230,52 @@
 				/>
 			</div>
 
-			<div class="chat-container">
-				{#if initialTranscript()}
-					<ChatMessage
-						type="user-message"
-						content={initialTranscript()}
-					/>
-				{/if}
-
-				{#if isSendingChat}
-					<div class="loading-indicator">
-						<div class="loading-dots">
-							<span>{$_("concept1.construct.loadingAI")}</span>
-							<div class="dots">
-								<span>.</span>
-								<span>.</span>
-								<span>.</span>
-							</div>
-						</div>
-					</div>
-				{/if}
-
-				{#each chatResponses() as response}
-					{#if response.data?.reply}
-						{#if initialTranscript() !== response.data.user_text}
+			<div class="chat-container" bind:this={chatContainer} onscroll={handleScroll}>
+				<div class="chat-messages">
+					{#if initialTranscript()}
+						<div class="message-wrapper">
 							<ChatMessage
 								type="user-message"
-								content={response.data.user_text}
+								content={initialTranscript()}
 							/>
-						{/if}
-						<ChatMessage
-							type="gemeente-ai"
-							content={response.data.reply}
-							sender={$_("concept1.construct.senderAI")}
-						/>
+						</div>
 					{/if}
-				{/each}
+
+					{#each chatResponses() as response}
+						{#if response.data?.reply}
+							{#if initialTranscript() !== response.data.user_text}
+								<div class="message-wrapper">
+									<ChatMessage
+										type="user-message"
+										content={response.data.user_text}
+									/>
+								</div>
+							{/if}
+							<div class="message-wrapper">
+								<ChatMessage
+									type="gemeente-ai"
+									content={response.data.reply}
+									sender={$_("concept1.construct.senderAI")}
+								/>
+							</div>
+						{/if}
+					{/each}
+
+					{#if isSendingChat}
+						<div class="message-wrapper">
+							<div class="loading-indicator">
+								<div class="loading-dots">
+									<span>{$_("concept1.construct.loadingAI")}</span>
+									<div class="dots">
+										<span>.</span>
+										<span>.</span>
+										<span>.</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					{/if}
+				</div>
 			</div>
 
 			<!-- Recording section fixed at bottom -->
@@ -351,11 +387,33 @@
 	.chat-container {
 		flex: 1;
 		display: flex;
+		flex-direction: column-reverse; /* Bottom-anchored scrolling */
+		overflow-y: auto;
+		min-height: 0;
+		padding: 0 0 1rem 0;
+		scroll-behavior: smooth;
+	}
+
+	.chat-messages {
+		display: flex;
 		flex-direction: column;
 		gap: 1rem;
-		overflow-y: auto; /* Make chat area scrollable */
-		min-height: 0; /* Allow flexbox to shrink */
-		padding-bottom: 1rem;
+		padding-top: 1rem;
+	}
+
+	.message-wrapper {
+		animation: slideInFromBottom 0.3s ease-out;
+	}
+
+	@keyframes slideInFromBottom {
+		from {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 
 	.recording-section {
