@@ -1,62 +1,62 @@
-import { writable } from 'svelte/store';
-import { browser } from '$app/environment';
+import { writable } from "svelte/store";
+import { browser } from "$app/environment";
 
 export interface ApiResponse {
-	endpoint: string;
-	data: any;
-	timestamp: number;
+  endpoint: string;
+  data: any;
+  timestamp: number;
 }
 
-const STORAGE_KEY = 'apiResponses';
+const STORAGE_KEY = "apiResponses";
 
 // Load from localStorage on initialization
 const loadFromStorage = (): ApiResponse[] => {
-	if (!browser) return [];
-	try {
-		const stored = localStorage.getItem(STORAGE_KEY);
-		return stored ? JSON.parse(stored) : [];
-	} catch {
-		return [];
-	}
+  if (!browser) return [];
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch {
+    return [];
+  }
 };
 
 export const apiResponses = writable<ApiResponse[]>(loadFromStorage());
 
 // Save to localStorage whenever store updates
-apiResponses.subscribe(responses => {
-	if (browser) {
-		localStorage.setItem(STORAGE_KEY, JSON.stringify(responses));
-	}
+apiResponses.subscribe((responses) => {
+  if (browser) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(responses));
+  }
 });
 
 export const addApiResponse = (endpoint: string, data: any) => {
-	apiResponses.update(responses => [
-		...responses,
-		{
-			endpoint,
-			data,
-			timestamp: Date.now()
-		}
-	]);
+  apiResponses.update((responses) => [
+    ...responses,
+    {
+      endpoint,
+      data,
+      timestamp: Date.now(),
+    },
+  ]);
 };
 
 export const getLatestResponse = (endpoint: string) => {
-	let latestResponse: ApiResponse | null = null;
-	
-	apiResponses.subscribe(responses => {
-		const filtered = responses.filter(r => r.endpoint === endpoint);
-		latestResponse = filtered.length > 0 ? filtered[filtered.length - 1] : null;
-	})();
-	
-	return latestResponse;
+  let latestResponse: ApiResponse | null = null;
+
+  apiResponses.subscribe((responses) => {
+    const filtered = responses.filter((r) => r.endpoint === endpoint);
+    latestResponse = filtered.length > 0 ? filtered[filtered.length - 1] : null;
+  })();
+
+  return latestResponse;
 };
 
 export const clearApiResponses = () => {
-	apiResponses.set([]);
+  apiResponses.set([]);
 };
 
 export const clearApiResponsesForEndpoint = (endpoint: string) => {
-	apiResponses.update(responses => 
-		responses.filter(r => r.endpoint !== endpoint)
-	);
+  apiResponses.update((responses) =>
+    responses.filter((r) => r.endpoint !== endpoint),
+  );
 };

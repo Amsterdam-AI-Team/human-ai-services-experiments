@@ -56,7 +56,7 @@ src/
 ## Backend Integration
 
 Please run the API at `../ai-assist/` for this to work. Includes:
+
 - OpenAI API integration
 - Audio transcription
 - Database storage
-
