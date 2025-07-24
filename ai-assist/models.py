@@ -49,6 +49,7 @@ class ChatResponse(BaseModel):
     reply: str
     checklist: dict
     finished: bool
+    user_text: str
 
 
 class IntentMatch(BaseModel):
@@ -59,6 +60,7 @@ class IntentMatch(BaseModel):
 
 class AnalyzeResponse(BaseModel):
     transcript: str
+    language: str
     matches: List[IntentMatch]
 
 

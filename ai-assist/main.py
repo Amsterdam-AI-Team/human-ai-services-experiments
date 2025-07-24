@@ -53,16 +53,18 @@ _WHISPER_MODEL_NAME = os.getenv("WHISPER_MODEL_NAME", "base")
 _whisper_model = whisper.load_model(_WHISPER_MODEL_NAME)
 
 
-def _transcribe(path: str) -> str:
-    """Blocking helper executed in a thread (keeps event loop responsive)."""
-    result = _whisper_model.transcribe(path, language="nl")
-    return result["text"].strip()
+def _transcribe(path: str) -> tuple[str, str]:
+    """
+    Blocking helper that returns (text, lang).
+    Whisper’s internal language detector is used when language=None.
+    """
+    res = _whisper_model.transcribe(path)     # auto‑detect language
+    return res["text"].strip(), res["language"]
 
 
 # ---------------------------------------------------------------------------
 # FastAPI app config
 # ---------------------------------------------------------------------------
-
 app = FastAPI(title="Whisper‑Intent Matcher (local Whisper + local embeddings)", version="4.1")
 app.add_middleware(
     CORSMiddleware,
@@ -155,9 +157,10 @@ async def analyze(
         tmp_path = tmp.name
 
     try:
+
         # 2️⃣ transcribe in background thread
         loop = asyncio.get_running_loop()
-        text = await loop.run_in_executor(None, _transcribe, tmp_path)
+        text, language = await loop.run_in_executor(None, _transcribe, tmp_path)
 
         # 3️⃣ similarity search
         q_vec = _embedder.encode(text, convert_to_numpy=True, normalize_embeddings=True)
@@ -173,7 +176,7 @@ async def analyze(
             for i in top_idx
         ]
 
-        return AnalyzeResponse(transcript=text, matches=matches)
+        return AnalyzeResponse(transcript=text, matches=matches, language=language)
 
     finally:
         os.remove(tmp_path)
@@ -224,7 +227,7 @@ async def chat(
 
         try:
             loop = asyncio.get_running_loop()
-            user_text = await loop.run_in_executor(None, _transcribe, tmp_path)
+            user_text, _ = await loop.run_in_executor(None, _transcribe, tmp_path)
         finally:
             os.remove(tmp_path)
     else:
@@ -281,6 +284,7 @@ async def chat(
         reply=step_obj.vragen[0] if step_obj.vragen else "Alle stappen zijn afgerond!",
         checklist=session["checklist"],
         finished=finished,
+        user_text=user_text
     )
 
 
@@ -316,8 +320,7 @@ async def yap_accumulate(
 
         try:
             loop = asyncio.get_running_loop()
-            new_text = await loop.run_in_executor(None, _transcribe, tmp_path)
-            print(new_text)
+            new_text, _ = await loop.run_in_executor(None, _transcribe, tmp_path)
         finally:
             os.remove(tmp_path)
 
