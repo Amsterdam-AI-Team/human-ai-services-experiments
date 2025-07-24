@@ -42,6 +42,7 @@
     "@amsterdam/design-system-react": "^1.1.0",
     "@amsterdam/design-system-react-icons": "^1.0.0",
     "@amsterdam/design-system-tokens": "^1.0.1",
+    "svelte-confetti": "^2.3.2",
     "svelte-i18n": "^4.0.1"
   }
 }
