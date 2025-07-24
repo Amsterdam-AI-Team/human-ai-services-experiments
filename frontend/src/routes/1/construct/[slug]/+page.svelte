@@ -1,50 +1,70 @@
 <script lang="ts">
-	import Pill from '$lib/components/Pill.svelte';
-	import ChatMessage from '$lib/components/ChatMessage.svelte';
-	import ChecklistCard from '$lib/components/ChecklistCard.svelte';
-	import ButtonSketchySmall from '$lib/components/ButtonSketchySmall.svelte';
-	import ApiDebugger from '$lib/components/ApiDebugger.svelte';
-	import SingleRecordingSection from '$lib/components/SingleRecordingSection.svelte';
-	import { _ } from 'svelte-i18n';
-	import { apiResponses, addApiResponse, clearApiResponses } from '$lib/stores/apiStore';
-	import { setSessionId, getSessionId, clearSession, sessionData } from '$lib/stores/sessionStore';
-	import { handleApiError, showTranslatedError, showTranslatedWarning, showTranslatedInfo } from '$lib/stores/errorStore';
-	import { page } from '$app/state';
-	import { goto } from '$app/navigation';
-
+	import Pill from "$lib/components/Pill.svelte";
+	import ChatMessage from "$lib/components/ChatMessage.svelte";
+	import ChecklistCard from "$lib/components/ChecklistCard.svelte";
+	import ButtonSketchySmall from "$lib/components/ButtonSketchySmall.svelte";
+	import ApiDebugger from "$lib/components/ApiDebugger.svelte";
+	import SingleRecordingSection from "$lib/components/SingleRecordingSection.svelte";
+	import { _ } from "svelte-i18n";
+	import {
+		apiResponses,
+		addApiResponse,
+		clearApiResponses,
+	} from "$lib/stores/apiStore";
+	import {
+		setSessionId,
+		getSessionId,
+		clearSession,
+		sessionData,
+	} from "$lib/stores/sessionStore";
+	import {
+		handleApiError,
+		showTranslatedError,
+		showTranslatedWarning,
+		showTranslatedInfo,
+	} from "$lib/stores/errorStore";
+	import { page } from "$app/state";
+	import { goto } from "$app/navigation";
 
 	// Get intentcode from URL slug
 	const intentcode = $derived(page.params.slug);
 
 	// Get the latest analyze response
 	const latestAnalyzeResponse = $derived(() => {
-		const analyzeResponses = $apiResponses.filter(r => r.endpoint === 'analyze');
-		return analyzeResponses.length > 0 ? analyzeResponses[analyzeResponses.length - 1] : null;
+		const analyzeResponses = $apiResponses.filter(
+			(r) => r.endpoint === "analyze",
+		);
+		return analyzeResponses.length > 0
+			? analyzeResponses[analyzeResponses.length - 1]
+			: null;
 	});
 
 	// Get transcript from analyze endpoint
 	const initialTranscript = $derived(() => {
-		return latestAnalyzeResponse()?.data?.transcript || '';
+		return latestAnalyzeResponse()?.data?.transcript || "";
 	});
 
 	// Find the matching intent object based on slug
 	const matchingIntent = $derived(() => {
 		const response = latestAnalyzeResponse();
 		if (!response?.data?.matches) return null;
-		
-		return response.data.matches.find((match: any) => match.intent.intentcode === intentcode) || null;
+
+		return (
+			response.data.matches.find(
+				(match: any) => match.intent.intentcode === intentcode,
+			) || null
+		);
 	});
 
 	// Get the heading from the intent
 	const intentHeading = $derived(() => {
 		const intent = matchingIntent();
-		return intent?.intent?.intent || 'Formulier';
+		return intent?.intent?.intent || "Formulier";
 	});
-
 
 	// Get chat endpoint responses for AI replies
 	const chatResponses = $derived(() => {
-		return $apiResponses.filter(r => r.endpoint === 'chat');
+		return $apiResponses.filter((r) => r.endpoint === "chat");
 	});
 
 	// Send transcript to chat endpoint
@@ -52,32 +72,32 @@
 		try {
 			isSendingChat = true;
 			const currentSessionId = getSessionId();
-			const requestBody: any = { 
-				message: transcript, 
-				intentcode: intentcode 
+			const requestBody: any = {
+				message: transcript,
+				intentcode: intentcode,
 			};
-			
+
 			if (currentSessionId) {
 				requestBody.session_id = currentSessionId;
 			}
-			
-			const response = await fetch('/api/chat', {
-				method: 'POST',
+
+			const response = await fetch("/api/chat", {
+				method: "POST",
 				headers: {
-					'Content-Type': 'application/json',
+					"Content-Type": "application/json",
 				},
-				body: JSON.stringify(requestBody)
+				body: JSON.stringify(requestBody),
 			});
 
 			const result = await response.json();
-			addApiResponse('chat', result);
-			
+			addApiResponse("chat", result);
+
 			// Store session_id from the first chat response
 			if (result.session_id) {
 				setSessionId(result.session_id);
 			}
 		} catch (error) {
-			handleApiError(error, 'chatSending');
+			handleApiError(error, "chatSending");
 		} finally {
 			isSendingChat = false;
 		}
@@ -91,8 +111,12 @@
 	$effect(() => {
 		const transcript = initialTranscript();
 		const existingChatMessages = chatResponses();
-		
-		if (transcript && !hasSentTranscript && existingChatMessages.length === 0) {
+
+		if (
+			transcript &&
+			!hasSentTranscript &&
+			existingChatMessages.length === 0
+		) {
 			hasSentTranscript = true;
 			sendTranscriptToChat(transcript);
 		}
@@ -100,18 +124,18 @@
 
 	// Helper function to convert text to backend format
 	function textToBackendId(text: string): string {
-		return text.toLowerCase().replace(/\s+/g, '-');
+		return text.toLowerCase().replace(/\s+/g, "-");
 	}
 
 	// Get checklist items from the intent steps
 	const checklistItems = $derived(() => {
 		const intent = matchingIntent();
 		if (!intent?.intent?.steps) return [];
-		
+
 		return intent.intent.steps.map((step: any) => ({
 			id: textToBackendId(step.title),
 			text: step.title,
-			checked: false
+			checked: false,
 		}));
 	});
 
@@ -122,7 +146,7 @@
 	const latestChecklist = $derived(() => {
 		const responses = chatResponses();
 		if (responses.length === 0) return null;
-		
+
 		const latest = responses[responses.length - 1];
 		return latest.data?.checklist || null;
 	});
@@ -130,7 +154,7 @@
 	// Get the latest draft text from checklist
 	const draftText = $derived(() => {
 		const checklist = latestChecklist();
-		return checklist?.draft || '';
+		return checklist?.draft || "";
 	});
 
 	// Sync checklist state with backend responses
@@ -138,14 +162,14 @@
 		const backendChecklist = latestChecklist();
 		if (backendChecklist) {
 			const newCheckedItems = new Set<string>();
-			
+
 			// Add checked items from backend state
 			Object.entries(backendChecklist).forEach(([key, value]) => {
-				if (key !== 'draft' && value === true) {
+				if (key !== "draft" && value === true) {
 					newCheckedItems.add(key);
 				}
 			});
-			
+
 			checkedItems = newCheckedItems;
 		}
 	});
@@ -163,28 +187,27 @@
 		// Clear all stores
 		clearApiResponses();
 		clearSession();
-		
-		// Navigate to /1/end
-		goto('/1/end');
-	}
 
+		// Navigate to /1/end
+		goto("/1/end");
+	}
 </script>
 
 <main class="app">
 	<div class="layout">
 		<div class="left-section">
 			<div class="pill-container">
-				<Pill 
-					icon="/images/document.svg" 
+				<Pill
+					icon="/images/document.svg"
 					text="Parkeerboete bezwaarformulier"
-					onclick={() => console.log('Pill clicked')}
+					onclick={() => console.log("Pill clicked")}
 				/>
 			</div>
-			
+
 			<div class="chat-container">
 				{#if initialTranscript()}
-					<ChatMessage 
-						type="user-message" 
+					<ChatMessage
+						type="user-message"
 						content={initialTranscript()}
 					/>
 				{/if}
@@ -192,7 +215,7 @@
 				{#if isSendingChat}
 					<div class="loading-indicator">
 						<div class="loading-dots">
-							<span>{$_('concept1.construct.loadingAI')}</span>
+							<span>{$_("concept1.construct.loadingAI")}</span>
 							<div class="dots">
 								<span>.</span>
 								<span>.</span>
@@ -204,42 +227,51 @@
 
 				{#each chatResponses() as response}
 					{#if response.data?.reply}
-						<ChatMessage 
-							type="gemeente-ai" 
+						{#if initialTranscript() !== response.data.user_text}
+							<ChatMessage
+								type="user-message"
+								content={response.data.user_text}
+							/>
+						{/if}
+						<ChatMessage
+							type="gemeente-ai"
 							content={response.data.reply}
-							sender={$_('concept1.construct.senderAI')}
+							sender={$_("concept1.construct.senderAI")}
 						/>
 					{/if}
 				{/each}
-
 			</div>
-			
+
 			<!-- Recording section fixed at bottom -->
 			<div class="recording-section">
-				<SingleRecordingSection endpoint="chat" intentcode={intentcode} />
+				<SingleRecordingSection endpoint="chat" {intentcode} />
 			</div>
 		</div>
 		<div class="right-section">
 			<div class="content-section">
 				<h1>{intentHeading()}</h1>
 
-				<ChecklistCard 
+				<ChecklistCard
 					items={checklistItems().map((item: any) => ({
 						...item,
-						checked: checkedItems.has(item.id)
+						checked: checkedItems.has(item.id),
 					}))}
 					onItemChange={handleChecklistChange}
 				/>
 
 				<div class="form-section">
-					<h2>{$_('concept1.construct.formTitle')}</h2>
-					
+					<h2>{$_("concept1.construct.formTitle")}</h2>
+
 					<div class="form-field">
-						<label class="field-label" for="bezwaar-textarea">{$_('concept1.construct.formLabel')}</label>
-						<textarea 
+						<label class="field-label" for="bezwaar-textarea"
+							>{$_("concept1.construct.formLabel")}</label
+						>
+						<textarea
 							id="bezwaar-textarea"
 							class="field-input"
-							placeholder={$_('concept1.construct.formPlaceholder')}
+							placeholder={$_(
+								"concept1.construct.formPlaceholder",
+							)}
 							rows="6"
 							value={draftText()}
 							readonly
@@ -248,20 +280,23 @@
 				</div>
 
 				<div class="submit-section">
-					<ButtonSketchySmall text={$_('buttons.submit')} onclick={handleBezwaarVersturen} />
+					<ButtonSketchySmall
+						text={$_("buttons.submit")}
+						onclick={handleBezwaarVersturen}
+					/>
 				</div>
 			</div>
 		</div>
 	</div>
-	
+
 	<!-- Debug components -->
 	<!-- <div style="display: flex; gap: 1rem; margin: 1rem; flex-wrap: wrap;"> -->
-		<!-- <button onclick={clearSession} style="padding: 0.5rem; background: #ff4444; color: white; border: none; border-radius: 4px; cursor: pointer;">
+	<!-- <button onclick={clearSession} style="padding: 0.5rem; background: #ff4444; color: white; border: none; border-radius: 4px; cursor: pointer;">
 			Clear Session ID: {$sessionData.sessionId ? $sessionData.sessionId.substring(0, 8) + '...' : 'None'}
 		</button> -->
-		
-		<!-- Error Display Test Buttons -->
-		<!-- <button onclick={() => showTranslatedError('errors.testError')} style="padding: 0.5rem; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer;">
+
+	<!-- Error Display Test Buttons -->
+	<!-- <button onclick={() => showTranslatedError('errors.testError')} style="padding: 0.5rem; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer;">
 			Test Error
 		</button>
 		<button onclick={() => showTranslatedWarning('errors.testWarning')} style="padding: 0.5rem; background: #d97706; color: white; border: none; border-radius: 4px; cursor: pointer;">
@@ -278,6 +313,7 @@
 		</button> -->
 	<!-- </div> -->
 </main>
+
 <!-- <ApiDebugger endpoint="analyze" /> -->
 <!-- <ApiDebugger endpoint="chat" />	 -->
 
@@ -330,8 +366,6 @@
 		margin-bottom: 70px; /* Move record button 70px higher */
 	}
 
-
-
 	.right-section {
 		flex: 2;
 		background-color: #ffffff;
@@ -353,7 +387,6 @@
 		line-height: 1.3;
 		font-weight: 600;
 	}
-
 
 	.form-section {
 		margin-bottom: 2rem;
@@ -405,8 +438,6 @@
 		margin-top: 2rem;
 	}
 
-
-
 	@media (max-width: 768px) {
 		.layout {
 			flex-direction: column;
@@ -447,16 +478,24 @@
 		animation: pulse 1.4s ease-in-out infinite both;
 	}
 
-	.dots span:nth-child(1) { animation-delay: -0.32s; }
-	.dots span:nth-child(2) { animation-delay: -0.16s; }
-	.dots span:nth-child(3) { animation-delay: 0s; }
+	.dots span:nth-child(1) {
+		animation-delay: -0.32s;
+	}
+	.dots span:nth-child(2) {
+		animation-delay: -0.16s;
+	}
+	.dots span:nth-child(3) {
+		animation-delay: 0s;
+	}
 
 	@keyframes pulse {
-		0%, 80%, 100% { 
-			opacity: 0.3; 
+		0%,
+		80%,
+		100% {
+			opacity: 0.3;
 		}
-		40% { 
-			opacity: 1; 
+		40% {
+			opacity: 1;
 		}
 	}
 </style>
