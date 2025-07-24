@@ -2,6 +2,7 @@
 	import { _ } from "svelte-i18n";
 	import { goto } from "$app/navigation";
 	import ButtonSketchySecondary from "$lib/components/ButtonSketchySecondary.svelte";
+	import ButtonSketchySmall from "$lib/components/ButtonSketchySmall.svelte";
 	import ChatMessage from "$lib/components/ChatMessage.svelte";
 	import {
 		apiResponses,
@@ -184,6 +185,11 @@
 		// Navigate back to /2
 		goto("/2");
 	}
+
+	function handleSubmit() {
+		// Navigate to /2/end
+		goto('/2/end');
+	}
 </script>
 
 <main class="agents-chat">
@@ -262,6 +268,10 @@
 					Omschrijving aangepast plan:
 				</div>
 				<p class="approval-description">{approvedResult.description}</p>
+				
+				<div class="submit-section">
+					<ButtonSketchySmall text={$_('buttons.submit')} onclick={handleSubmit} />
+				</div>
 			</div>
 		{/if}
 
@@ -493,6 +503,12 @@
 
 	.reset-button:hover {
 		background: #4b5563;
+	}
+
+	.submit-section {
+		display: flex;
+		justify-content: flex-end;
+		margin-top: 1.5rem;
 	}
 
 	@media (max-width: 768px) {
