@@ -255,13 +255,13 @@
 	</div>
 	
 	<!-- Debug components -->
-	<div style="display: flex; gap: 1rem; margin: 1rem; flex-wrap: wrap;">
-		<button onclick={clearSession} style="padding: 0.5rem; background: #ff4444; color: white; border: none; border-radius: 4px; cursor: pointer;">
+	<!-- <div style="display: flex; gap: 1rem; margin: 1rem; flex-wrap: wrap;"> -->
+		<!-- <button onclick={clearSession} style="padding: 0.5rem; background: #ff4444; color: white; border: none; border-radius: 4px; cursor: pointer;">
 			Clear Session ID: {$sessionData.sessionId ? $sessionData.sessionId.substring(0, 8) + '...' : 'None'}
-		</button>
+		</button> -->
 		
 		<!-- Error Display Test Buttons -->
-		<button onclick={() => showTranslatedError('errors.testError')} style="padding: 0.5rem; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer;">
+		<!-- <button onclick={() => showTranslatedError('errors.testError')} style="padding: 0.5rem; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer;">
 			Test Error
 		</button>
 		<button onclick={() => showTranslatedWarning('errors.testWarning')} style="padding: 0.5rem; background: #d97706; color: white; border: none; border-radius: 4px; cursor: pointer;">
@@ -275,11 +275,11 @@
 		</button>
 		<button onclick={() => handleApiError(new Error($_('errors.transcriptionTimeout')), 'recordingAnalysis')} style="padding: 0.5rem; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;">
 			Test Recording Timeout
-		</button>
-	</div>
+		</button> -->
+	<!-- </div> -->
 </main>
-<ApiDebugger endpoint="analyze" />
-<ApiDebugger endpoint="chat" />
+<!-- <ApiDebugger endpoint="analyze" /> -->
+<!-- <ApiDebugger endpoint="chat" />	 -->
 
 <style>
 	.app {
