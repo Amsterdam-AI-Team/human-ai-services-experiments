@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { _ } from 'svelte-i18n';
 	import MainMessage from '$lib/components/MainMessage.svelte';
+	import AnimatedSubtitle from '$lib/components/AnimatedSubtitle.svelte';
 	import CalloutBubble from '$lib/components/CalloutBubble.svelte';
 	import SingleRecordingSection from '$lib/components/SingleRecordingSection.svelte';
 	import ApiDebugger from '$lib/components/ApiDebugger.svelte';
@@ -32,7 +33,10 @@
 
 <main class="app">
 	<div class="content">
-		<MainMessage center mainText={$_('concept1.mainHelp')} subtitle={$_('concept1.helpSubtitle')} />
+		<div class="main-section">
+			<MainMessage center mainText={$_('concept1.mainHelp')} />
+			<AnimatedSubtitle />
+		</div>
 
 		<CalloutBubble
 			text={$_('concept1.callout')}
@@ -65,10 +69,17 @@
 		margin: auto;
 	}
 
+	.main-section {
+		margin-bottom: 80px;
+	}
 
 	@media (max-width: 768px) {
 		.content {
 			padding: 1rem;
+		}
+		
+		.main-section {
+			margin-bottom: 40px;
 		}
 	}
 </style>
