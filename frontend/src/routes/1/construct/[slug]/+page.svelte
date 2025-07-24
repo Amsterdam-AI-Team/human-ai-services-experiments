@@ -273,6 +273,9 @@
 		<button onclick={() => handleApiError(new Error($_('errors.apiConnectionFailed')), 'apiCall')} style="padding: 0.5rem; background: #7c2d12; color: white; border: none; border-radius: 4px; cursor: pointer;">
 			Test API Error
 		</button>
+		<button onclick={() => handleApiError(new Error($_('errors.transcriptionTimeout')), 'recordingAnalysis')} style="padding: 0.5rem; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;">
+			Test Recording Timeout
+		</button>
 	</div>
 </main>
 <ApiDebugger endpoint="analyze" />

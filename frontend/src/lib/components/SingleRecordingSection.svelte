@@ -3,6 +3,9 @@
 	import { sendToEndpoint, type EndpointType } from "$lib/utils/apiHelpers";
 	import { addApiResponse } from "$lib/stores/apiStore";
 	import { getSessionId } from "$lib/stores/sessionStore";
+	import { handleApiError } from "$lib/stores/errorStore";
+	import { _ as t, isLoading } from 'svelte-i18n';
+	import { get } from 'svelte/store';
 
 	let {
 		endpoint = "analyze" as EndpointType,
@@ -19,6 +22,7 @@
 	let keyPressed = $state(false);
 	let keyPressTimer = $state<number | null>(null);
 	let isHoldToTalk = $state(false);
+	let requestTimeout = $state<number | null>(null);
 
 	async function handleRecordingStop(audioBlob: Blob) {
 		// Send audio to the specified endpoint
@@ -51,13 +55,44 @@
 		}
 
 		try {
-			const result = await sendToEndpoint(endpoint, formData);
+			// Set up timeout for API request (30 seconds)
+			const timeoutPromise = new Promise((_, reject) => {
+				requestTimeout = window.setTimeout(() => {
+					const translator = get(t);
+					const loading = get(isLoading);
+					const message = !loading && translator ? translator('errors.transcriptionTimeout') : 'Transcribing took longer than 30 seconds, please try again';
+					reject(new Error(message));
+				}, 10000);
+			});
+
+			// Race between API call and timeout
+			const result = await Promise.race([
+				sendToEndpoint(endpoint, formData),
+				timeoutPromise
+			]);
+
+			// Clear timeout if request succeeds
+			if (requestTimeout) {
+				clearTimeout(requestTimeout);
+				requestTimeout = null;
+			}
+
 			console.log("API response:", result);
 
 			// Store the response in the store
 			addApiResponse(endpoint, result);
 		} catch (error) {
+			// Clear timeout on error
+			if (requestTimeout) {
+				clearTimeout(requestTimeout);
+				requestTimeout = null;
+			}
+
 			console.error("API error:", error);
+			
+			// Use the error store for user-visible errors
+			handleApiError(error, 'recordingAnalysis');
+			
 			// Store error in the store as well
 			addApiResponse(endpoint, {
 				error: error instanceof Error ? error.message : "Unknown error",
@@ -166,6 +201,12 @@
 		return () => {
 			window.removeEventListener("keydown", handleKeyDown);
 			window.removeEventListener("keyup", handleKeyUp);
+			
+			// Clean up any pending timeouts
+			if (requestTimeout) {
+				clearTimeout(requestTimeout);
+				requestTimeout = null;
+			}
 		};
 	});
 </script>

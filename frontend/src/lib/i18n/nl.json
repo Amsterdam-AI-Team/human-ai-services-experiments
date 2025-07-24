@@ -57,7 +57,9 @@
     "testError": "Dit is een test foutmelding",
     "testWarning": "Dit is een test waarschuwing",
     "testInfo": "Dit is een test informatie bericht",
-    "dismissLabel": "Foutmelding sluiten"
+    "dismissLabel": "Foutmelding sluiten",
+    "recordingAnalysis": "Opname analyse",
+    "transcriptionTimeout": "Transcriberen duurde langer dan 10 seconden, probeer het opnieuw"
   },
   "concept1": {
     "mainHelp": "Hoe kunnen we je helpen?",

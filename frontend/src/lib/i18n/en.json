@@ -57,7 +57,9 @@
     "testError": "This is a test error message",
     "testWarning": "This is a test warning message",
     "testInfo": "This is a test info message",
-    "dismissLabel": "Dismiss error"
+    "dismissLabel": "Dismiss error",
+    "recordingAnalysis": "Recording analysis",
+    "transcriptionTimeout": "Transcribing took longer than 10 seconds, please try again"
   },
   "concept1": {
     "mainHelp": "How can we help you?",
