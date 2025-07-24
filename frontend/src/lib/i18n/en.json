@@ -59,7 +59,7 @@
     "testInfo": "This is a test info message",
     "dismissLabel": "Dismiss error",
     "recordingAnalysis": "Recording analysis",
-    "transcriptionTimeout": "Transcribing took longer than 10 seconds, please try again"
+    "transcriptionTimeout": "Transcribing took longer than 20 seconds, please try again"
   },
   "concept1": {
     "mainHelp": "How can we help you?",

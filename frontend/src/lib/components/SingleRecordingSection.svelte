@@ -55,14 +55,14 @@
 		}
 
 		try {
-			// Set up timeout for API request (30 seconds)
+			// Set up timeout for API request (20 seconds)
 			const timeoutPromise = new Promise((_, reject) => {
 				requestTimeout = window.setTimeout(() => {
 					const translator = get(t);
 					const loading = get(isLoading);
-					const message = !loading && translator ? translator('errors.transcriptionTimeout') : 'Transcribing took longer than 30 seconds, please try again';
+					const message = !loading && translator ? translator('errors.transcriptionTimeout') : 'Transcribing took longer than 20 seconds, please try again';
 					reject(new Error(message));
-				}, 10000);
+				}, 20000);
 			});
 
 			// Race between API call and timeout

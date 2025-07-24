@@ -59,7 +59,7 @@
     "testInfo": "Ceci est un message d'information de test",
     "dismissLabel": "Fermer l'erreur",
     "recordingAnalysis": "Analyse d'enregistrement",
-    "transcriptionTimeout": "La transcription a pris plus de 10 secondes, veuillez réessayer"
+    "transcriptionTimeout": "La transcription a pris plus de 20 secondes, veuillez réessayer"
   },
   "concept1": {
     "mainHelp": "Comment pouvons-nous vous aider?",
