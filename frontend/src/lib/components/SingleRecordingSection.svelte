@@ -8,6 +8,8 @@
 		endpoint = "analyze" as EndpointType,
 		intentcode = null,
 		recordKey = "e",
+		onStateChange = null,
+		existingText = null,
 	} = $props();
 
 	let isAnalyzing = $state(false);
@@ -21,6 +23,7 @@
 	async function handleRecordingStop(audioBlob: Blob) {
 		// Send audio to the specified endpoint
 		isAnalyzing = true;
+		onStateChange?.(isRecording, isAnalyzing);
 		const formData = new FormData();
 
 		// TODO: API inconsistency - different endpoints expect different field names
@@ -42,6 +45,11 @@
 			}
 		}
 
+		// Add existing text for incremental transcription (yap endpoint)
+		if (endpoint === "yap" && existingText && existingText.length > 0) {
+			formData.append("text", existingText);
+		}
+
 		try {
 			const result = await sendToEndpoint(endpoint, formData);
 			console.log("API response:", result);
@@ -56,6 +64,7 @@
 			});
 		} finally {
 			isAnalyzing = false;
+			onStateChange?.(isRecording, isAnalyzing);
 		}
 	}
 
@@ -68,6 +77,7 @@
 				mediaRecorder = new MediaRecorder(stream);
 				mediaRecorder.start();
 				isRecording = true;
+				onStateChange?.(isRecording, isAnalyzing);
 				audioChunks = [];
 
 				mediaRecorder.addEventListener("dataavailable", (event) => {
@@ -81,6 +91,7 @@
 					console.log("Recording stopped", audioBlob);
 					audioChunks = [];
 					isRecording = false;
+					onStateChange?.(isRecording, isAnalyzing);
 
 					// Handle the stopped recording
 					await handleRecordingStop(audioBlob);
@@ -259,12 +270,6 @@
 		}
 	}
 
-	.keyboard-hint {
-		margin-top: 1rem;
-		font-size: 0.875rem;
-		color: #666;
-		text-align: center;
-	}
 
 	.squiggly-overlay {
 		position: absolute;
