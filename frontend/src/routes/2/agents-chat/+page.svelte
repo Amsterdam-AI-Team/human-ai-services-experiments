@@ -3,6 +3,7 @@
 	import { goto } from "$app/navigation";
 	import ButtonSketchySecondary from "$lib/components/ButtonSketchySecondary.svelte";
 	import ButtonSketchySmall from "$lib/components/ButtonSketchySmall.svelte";
+	import ButtonNormal from "$lib/components/ButtonNormal.svelte";
 	import ChatMessage from "$lib/components/ChatMessage.svelte";
 	import {
 		apiResponses,
@@ -54,9 +55,9 @@
 
 	// Process steps for animation
 	const processSteps = [
-		"📋 subsidie regels opzoeken",
-		"✏️ voorstel schrijven",
-		"💬 overleggen met gemeente AI-agent",
+		{ icon: "/images/agent-icon-search.svg", text: "regels opzoeken" },
+		{ icon: "/images/agent-icon-edit.svg", text: "voorstel schrijven" },
+		{ icon: "/images/agent-icon-agree.svg", text: "overleggen met gemeente AI-agent" },
 	];
 
 	// Start the yap conversation when user message is available
@@ -184,10 +185,32 @@
 	}
 
 
-	let approvedResult = $state({
-		title: 'Goedgekeurde subsidie: Buurtfeest "Samen aan Tafel" – €750',
-		description:
-			"Een duurzaam, inclusief buurtfeest voor 50 bewoners met een gemengde BBQ (biologische sparerib én plantaardige alternatieven), kleurrijke decoratie van gerecycled materiaal, en een knutselmiddag vooraf. Het feest bevordert saamhorigheid, culturele uitwisseling en milieubewustzijn. Toegang is gratis, met aandacht voor dieetvetsen en participatie van alle buurtbewoners.",
+	// Get the final approved result from the API response
+	const approvedResult = $derived(() => {
+		if (!isFinished) return null;
+		
+		// Get the latest yapNext response
+		const yapNextResponses = $apiResponses.filter((r) => r.endpoint === "yapNext");
+		const latestResponse = yapNextResponses.length > 0 
+			? yapNextResponses[yapNextResponses.length - 1] 
+			: null;
+		
+		if (!latestResponse?.data?.message) {
+			return {
+				title: 'Goedgekeurde subsidie: Buurtfeest "Samen aan Tafel" – €750',
+				description: "Een duurzaam, inclusief buurtfeest voor 50 bewoners met een gemengde BBQ (biologische sparerib én plantaardige alternatieven), kleurrijke decoratie van gerecycled materiaal, en een knutselmiddag vooraf. Het feest bevordert saamhorigheid, culturele uitwisseling en milieubewustzijn. Toegang is gratis, met aandacht voor dieetvetsen en participatie van alle buurtbewoners."
+			};
+		}
+		
+		const message = latestResponse.data.draft;
+		const sentences = message.split(/(?<=\.)\s+/);
+		const title = sentences[0] || message;
+		const description = sentences.slice(1).join(' ').trim() || message;
+		
+		return {
+			title,
+			description
+		};
 	});
 
 	function goBack() {
@@ -218,7 +241,7 @@
 <main class="agents-chat">
 	<header class="page-header">
 		<ButtonSketchySecondary onclick={goBack} />
-		<div class="status-indicator">
+		<div class="status-indicator user-style">
 			{userMessage()}
 		</div>
 	</header>
@@ -233,7 +256,8 @@
 					class:active={index <= currentStep}
 					class:bold={index === currentStep}
 				>
-					{step}
+					<img src={step.icon} alt="" class="step-icon" />
+					{step.text}
 				</div>
 			{/each}
 		</div>
@@ -249,6 +273,11 @@
 							content={message.content}
 							sender={message.sender}
 						/>
+						{#if message.type === "user-message"}
+							<div class="user-button-wrapper">
+								<ButtonNormal onclick={() => handleAction('wijziging')} />
+							</div>
+						{/if}
 						{#if message.actions}
 							<div class="message-actions">
 								{#each message.actions as action}
@@ -285,16 +314,17 @@
 			<button class="primary-button">↗ onderhandeling bekijken</button>
 		</div>
 
-		{#if isFinished}
+		{#if isFinished && approvedResult()}
+			{@const result = approvedResult()}
 			<div class="approved-result">
 				<div class="approval-header">
 					<span class="checkmark">✅</span>
-					<h3>{approvedResult.title}</h3>
+					<h3>{result?.title}</h3>
 				</div>
 				<div class="approval-subtitle">
 					Omschrijving aangepast plan:
 				</div>
-				<p class="approval-description">{approvedResult.description}</p>
+				<p class="approval-description">{result?.description}</p>
 				
 				<div class="submit-section">
 					<ButtonSketchySmall text={$_('buttons.submit')} onclick={handleSubmit} />
@@ -314,10 +344,7 @@
 	.agents-chat {
 		min-height: calc(100vh - 70px);
 		background-color: #f8f9fa;
-		font-family:
-			system-ui,
-			-apple-system,
-			sans-serif;
+		font-family: 'Amsterdam Sans', Arial, sans-serif;
 		padding: 2rem;
 	}
 
@@ -332,10 +359,17 @@
 	.status-indicator {
 		background: #f3f4f6;
 		padding: 0.5rem 1rem;
-		border-radius: 4px;
 		font-size: 0.875rem;
 		color: #6b7280;
 		flex: 1;
+	}
+
+	.user-style {
+		background: #e5e5e5;
+		text-align: right;
+		font-size: 0.75rem;
+		max-width: 300px;
+		margin-left: auto;
 	}
 
 	.content {
@@ -364,6 +398,15 @@
 		color: #6b7280;
 		padding: 0.25rem 0;
 		transition: all 0.3s ease;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.step-icon {
+		width: 16px;
+		height: 16px;
+		flex-shrink: 0;
 	}
 
 	.step.active {
@@ -382,7 +425,6 @@
 		scroll-behavior: smooth;
 		margin-bottom: 2rem;
 		border: 1px solid #e5e7eb;
-		border-radius: 8px;
 		padding: 1rem;
 		background: #ffffff;
 	}
@@ -422,9 +464,9 @@
 		color: white;
 		border: none;
 		padding: 0.5rem 1rem;
-		border-radius: 4px;
 		font-size: 0.875rem;
 		cursor: pointer;
+		font-family: 'Amsterdam Sans', Arial, sans-serif;
 	}
 
 	.action-button:hover {
@@ -435,7 +477,6 @@
 		padding: 1rem;
 		margin: 0.5rem 0;
 		background-color: #f8f9fa;
-		border-radius: 8px;
 		border-left: 4px solid #007bff;
 	}
 
@@ -487,9 +528,9 @@
 		color: white;
 		border: none;
 		padding: 0.75rem 1.5rem;
-		border-radius: 4px;
 		font-size: 0.875rem;
 		cursor: pointer;
+		font-family: 'Amsterdam Sans', Arial, sans-serif;
 	}
 
 	.primary-button:hover {
@@ -499,7 +540,6 @@
 	.approved-result {
 		background: #f0fdf4;
 		border: 2px solid #22c55e;
-		border-radius: 8px;
 		padding: 1.5rem;
 	}
 
@@ -546,10 +586,10 @@
 		color: white;
 		border: none;
 		padding: 0.75rem 1.5rem;
-		border-radius: 4px;
 		font-size: 0.875rem;
 		cursor: pointer;
 		transition: background-color 0.2s;
+		font-family: 'Amsterdam Sans', Arial, sans-serif;
 	}
 
 	.reset-button:hover {
@@ -560,6 +600,12 @@
 		display: flex;
 		justify-content: flex-end;
 		margin-top: 1.5rem;
+	}
+
+	.user-button-wrapper {
+		display: flex;
+		justify-content: flex-end;
+		margin-top: 0.5rem;
 	}
 
 	@media (max-width: 768px) {

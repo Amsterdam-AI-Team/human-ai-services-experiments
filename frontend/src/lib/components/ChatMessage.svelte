@@ -12,7 +12,7 @@
 <div class="chat-message {type}">
 	{#if type === 'gemeente-ai'}
 		<div class="message-header">
-			<span class="sender-indicator">🔴</span>
+			<img src="/images/chat-gemeente-avatar.png" alt="Gemeente AI" class="avatar" />
 			<span class="sender-name">{sender || 'Gemeente AI-agent:'}</span>
 		</div>
 	{/if}
@@ -32,21 +32,19 @@
 
 <style>
 	.chat-message {
-		border-radius: 12px;
 		padding: 1rem;
 		max-width: 80%;
 		margin-bottom: 1rem;
+		font-family: 'Amsterdam Sans', Arial, sans-serif;
 	}
 
 	.chat-message.gemeente-ai {
 		background: #f8f9fa;
-		border: 1px solid #e9ecef;
 		align-self: flex-start;
 	}
 
 	.chat-message.user-message {
-		background: #e9ecef;
-		border: 1px solid #dee2e6;
+		background: #e5e5e5;
 		align-self: flex-end;
 		margin-left: auto;
 	}
@@ -58,9 +56,10 @@
 		margin-bottom: 0.5rem;
 	}
 
-	.sender-indicator {
-		font-size: 0.8rem;
-		line-height: 1;
+	.avatar {
+		width: 36px;
+		height: 36px;
+		flex-shrink: 0;
 	}
 
 	.sender-name {
