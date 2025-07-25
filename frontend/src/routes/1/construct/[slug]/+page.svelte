@@ -472,7 +472,7 @@
 	.field-input {
 		padding: 1rem;
 		border: 1px solid #dee2e6;
-		border-radius: 8px;
+		/* border-radius: 8px; */
 		font-size: 1rem;
 		line-height: 1.5;
 		resize: vertical;
@@ -515,7 +515,7 @@
 		padding: 1rem;
 		margin: 0.5rem 0;
 		background-color: #f8f9fa;
-		border-radius: 8px;
+		/* border-radius: 8px; */
 		border-left: 4px solid #007bff;
 	}
 

@@ -124,7 +124,7 @@
 		min-height: 150px;
 		padding: 1rem;
 		border: 1px solid #dee2e6;
-		border-radius: 8px;
+		/* border-radius: 8px; */
 		font-size: 1rem;
 		font-family: inherit;
 		resize: vertical;

@@ -62,7 +62,7 @@
 		align-items: center;
 		gap: 0.75rem;
 		padding: 0.75rem 1rem;
-		border-radius: 8px;
+		/* border-radius: 8px; */
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 		animation: slideIn 0.3s ease-out;
 		border-left: 4px solid;
@@ -105,7 +105,7 @@
 		color: inherit;
 		opacity: 0.7;
 		padding: 0.25rem;
-		border-radius: 4px;
+		/* border-radius: 4px; */
 		transition: opacity 0.2s, background-color 0.2s;
 	}
 
