@@ -6,6 +6,7 @@
 	import ApiDebugger from "$lib/components/ApiDebugger.svelte";
 	import SingleRecordingSection from "$lib/components/SingleRecordingSection.svelte";
 	import { _ } from "svelte-i18n";
+	import slugify from "slugify";
 	import {
 		apiResponses,
 		addApiResponse,
@@ -126,9 +127,9 @@
 		}
 	});
 
-	// Helper function to convert text to backend format
+	// Helper function to convert text to backend format (uses same slugify library as Python backend)
 	function textToBackendId(text: string): string {
-		return text.toLowerCase().replace(/\s+/g, "-");
+		return slugify(text, { lower: true });
 	}
 
 	// Get checklist items from the intent steps
@@ -168,6 +169,7 @@
 			const newCheckedItems = new Set<string>();
 
 			// Add checked items from backend state
+			// The backend now returns keys directly, so we use them as-is
 			Object.entries(backendChecklist).forEach(([key, value]) => {
 				if (key !== "draft" && value === true) {
 					newCheckedItems.add(key);
