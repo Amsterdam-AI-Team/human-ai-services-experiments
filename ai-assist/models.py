@@ -76,6 +76,7 @@ class YapAccumRequest(BaseModel):
 
 class YapAccumResponse(BaseModel):
     text: str = Field(..., description="Full accumulated transcript after append")
+    language: str
 
 
 class YapStartRequest(BaseModel):
@@ -86,8 +87,6 @@ class YapStartRequest(BaseModel):
 class YapStartResponse(BaseModel):
     yap_session_id: str
     messages: List[Dict[str, Any]]  # [{speaker, message}]
-    finished: bool = False
-    draft: Optional[str] = None
 
 
 class YapNextResponse(BaseModel):
@@ -97,3 +96,17 @@ class YapNextResponse(BaseModel):
     message: str
     finished: bool
     draft: Optional[str] = None
+
+
+class BurgerTurn(BaseModel):
+    """Burger mag alleen antwoorden geven – géén status‑velden."""
+    message: str = Field(..., description="Antwoord van de burger")
+
+
+class GemeenteTurn(BaseModel):
+    """Gemeente beheert de processtatus."""
+    finished: bool = Field(False, description="Akkoord bereikt?")
+    message: str = Field(..., description="Openstaande vragen (één string, regels gescheiden door \\n)")
+    draft: Optional[str] = Field(
+        None, description="Definitieve samenvatting of concept‑tekst"
+    )

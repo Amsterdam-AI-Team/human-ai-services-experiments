@@ -5,9 +5,11 @@ from langchain_openai import AzureChatOpenAI
 from langchain_core.output_parsers.json import JsonOutputParser
 from langchain_core.output_parsers.pydantic import PydanticOutputParser
 from models import BaseModel
-from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
-
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, BaseMessage
 import socket
+from models import GemeenteTurn, BurgerTurn
+from langchain.output_parsers import OutputFixingParser
+
 
 # ── Workaround for WSL DNS issues: force host resolution to the public IP ──
 PUBLIC_IP = "100.64.1.20"  # replace with your resource's actual public front-door IP
@@ -116,52 +118,139 @@ def make_chain(step_model: type[BaseModel], session: dict):
     return run_chain
 
 
-# Hergebruik dezelfde LLM-config als elders (of maak aparte instanties).
-_yap_llm = AzureChatOpenAI(
+yap_llm_gemeente = AzureChatOpenAI(
     deployment_name=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
     api_version=os.getenv("OPENAI_API_VERSION"),
     temperature=0.4,
-)
+).bind(response_format={"type": "json_object"})
 
-BURGER_SYSTEM = (
-    "Je bent een inwoner van de gemeente die een subsidie voor een buurtfeest wil aanvragen. "
-    "Je reageert bondig, in spreektaal. Gebruik de informatie in de transcriptie als basis. "
-    "Voeg relevante details toe als die ontbreken."
-)
-
-GEMEENTE_SYSTEM = (
-    "Je bent een medewerker van de gemeente die subsidieaanvragen beoordeelt. "
-    "Stel gerichte vragen (budget, datum, aantal deelnemers, toegankelijkheid, duurzaamheid). "
-    "Werk toe naar een kort akkoord met subsidiebedrag en voorwaarden. "
-    "Als alle informatie compleet is, zeg dat we akkoord zijn en vat samen in 1 alinea."
-)
+yap_llm_burger = AzureChatOpenAI(
+    deployment_name=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME"),
+    api_version=os.getenv("OPENAI_API_VERSION"),
+    temperature=0.4,
+).bind(response_format={"type": "json_object"})
 
 
-async def _yap_generate(role: str, transcript: str, history: list[dict]) -> str:
-    """
-    Laat 'burger' of 'gemeente' spreken, gegeven de transcript seed en tot nu toe bekende messages.
-    history: list[{speaker, message}] in chronologische volgorde.
-    Retourneert de nieuwe utterance (str).
-    """
+BURGER_SYSTEM = """
+<Context>
+Je bent de persoonlijke AI‑assistent (“BURGER_SYSTEM”) van een Amsterdamse
+inwoner die een subsidie voor een buurtfeest aanvraagt.  
+De gemeente heeft haar eigen AI‑agent (“GEMEENTE_SYSTEM”).  
+Transcript (door de gebruiker aangeleverd):
+{transcript}
+</Context>
+
+<Objective>
+• Neem de gebruikersinput (locatie, idee, sfeer, …) en stel daaruit
+  zelfstandig een volledig en realistisch feestplan op.  
+• Dien het plan in bij GEMEENTE_SYSTEM, onderhandel en pas aan bij
+  redelijke tegenvoorstellen.  
+• Streef ernaar de subsidie te verkrijgen (≈ 60 % van de sessies moet
+  slagen, ≈ 40 % mislukken met acceptatie van de uitkomst).  
+• Maximaal 5 berichten van elk ≤ 50 woorden.
+</Objective>
+
+<Style>
+Spreektaal, kort en duidelijk; toon empathie en blijf constructief.
+Antwoord altijd in de taal van de gebruiker.
+Geef ALTIJD strikt geldige JSON volgens dit schema:
+<schema>{schema}</schema>
+
+<format>{format}</format>
+</Style>
+
+<Tone>
+Diplomatiek maar vasthoudend: regel zoveel mogelijk voor jouw burger.
+</Tone>
+
+<Audience>
+AI‑ambtenaar van de gemeente (“GEMEENTE_SYSTEM”).
+</Audience>
+
+<Response>
+Schrijf alleen je antwoord zonder verdere uitleg of rol‑tags.
+</Response>
+""".strip()
+
+
+
+GEMEENTE_SYSTEM = """
+<Context>
+Je bent de AI‑ambtenaar (“GEMEENTE_SYSTEM”) van de gemeente Amsterdam en
+beoordeelt subsidieaanvragen voor buurtfeesten.
+</Context>
+
+<Objective>
+• Wacht op het voorstel van BURGER_SYSTEM (begin niet zelf).  
+• Controleer het plan streng op gemeentelijk beleid en risico’s:
+  geluidsnorm (geen harde muziek na 22 u), vergunningen (alcohol, live
+  muziek in openbare ruimte), veiligheid, duurzaamheid, inclusiviteit,
+  max. 250 deelnemers, …  
+• Stel kritische vragen of beperkingen – **elk op een nieuwe regel binnen
+  één tekstveld**.  
+• Wees bereid het plan goed te keuren als aanpassingen voldoen.
+  Ongeveer 60 % van de gesprekken eindigt met toekenning (“akkoord”),
+  40 % met een duidelijke afwijzing en reden.  
+• Gebruik hoogstens 5 berichten van elk ≤ 50 woorden.
+</Objective>
+
+<Style>
+Zakelijk en puntsgewijs, formeel maar coöperatief.
+Geef ALTIJD strikt geldige JSON volgens dit schema:  
+<schema>{schema}</schema>
+
+<format>{format}</format>
+</Style>
+
+<Tone>
+Behulpzaam, maar bewaak strikt de subsidie‑ en beleidscriteria.
+</Tone>
+
+<Audience>
+Persoonlijke AI‑assistent van de burger (“BURGER_SYSTEM”).
+</Audience>
+
+<Response>
+Geef alleen je eigen boodschap, zonder systeem‑ of rol‑labels.
+</Response>
+""".strip()
+
+
+async def _yap_generate(role: str, transcript: str, history: list[dict]) -> dict:
+    # 1. Kies schema + parser
     if role == "burger":
-        sys_msg = SystemMessage(content=BURGER_SYSTEM + f"\n\nTranscript basis:\n{transcript}")
+        parser = PydanticOutputParser(pydantic_object=BurgerTurn)
+        fmt = parser.get_format_instructions()
+        schema_json = json.dumps(BurgerTurn.model_json_schema(),
+                                 ensure_ascii=False, indent=2)
+        schema_json = schema_json.replace("{", "{{").replace("}", "}}")   # accolades escapen
+        sys_template = BURGER_SYSTEM.replace("<schema>", schema_json).replace("<format>", fmt)
     else:
-        sys_msg = SystemMessage(content=GEMEENTE_SYSTEM)
+        parser = PydanticOutputParser(pydantic_object=GemeenteTurn)
+        fmt = parser.get_format_instructions()
+        schema_json = json.dumps(GemeenteTurn.model_json_schema(), ensure_ascii=False, indent=2)
+        schema_json = schema_json.replace("{", "{{").replace("}", "}}")   # accolades escapen
+        sys_template = GEMEENTE_SYSTEM.replace("<schema>", schema_json).replace("<format>", fmt)
 
+    sys_msg = SystemMessage(content=sys_template.replace("{transcript}", transcript))
+
+    # 2. Bouw berichten met correcte HUMAN/ASSISTANT‑mapping
     msgs = [sys_msg]
     for turn in history:
-        speaker = turn["speaker"]
-        text = turn["message"]
+        speaker, text = turn["speaker"], turn["message"]
         if speaker == "burger":
             msgs.append(HumanMessage(content=text))
         else:  # gemeente
             msgs.append(AIMessage(content=text))
 
-    # De model-uitspraak: we behandelen altijd de volgende beurt als AIMessage
-    # omdat we de rol mapping in history zelf bijhouden.
-    resp = await _yap_llm.apredict_messages(msgs)
-    # apredict_messages() geeft een BaseMessage terug; pak content
-    return resp.content if hasattr(resp, "content") else str(resp)
+    chat_llm = yap_llm_burger if role == "burger" else yap_llm_gemeente
+    response = await chat_llm.apredict_messages(
+        msgs,
+        response_format={"type": "json_object"},
+    )
+
+    safe_parser = OutputFixingParser.from_llm(llm=chat_llm, parser=parser)
+    return safe_parser.parse(response.content)
 
 
 def _yap_check_finished(history: list[dict]) -> tuple[bool, str | None]:

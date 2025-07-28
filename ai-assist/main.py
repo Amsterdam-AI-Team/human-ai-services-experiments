@@ -17,8 +17,7 @@ from models import (build_step_model, ChatResponse,
                     YapNextResponse)
 
 from intents import INTENTS
-from templates import (make_chain, _yap_check_finished,
-                       _yap_generate)
+from templates import (make_chain, _yap_generate)
 
 import os
 
@@ -27,6 +26,9 @@ import asyncio
 import asyncpg
 import re
 import logging
+import requests
+from langdetect import detect
+
 
 if "AZURE_OPENAI_API_KEY" not in os.environ:
     print("❌  Missing Azure OpenAI API key")
@@ -52,14 +54,41 @@ for var in [
 _WHISPER_MODEL_NAME = os.getenv("WHISPER_MODEL_NAME", "base")
 _whisper_model = whisper.load_model(_WHISPER_MODEL_NAME)
 
+# cloud transcribe endpoint
+_AZ_ENDPOINT = os.getenv("TRANSCRIPTION_AZ_ENDPOINT")
+_AZ_MODEL = os.getenv("TRANSCRIPTION_AZ_MODEL")
+_AZ_KEY = os.getenv("TRANSCRIPTION_API_KEY")
 
-def _transcribe(path: str) -> tuple[str, str]:
+
+def _transcribe(path: str) -> str:
     """
-    Blocking helper that returns (text, lang).
-    Whisper’s internal language detector is used when language=None.
+    Return only the transcript text using GPT‑4o‑Transcribe.
+    Falls back to local Whisper if the cloud call fails.
     """
-    res = _whisper_model.transcribe(path)     # auto‑detect language
-    return res["text"].strip(), res["language"]
+    with open(path, "rb") as f:
+        try:
+            r = requests.post(
+                _AZ_ENDPOINT,
+                files={"file": f},
+                data={"model": _AZ_MODEL},
+                headers={"Authorization": f"Bearer {_AZ_KEY}"},
+                timeout=60,
+            )
+            r.raise_for_status()
+            return r.json()["text"].strip()
+        except Exception as e:
+            # log & fallback
+            logging.warning("Azure GPT‑4o failed (%s) – using local Whisper", e)
+            res = _whisper_model.transcribe(path)
+            return res["text"].strip()
+
+
+def _detect_language(text: str) -> str:
+    """Lightweight n‑gram language ID (ISO‑639‑1)."""
+    try:
+        return detect(text)          # e.g. 'nl', 'en'
+    except Exception:
+        return "und"                 # undefined
 
 
 # ---------------------------------------------------------------------------
@@ -160,7 +189,8 @@ async def analyze(
 
         # 2️⃣ transcribe in background thread
         loop = asyncio.get_running_loop()
-        text, language = await loop.run_in_executor(None, _transcribe, tmp_path)
+        text = await loop.run_in_executor(None, _transcribe, tmp_path)
+        language = _detect_language(text)
 
         # 3️⃣ similarity search
         q_vec = _embedder.encode(text, convert_to_numpy=True, normalize_embeddings=True)
@@ -227,7 +257,7 @@ async def chat(
 
         try:
             loop = asyncio.get_running_loop()
-            user_text, _ = await loop.run_in_executor(None, _transcribe, tmp_path)
+            user_text = await loop.run_in_executor(None, _transcribe, tmp_path)
         finally:
             os.remove(tmp_path)
     else:
@@ -320,7 +350,8 @@ async def yap_accumulate(
 
         try:
             loop = asyncio.get_running_loop()
-            new_text, _ = await loop.run_in_executor(None, _transcribe, tmp_path)
+            new_text = await loop.run_in_executor(None, _transcribe, tmp_path)
+
         finally:
             os.remove(tmp_path)
 
@@ -338,7 +369,7 @@ async def yap_accumulate(
         # no audio, no append: just echo provided text
         base_text = base_text.strip()
 
-    return YapAccumResponse(text=base_text)
+    return YapAccumResponse(text=base_text, language=_detect_language(base_text))
 
 
 # ---------------------------------------------------------------------------
@@ -357,13 +388,13 @@ async def yap_start(req: YapStartRequest):
 
     # 2. gemeente‑reactie
     gemeente_reply = await _yap_generate("gemeente", req.text, msgs)
-    msgs.append({"speaker": "gemeente", "message": gemeente_reply})
+    msgs.append({"speaker": "gemeente", "message": gemeente_reply.message})
 
     # 3. cache in RAM  ✅ transcript back
     YAP_SESSIONS[sid] = {
         "transcript": req.text,      # <── added line
         "messages": msgs,
-        "turn": 3,                   # volgende = burger
+        "turn": 2,                   # volgende = burger
         "finished": False,
         "draft": None,
     }
@@ -371,18 +402,16 @@ async def yap_start(req: YapStartRequest):
     # 4. persist two rows + the transcript once
     await _store_yap(sid, "system", f"TRANSCRIPT::{req.text}")   # optional
     await _store_yap(sid, "burger", opening)
-    await _store_yap(sid, "gemeente", gemeente_reply)
+    await _store_yap(sid, "gemeente", gemeente_reply.message)
 
-    finished, draft = _yap_check_finished(msgs)
-    if finished:
-        YAP_SESSIONS[sid]["finished"] = True
-        YAP_SESSIONS[sid]["draft"] = draft
+    # finished, draft = _yap_check_finished(msgs)
+    # if finished:
+    #     YAP_SESSIONS[sid]["finished"] = True
+    #     YAP_SESSIONS[sid]["draft"] = draft
 
     return YapStartResponse(
         yap_session_id=sid,
-        messages=msgs,
-        finished=finished,
-        draft=draft,
+        messages=msgs
     )
 
 
@@ -408,27 +437,25 @@ async def yap_next(
         )
 
     # Whose turn?
-    role = "burger" if sess["turn"] % 2 == 0 else "gemeente"
-    # NB: we started turn=1 after burger opening + gemeente reply, adjust if changed.
-    # Safer: infer from last speaker:
-    if sess["messages"]:
-        last_speaker = sess["messages"][-1]["speaker"]
-        role = "burger" if last_speaker == "gemeente" else "gemeente"
+    last_speaker = sess["messages"][-1]["speaker"]
+    role = "burger" if last_speaker == "gemeente" else "gemeente"
 
-    new_msg = await _yap_generate(role, sess["transcript"], sess["messages"])
-    sess["messages"].append({"speaker": role, "message": new_msg})
-    sess["turn"] += 1
+    # structured output (BurgerTurn of GemeenteTurn)
+    step_obj = await _yap_generate(role, sess["transcript"], sess["messages"])
 
-    finished, draft = _yap_check_finished(sess["messages"])
-    if finished:
-        sess["finished"] = True
-        sess["draft"] = draft
+    # 1.  sla de boodschap op
+    sess["messages"].append({"speaker": role, "message": step_obj.message})
+
+    # 2.  update status – alleen de gemeente mag finished/draft zetten
+    if role == "gemeente":
+        sess["finished"] = bool(step_obj.finished)
+        sess["draft"] = step_obj.draft
 
     return YapNextResponse(
         yap_session_id=yap_session_id,
         messages=sess["messages"],
         speaker=role,
-        message=new_msg,
+        message=step_obj.message,
         finished=sess["finished"],
         draft=sess["draft"],
     )
