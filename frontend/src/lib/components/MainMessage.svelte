@@ -46,7 +46,7 @@
 	}
 
 	.main-message {
-		font-size: 72px;
+		font-size: 4rem;
 		font-style: italic;
 		font-weight: 700;
 		line-height: 1.15;

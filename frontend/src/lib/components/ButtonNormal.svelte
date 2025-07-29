@@ -25,7 +25,7 @@
 		border: 2px solid #004699;
 		padding: 0.5rem 1rem;
 		font-family: 'Amsterdam Sans', Arial, sans-serif;
-		font-size: 0.875rem;
+		font-size: 1rem;
 		color: #004699;
 		cursor: pointer;
 		transition: background-color 0.2s, color 0.2s;
@@ -37,8 +37,8 @@
 	}
 
 	.button-icon {
-		width: 16px;
-		height: 16px;
+		width: 32px;
+		height: 32px;
 		flex-shrink: 0;
 	}
 </style>

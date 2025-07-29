@@ -7,6 +7,9 @@
 		content: string;
 		sender?: string;
 	}>();
+
+	// Process content to convert literal \n to actual newlines
+	const processedContent = $derived(() => content.replace(/\\n/g, '\n'));
 </script>
 
 <div class="chat-message {type}">
@@ -18,14 +21,14 @@
 	{/if}
 	
 	<div class="message-content">
-		{#if content.includes('\n')}
-			{#each content.split('\n') as paragraph}
+		{#if processedContent().includes('\n')}
+			{#each processedContent().split('\n') as paragraph}
 				{#if paragraph.trim()}
 					<p>{paragraph}</p>
 				{/if}
 			{/each}
 		{:else}
-			<p>{content}</p>
+			<p>{processedContent()}</p>
 		{/if}
 	</div>
 </div>
@@ -65,7 +68,7 @@
 	.sender-name {
 		font-weight: 600;
 		color: #333;
-		font-size: 0.9rem;
+		font-size: 1rem;
 	}
 
 	.message-content {
@@ -75,7 +78,7 @@
 
 	.message-content p {
 		margin: 0 0 0.5rem 0;
-		font-size: 0.9rem;
+		font-size: 1rem;
 	}
 
 	.message-content p:last-child {

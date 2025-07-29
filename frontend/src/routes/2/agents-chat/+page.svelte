@@ -310,9 +310,9 @@
 			</div>
 		</div>
 
-		<div class="final-action">
+		<!-- <div class="final-action">
 			<button class="primary-button">↗ onderhandeling bekijken</button>
-		</div>
+		</div> -->
 
 		{#if isFinished && approvedResult()}
 			{@const result = approvedResult()}
@@ -332,11 +332,11 @@
 			</div>
 		{/if}
 
-		<div class="reset-section">
+		<!-- <div class="reset-section">
 			<button class="reset-button" onclick={handleReset}>
 				🔄 Reset conversation & return
 			</button>
-		</div>
+		</div> -->
 	</div>
 </main>
 
@@ -358,16 +358,15 @@
 
 	.status-indicator {
 		background: #f3f4f6;
-		padding: 0.5rem 1rem;
-		font-size: 0.875rem;
-		color: #6b7280;
+		padding: 1rem;
+		font-size: 1rem;
 		flex: 1;
 	}
 
 	.user-style {
 		background: #e5e5e5;
 		text-align: right;
-		font-size: 0.75rem;
+		font-size: 1rem;
 		max-width: 300px;
 		margin-left: auto;
 	}
@@ -394,7 +393,7 @@
 	}
 
 	.step {
-		font-size: 0.875rem;
+		font-size: 1rem;
 		color: #6b7280;
 		padding: 0.25rem 0;
 		transition: all 0.3s ease;
@@ -404,8 +403,8 @@
 	}
 
 	.step-icon {
-		width: 16px;
-		height: 16px;
+		width: 32px;
+		height: 32px;
 		flex-shrink: 0;
 	}
 
@@ -424,9 +423,7 @@
 		flex-direction: column-reverse;
 		scroll-behavior: smooth;
 		margin-bottom: 2rem;
-		border: 1px solid #e5e7eb;
 		padding: 1rem;
-		background: #ffffff;
 	}
 
 	.conversation {
@@ -464,7 +461,7 @@
 		color: white;
 		border: none;
 		padding: 0.5rem 1rem;
-		font-size: 0.875rem;
+		font-size: 1rem;
 		cursor: pointer;
 		font-family: 'Amsterdam Sans', Arial, sans-serif;
 	}
@@ -528,7 +525,7 @@
 		color: white;
 		border: none;
 		padding: 0.75rem 1.5rem;
-		font-size: 0.875rem;
+		font-size: 1rem;
 		cursor: pointer;
 		font-family: 'Amsterdam Sans', Arial, sans-serif;
 	}

@@ -35,7 +35,7 @@
 
 <style>
 	.app {
-		height: 100vh;
+		height: calc(100vh - 70px);
 		background-color: #f8f9fa;
 		display: flex;
 		flex-direction: column;
@@ -73,7 +73,7 @@
 		flex-wrap: wrap;
 		gap: 1rem;
 		justify-content: flex-start;
-		margin-bottom: 4rem;
+		margin-bottom: 3rem;
 		width: 1400px;
 		margin-left: -100px;
 	}
@@ -87,12 +87,10 @@
 		border: 1px solid #dee2e6;
 	}
 
-
 	@media (max-width: 768px) {
 		.content {
 			padding: 1rem;
 		}
-
 
 		.tags {
 			gap: 0.5rem;
