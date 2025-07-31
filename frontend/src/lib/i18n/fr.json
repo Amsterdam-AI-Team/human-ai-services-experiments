@@ -35,7 +35,8 @@
     "aiMessage": "Message entrant de votre agent IA personnel:",
     "subsidyQuestion": "Peut-être avez-vous droit à une subvention pour la fête de quartier, dois-je essayer de faire une demande?",
     "ideas": "Quelles idées avez-vous déjà pour la fête de quartier? Alors nous les prendrons en compte.",
-    "callout": "Pour l'instant, notre prototype ne peut vous aider qu'avec quelques scénarios: contraventions de stationnement, déménagements, et X, Y et Z. Essayez-le déjà!"
+    "callout": "Pour l'instant, notre prototype ne peut vous aider qu'avec quelques scénarios: contraventions de stationnement, déménagements, et X, Y et Z. Essayez-le déjà!",
+    "yourAgent": "Votre agent"
   },
   "recording": {
     "startRecording": "Cliquez pour commencer l'enregistrement",

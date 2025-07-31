@@ -35,7 +35,8 @@
     "aiMessage": "Inkomend bericht van jouw persoonlijke AI-agent:",
     "subsidyQuestion": "Misschien heb je wel recht op subsidie voor het buurtfeest, zal ik dit proberen aan te vragen?",
     "ideas": "Wat voor ideeën heb je al voor het buurtfeest? Dan nemen we die mee.",
-    "callout": "Voor nu kan ons prototype je alleen helpen met een paar scenario's: parkeerboetes, verhuizingen, en X, Y en Z. Probeer het alvast uit!"
+    "callout": "Voor nu kan ons prototype je alleen helpen met een paar scenario's: parkeerboetes, verhuizingen, en X, Y en Z. Probeer het alvast uit!",
+    "yourAgent": "Jouw agent"
   },
   "recording": {
     "startRecording": "Klik om te starten met opnemen",

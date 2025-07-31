@@ -35,7 +35,8 @@
     "aiMessage": "Incoming message from your personal AI agent:",
     "subsidyQuestion": "Maybe you are eligible for a subsidy for the neighborhood party, shall I try to apply for this?",
     "ideas": "What ideas do you already have for the neighborhood party? Then we'll take those into account.",
-    "callout": "For now our prototype can only help you with a few scenarios: parking tickets, relocations, and X, Y and Z. Try it out already!"
+    "callout": "For now our prototype can only help you with a few scenarios: parking tickets, relocations, and X, Y and Z. Try it out already!",
+    "yourAgent": "Your agent"
   },
   "recording": {
     "startRecording": "Click to start recording",

@@ -1,5 +1,7 @@
 <!-- ChatMessage.svelte -->
 <script lang="ts">
+	import { _ } from "svelte-i18n";
+	
 	type MessageType = 'gemeente-ai' | 'user-message';
 	
 	let { type, content, sender = '' } = $props<{
@@ -17,6 +19,12 @@
 		<div class="message-header">
 			<img src="/images/chat-gemeente-avatar.png" alt="Gemeente AI" class="avatar" />
 			<span class="sender-name">{sender || 'Gemeente AI-agent:'}</span>
+		</div>
+	{/if}
+	{#if type === 'user-message'}
+		<div class="message-header">
+			<!-- <img src="/images/chat-gemeente-avatar.png" alt="Gemeente AI" class="avatar" /> -->
+			<span class="sender-name">{$_("messages.yourAgent")}</span>
 		</div>
 	{/if}
 	
