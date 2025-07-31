@@ -301,7 +301,7 @@
 
 					<div class="form-field">
 						<label class="field-label" for="bezwaar-textarea"
-							>{$_("concept1.construct.formLabel")}</label
+							>Betreft: {intentHeading()}</label
 						>
 						<textarea
 							id="bezwaar-textarea"
