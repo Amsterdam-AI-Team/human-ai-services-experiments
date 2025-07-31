@@ -224,16 +224,15 @@
 <main class="app">
 	<div class="layout">
 		<div class="left-section">
-			<div class="pill-container">
-				<Pill
-					icon="/images/document.svg"
-					text="Parkeerboete bezwaarformulier"
-					onclick={() => console.log("Pill clicked")}
-				/>
-			</div>
-
 			<div class="chat-container" bind:this={chatContainer} onscroll={handleScroll}>
 				<div class="chat-messages">
+					<div class="message-wrapper">
+						<Pill
+							icon="/images/document.svg"
+							text={`${intentHeading()} formulier`}
+							onclick={() => console.log("Pill clicked")}
+						/>
+					</div>
 					{#if initialTranscript()}
 						<div class="message-wrapper">
 							<ChatMessage
@@ -360,12 +359,12 @@
 		background-color: #f8f9fa;
 		display: flex;
 		flex-direction: column;
-		min-height: calc(100vh - 70px); /* Account for header */
+		min-height: calc(100vh - 140px); /* Account for header */
 	}
 
 	.layout {
 		display: flex;
-		height: calc(100vh - 70px); /* Fixed height for the main layout */
+		height: calc(100vh - 140px); /* Fixed height for the main layout */
 	}
 
 	.left-section {
@@ -379,12 +378,6 @@
 		gap: 1rem;
 	}
 
-	.pill-container {
-		display: flex;
-		justify-content: flex-start;
-		margin-top: 15px;
-		margin-bottom: 1rem;
-	}
 
 	.chat-container {
 		flex: 1;
@@ -430,7 +423,7 @@
 		flex: 2;
 		background-color: #ffffff;
 		padding: 0rem 2rem;
-		overflow: hidden;
+		/* overflow: hidden; */
 	}
 
 	.content-section {
