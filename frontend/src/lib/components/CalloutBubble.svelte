@@ -25,7 +25,7 @@
 </div>
 
 <style>
-	@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
+	/* @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap'); */
 	.callout-bubble {
 		position: relative;
 		max-width: 519px;
@@ -43,15 +43,16 @@
 		top: 0;
 		left: 0;
 		right: 0;
-		bottom: 20px;
+		bottom: 25px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-family: 'Patrick Hand', cursive;
-		font-size: 1.75rem;
-		line-height: 1;
+		/* font-family: 'Patrick Hand', cursive; */
+		font-family: 'Amsterdam Sans', sans-serif;
+		font-size: 1.3rem;
+		line-height: 1.1;
 		text-align: center;
-		padding: 20px 40px;
+		padding: 10px 30px;
 		color: #000;
 	}
 </style>
