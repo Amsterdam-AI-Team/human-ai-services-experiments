@@ -66,8 +66,8 @@
     "helpSubtitle": "Comment pouvons-nous vous aider?",
     "callout": "Pour l'instant, notre prototype ne peut vous aider qu'avec quelques scénarios: contraventions de stationnement, déménagements, et X, Y et Z. Essayez-le déjà!",
     "choose": {
-      "title": "Nous ne sommes pas sûrs de ce que vous vouliez dire",
-      "subtitle": "Nous vous avons entendu dire: {transcript} Nous ne savons pas exactement ce que vous voulez avec cela :) Vous pouvez faire les choses suivantes:"
+      "title": "Choisissez un sujet",
+      "subtitle": "Nous vous avons entendu dire: {transcript}. Nous ne savons pas encore exactement ce que vous voulez dire. Ce prototype ne reconnaît que quelques sujets fixes. Choisissez l'un des sujets suivants pour continuer:"
     },
     "construct": {
       "loadingAI": "L'IA traite votre demande",

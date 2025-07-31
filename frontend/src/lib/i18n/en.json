@@ -66,8 +66,8 @@
     "helpSubtitle": "Comment pouvons-nous vous aider?",
     "callout": "For now our prototype can only help you with a few scenarios: parking tickets, relocations, and X, Y and Z. Try it out already!",
     "choose": {
-      "title": "We're not sure what you meant",
-      "subtitle": "We heard you say: {transcript} We don't know exactly what you want with that :) You can do the following things:"
+      "title": "Choose a topic",
+      "subtitle": "We heard you say: {transcript}. We don't yet know exactly what you mean. This prototype only recognizes a few fixed topics. Choose one of the following topics to continue:"
     },
     "construct": {
       "loadingAI": "AI is processing your request",
