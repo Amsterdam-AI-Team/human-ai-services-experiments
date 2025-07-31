@@ -6,7 +6,7 @@
 	$effect(() => {
 		const timer = setTimeout(() => {
 			goto('/2/feedback');
-		}, 10000);
+		}, 2000);
 
 		return () => clearTimeout(timer);
 	});
