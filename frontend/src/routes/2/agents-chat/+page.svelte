@@ -342,7 +342,7 @@
 
 <style>
 	.agents-chat {
-		min-height: calc(100vh - 70px);
+		min-height: calc(100vh - 100px);
 		background-color: #f8f9fa;
 		font-family: 'Amsterdam Sans', Arial, sans-serif;
 		padding: 2rem;

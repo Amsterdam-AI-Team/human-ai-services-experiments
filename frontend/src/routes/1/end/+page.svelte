@@ -43,7 +43,7 @@
 
 <style>
 	.app {
-		height: calc(100vh - 70px);
+		height: calc(100vh - 100px);
 		background-color: white;
 		display: flex;
 		flex-direction: column;
@@ -56,7 +56,7 @@
 		align-items: center;
 		justify-content: center;
 		text-align: center;
-		transform: translateY(-140px);
+		transform: translateY(-100px);
 	}
 
 	.success-header {

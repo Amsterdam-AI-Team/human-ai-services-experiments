@@ -359,12 +359,12 @@
 		background-color: #f8f9fa;
 		display: flex;
 		flex-direction: column;
-		min-height: calc(100vh - 140px); /* Account for header */
+		min-height: calc(100vh - 100px); /* Account for header */
 	}
 
 	.layout {
 		display: flex;
-		height: calc(100vh - 140px); /* Fixed height for the main layout */
+		height: calc(100vh - 100px); /* Fixed height for the main layout */
 	}
 
 	.left-section {

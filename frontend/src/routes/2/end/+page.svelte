@@ -43,7 +43,7 @@
 
 <style>
 	.app {
-		height: calc(100vh - 70px);
+		height: calc(100vh - 100px);
 		background-color: white;
 		display: flex;
 		flex-direction: column;

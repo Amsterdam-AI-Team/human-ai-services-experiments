@@ -35,7 +35,7 @@
 
 <style>
 	.app {
-		height: calc(100vh - 70px);
+		height: calc(100vh - 100px);
 		background-color: #f8f9fa;
 		display: flex;
 		flex-direction: column;
