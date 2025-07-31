@@ -1,42 +1,59 @@
 <!-- Header.svelte -->
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
-	import { page } from '$app/state';
-	import { setLanguage, currentLanguage } from '$lib/stores/languageStore';
-	import type { LanguageCode } from '$lib/i18n';
-	
+	import { _ } from "svelte-i18n";
+	import { page } from "$app/state";
+	import { goto } from "$app/navigation";
+	import { setLanguage, currentLanguage } from "$lib/stores/languageStore";
+	import { clearApiResponses } from "$lib/stores/apiStore";
+	import type { LanguageCode } from "$lib/i18n";
+
 	const currentRoute = $derived(page.route.id);
-	
+
 	// Map current language to dropdown value
 	const dropdownValue = $derived($currentLanguage);
 
 	function handleDropdownChange(event: Event) {
 		const value = (event.target as HTMLSelectElement).value;
-		
+
 		// Handle supported languages
-		if (value === 'nl' || value === 'en' || value === 'fr') {
+		if (value === "nl" || value === "en" || value === "fr") {
 			setLanguage(value as LanguageCode);
-		} else if (value === 'auto') {
+		} else if (value === "auto") {
 			// 'Auto' means default to Dutch for now
-			setLanguage('nl');
+			setLanguage("nl");
 		} else {
 			// For unsupported languages, show message and revert to current language
 			alert(`${value} is not yet supported. Coming soon!`);
 			// The dropdown will automatically revert due to reactive dropdownValue
 		}
 	}
+
+	function handleBackClick() {
+		clearApiResponses();
+		goto("/1");
+	}
 </script>
 
 <header class="header">
-	{#if currentRoute === '/1/construct'}
+	{#if currentRoute?.startsWith("/1/construct")}
 		<div class="header-layout">
 			<div class="header-left">
 				<div class="logo-container">
-					<img src="/images/logo-sketchy.svg" alt="Logo" class="logo" />
-					<a href="/1" class="back-button">
-						<img src="/images/chevron-left.svg" alt="Back" class="back-arrow" />
-						<span class="back-text">{$_('concept1.construct.backButton')}</span>
-					</a>
+					<img
+						src="/images/logo-sketchy.svg"
+						alt="Logo"
+						class="logo"
+					/>
+					<button onclick={handleBackClick} class="back-button">
+						<img
+							src="/images/chevron-left.svg"
+							alt="Back"
+							class="back-arrow"
+						/>
+						<span class="back-text"
+							>{$_("concept1.construct.backButton")}</span
+						>
+					</button>
 				</div>
 			</div>
 			<div class="header-right">
@@ -101,7 +118,7 @@
 </header>
 
 <style>
-	@import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap');
+	/* @import url("https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap"); */
 
 	.header {
 		height: 140px;
@@ -156,6 +173,7 @@
 		color: #1864ab;
 		padding: 0.5rem 0;
 		text-decoration: none;
+		font-family: 'Amsterdam Sans', sans-serif
 	}
 
 	.back-button:hover {
@@ -191,8 +209,9 @@
 		border: 2px solid #1864ab;
 		border-radius: 8px;
 		padding: 8px 32px 8px 12px;
-		font-family: 'Patrick Hand', cursive;
-		font-size: 1.1rem;
+		/* font-family: "Patrick Hand", cursive; */
+		font-family: "Amsterdam Sans", sans-serif;
+		font-size: 1rem;
 		color: #000;
 		cursor: pointer;
 		position: relative;
@@ -215,7 +234,7 @@
 	}
 
 	.sketchy-dropdown option {
-		font-family: 'Patrick Hand', cursive;
+		font-family: "Patrick Hand", cursive;
 		font-size: 1.1rem;
 		padding: 8px;
 		background: white;

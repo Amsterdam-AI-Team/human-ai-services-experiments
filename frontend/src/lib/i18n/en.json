@@ -25,7 +25,7 @@
   "buttons": {
     "start": "Yes, start →",
     "continue": "submit request →",
-    "submit": "Submit objection",
+    "submit": "Submit",
     "back": "Back",
     "button": "Button"
   },
@@ -72,7 +72,7 @@
     "construct": {
       "loadingAI": "AI is processing your request",
       "senderAI": "Municipal AI agent:",
-      "backButton": "back",
+      "backButton": "Start over",
       "formTitle": "This is what you will submit:",
       "formLabel": "Subject: Appeal against parking fine",
       "formPlaceholder": "Describe your situation"
