@@ -50,7 +50,10 @@
 	const processSteps = [
 		{ icon: "/images/agent-icon-search.svg", text: "regels opzoeken" },
 		{ icon: "/images/agent-icon-edit.svg", text: "voorstel schrijven" },
-		{ icon: "/images/agent-icon-agree.svg", text: "overleggen met gemeente AI-agent" },
+		{
+			icon: "/images/agent-icon-agree.svg",
+			text: "overleggen met gemeente AI-agent",
+		},
 	];
 
 	// Start the yap conversation when user message is available
@@ -80,8 +83,8 @@
 					type: "gemeente-ai",
 					content: "schrijft antwoord...",
 					sender: "Gemeente AI-agent:",
-					isPlaceholder: true
-				}
+					isPlaceholder: true,
+				},
 			];
 
 			// Call yap/start
@@ -110,18 +113,21 @@
 			// Continue with yap/next if not finished
 			if (!result.finished) {
 				// Add user-agent placeholder for next response
-				conversation = [...conversation, {
-					type: "user-message",
-					content: "schrijft antwoord...",
-					sender: "Burger:",
-					isPlaceholder: true
-				}];
-				
+				conversation = [
+					...conversation,
+					{
+						type: "user-message",
+						content: "schrijft antwoord...",
+						sender: "Burger:",
+						isPlaceholder: true,
+					},
+				];
+
 				// Add a small delay before next call to make conversation feel more natural
 				setTimeout(() => continueYapConversation(), 1500);
 			} else {
 				// Remove any remaining placeholder before finishing
-				conversation = conversation.filter(msg => !msg.isPlaceholder);
+				conversation = conversation.filter((msg) => !msg.isPlaceholder);
 				isFinished = true;
 				isLoading = false;
 			}
@@ -153,28 +159,40 @@
 							? "Burger:"
 							: "Gemeente AI-agent:",
 				}));
-				
+
 				conversation = newConversation;
 
 				// Continue if not finished - add placeholder for next response
 				if (!result.finished) {
 					// Determine what type of response comes next
-					const lastMessage = newConversation[newConversation.length - 1];
-					const nextType = lastMessage.type === "gemeente-ai" ? "user-message" : "gemeente-ai";
-					const nextSender = nextType === "gemeente-ai" ? "Gemeente AI-agent:" : "Burger:";
-					
-					conversation = [...conversation, {
-						type: nextType,
-						content: "schrijft antwoord...",
-						sender: nextSender,
-						isPlaceholder: true
-					}];
-					
+					const lastMessage =
+						newConversation[newConversation.length - 1];
+					const nextType =
+						lastMessage.type === "gemeente-ai"
+							? "user-message"
+							: "gemeente-ai";
+					const nextSender =
+						nextType === "gemeente-ai"
+							? "Gemeente AI-agent:"
+							: "Burger:";
+
+					conversation = [
+						...conversation,
+						{
+							type: nextType,
+							content: "schrijft antwoord...",
+							sender: nextSender,
+							isPlaceholder: true,
+						},
+					];
+
 					// Add a small delay before next call to make conversation feel more natural
 					setTimeout(() => continueYapConversation(), 1500);
 				} else {
 					// Remove any remaining placeholder before finishing
-					conversation = conversation.filter(msg => !msg.isPlaceholder);
+					conversation = conversation.filter(
+						(msg) => !msg.isPlaceholder,
+					);
 					isFinished = true;
 					isLoading = false;
 				}
@@ -201,38 +219,41 @@
 			requestAnimationFrame(() => {
 				window.scrollTo({
 					top: document.body.scrollHeight,
-					behavior: 'smooth'
+					behavior: "smooth",
 				});
 			});
 		}
 	});
 
-
 	// Get the final approved result from the API response
 	const approvedResult = $derived(() => {
 		if (!isFinished) return null;
-		
+
 		// Get the latest yapNext response
-		const yapNextResponses = $apiResponses.filter((r) => r.endpoint === "yapNext");
-		const latestResponse = yapNextResponses.length > 0 
-			? yapNextResponses[yapNextResponses.length - 1] 
-			: null;
-		
+		const yapNextResponses = $apiResponses.filter(
+			(r) => r.endpoint === "yapNext",
+		);
+		const latestResponse =
+			yapNextResponses.length > 0
+				? yapNextResponses[yapNextResponses.length - 1]
+				: null;
+
 		if (!latestResponse?.data?.message) {
 			return {
 				title: 'Goedgekeurde subsidie: Buurtfeest "Samen aan Tafel" – €750',
-				description: "Een duurzaam, inclusief buurtfeest voor 50 bewoners met een gemengde BBQ (biologische sparerib én plantaardige alternatieven), kleurrijke decoratie van gerecycled materiaal, en een knutselmiddag vooraf. Het feest bevordert saamhorigheid, culturele uitwisseling en milieubewustzijn. Toegang is gratis, met aandacht voor dieetvetsen en participatie van alle buurtbewoners."
+				description:
+					"Een duurzaam, inclusief buurtfeest voor 50 bewoners met een gemengde BBQ (biologische sparerib én plantaardige alternatieven), kleurrijke decoratie van gerecycled materiaal, en een knutselmiddag vooraf. Het feest bevordert saamhorigheid, culturele uitwisseling en milieubewustzijn. Toegang is gratis, met aandacht voor dieetvetsen en participatie van alle buurtbewoners.",
 			};
 		}
-		
+
 		const message = latestResponse.data.draft;
 		const sentences = message.split(/(?<=\.)\s+/);
 		const title = sentences[0] || message;
-		const description = sentences.slice(1).join(' ').trim() || message;
-		
+		const description = sentences.slice(1).join(" ").trim() || message;
+
 		return {
 			title,
-			description
+			description,
 		};
 	});
 
@@ -257,16 +278,18 @@
 
 	function handleSubmit() {
 		// Navigate to /2/end
-		goto('/2/end');
+		goto("/2/end");
 	}
 </script>
 
 <main class="agents-chat">
 	<header class="page-header">
 		<ButtonSketchySecondary onclick={goBack} />
-		<div class="status-indicator user-style">
-			{userMessage()}
-		</div>
+		<ChatMessage
+			type="user-message"
+			content={userMessage()}
+			sender="Jouw agent"
+		/>
 	</header>
 
 	<div class="content">
@@ -285,35 +308,38 @@
 			{/each}
 		</div>
 
-		<div class="conversation">
-			{#each conversation as message}
-				<div class="message-wrapper">
-					<ChatMessage
-						type={message.type === "user-message"
-							? "user-message"
-							: "gemeente-ai"}
-						content={message.content}
-						sender={message.sender}
-					/>
-					<!-- {#if message.type === "user-message" && !message.isPlaceholder}
-						<div class="user-button-wrapper">
-							<ButtonNormal onclick={() => handleAction('wijziging')} />
-						</div>
-					{/if} -->
-					{#if message.actions}
-						<div class="message-actions">
-							{#each message.actions as action}
-								<button
-									class="action-button"
-									onclick={() => handleAction(action)}
-								>
-									📝 {action}
-								</button>
-							{/each}
-						</div>
-					{/if}
-				</div>
-			{/each}
+		<div class="conversation-container">
+			<div class="conversation-line"></div>
+			<div class="conversation">
+				{#each conversation as message}
+					<div class="message-wrapper">
+						<ChatMessage
+							type={message.type === "user-message"
+								? "user-message"
+								: "gemeente-ai"}
+							content={message.content}
+							sender={message.sender}
+						/>
+						<!-- {#if message.type === "user-message" && !message.isPlaceholder}
+							<div class="user-button-wrapper">
+								<ButtonNormal onclick={() => handleAction('wijziging')} />
+							</div>
+						{/if} -->
+						{#if message.actions}
+							<div class="message-actions">
+								{#each message.actions as action}
+									<button
+										class="action-button"
+										onclick={() => handleAction(action)}
+									>
+										📝 {action}
+									</button>
+								{/each}
+							</div>
+						{/if}
+					</div>
+				{/each}
+			</div>
 		</div>
 
 		<!-- <div class="final-action">
@@ -331,9 +357,12 @@
 					Omschrijving aangepast plan:
 				</div>
 				<p class="approval-description">{result?.description}</p>
-				
+
 				<div class="submit-section">
-					<ButtonSketchySmall text={$_('buttons.submit')} onclick={handleSubmit} />
+					<ButtonSketchySmall
+						text={$_("buttons.submit")}
+						onclick={handleSubmit}
+					/>
 				</div>
 			</div>
 		{/if}
@@ -350,7 +379,7 @@
 	.agents-chat {
 		min-height: calc(100vh - 100px);
 		background-color: #f8f9fa;
-		font-family: 'Amsterdam Sans', Arial, sans-serif;
+		font-family: "Amsterdam Sans", Arial, sans-serif;
 		padding: 2rem;
 	}
 
@@ -378,7 +407,7 @@
 	}
 
 	.content {
-		max-width: 1200px;
+		max-width: 1000px;
 		margin: 0 auto;
 		width: 100%;
 	}
@@ -422,11 +451,26 @@
 		font-weight: 600;
 	}
 
+	.conversation-container {
+		display: flex;
+		align-items: flex-start;
+		gap: 1rem;
+		margin: 0 auto 2rem auto;
+	}
+
+	.conversation-line {
+		width: 3px;
+		background-color: #d1d5db;
+		flex-shrink: 0;
+		align-self: stretch;
+		min-height: 200px;
+	}
+
 	.conversation {
 		display: flex;
 		flex-direction: column;
 		gap: 1.5rem;
-		margin-bottom: 2rem;
+		flex: 1;
 	}
 
 	.message-wrapper {
@@ -460,13 +504,12 @@
 		padding: 0.5rem 1rem;
 		font-size: 1rem;
 		cursor: pointer;
-		font-family: 'Amsterdam Sans', Arial, sans-serif;
+		font-family: "Amsterdam Sans", Arial, sans-serif;
 	}
 
 	.action-button:hover {
 		background: #2563eb;
 	}
-
 
 	.final-action {
 		text-align: center;
@@ -480,7 +523,7 @@
 		padding: 0.75rem 1.5rem;
 		font-size: 1rem;
 		cursor: pointer;
-		font-family: 'Amsterdam Sans', Arial, sans-serif;
+		font-family: "Amsterdam Sans", Arial, sans-serif;
 	}
 
 	.primary-button:hover {
@@ -539,7 +582,7 @@
 		font-size: 0.875rem;
 		cursor: pointer;
 		transition: background-color 0.2s;
-		font-family: 'Amsterdam Sans', Arial, sans-serif;
+		font-family: "Amsterdam Sans", Arial, sans-serif;
 	}
 
 	.reset-button:hover {
