@@ -51,8 +51,8 @@
 			}
 		}
 
-		// Add existing text for incremental transcription (yap endpoint)
-		if (endpoint === "yap" && existingText && existingText.length > 0) {
+		// Add existing text for incremental transcription (yap and feedback-transcribe endpoints)
+		if ((endpoint === "yap" || endpoint === "feedback-transcribe") && existingText && existingText.length > 0) {
 			formData.append("text", existingText);
 		}
 
@@ -82,7 +82,7 @@
 			console.log("API response:", result);
 
 			// Handle language detection from API response
-			if (result?.language && (endpoint === "yap" || endpoint === "analyze")) {
+			if (result?.language && (endpoint === "yap" || endpoint === "analyze" || endpoint === "feedback-transcribe")) {
 				const detectedLang = result.language as LanguageCode;
 				if (shouldSwitchLanguage(detectedLang)) {
 					setLanguageFromAPI(detectedLang);

@@ -2,23 +2,15 @@ import { AI_API_ENDPOINT } from "$env/static/private";
 
 export async function POST({ request }) {
   try {
-    // Handle JSON (text feedback only)
-    const { feedback, session_id, concept } = await request.json();
-    const requestBody = {
-      feedback,
-      ...(session_id && { session_id }),
-      ...(concept && { concept }),
-    };
-
-    const response = await fetch(`${AI_API_ENDPOINT}/feedback`, {
+    const formData = await request.formData();
+    
+    const response = await fetch(`${AI_API_ENDPOINT}/yap`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(requestBody),
+      body: formData,
     });
 
     const result = await response.json();
     return new Response(JSON.stringify(result), {
-      status: response.status,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {

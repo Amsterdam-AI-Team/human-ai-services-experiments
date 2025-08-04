@@ -2,6 +2,7 @@
 	import { _ } from "svelte-i18n";
 	import { goto } from "$app/navigation";
 	import ButtonSketchy from "$lib/components/ButtonSketchy.svelte";
+	import { clearApiResponses } from "$lib/stores/apiStore";
 
 	interface Props {
 		concept: number;
@@ -13,6 +14,7 @@
 	$effect(() => {
 		const redirectUrl = `/${concept}`;
 		const timer = setTimeout(() => {
+			clearApiResponses();
 			goto(redirectUrl);
 		}, 5000);
 
@@ -20,6 +22,7 @@
 	});
 
 	function handleGoHome() {
+		clearApiResponses();
 		goto(`/${concept}`);
 	}
 </script>

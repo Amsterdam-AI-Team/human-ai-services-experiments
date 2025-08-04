@@ -5,7 +5,9 @@
 	import { _ } from "svelte-i18n";
 	import { handleApiError } from "$lib/stores/errorStore";
 	import { getSessionId } from "$lib/stores/sessionStore";
-	import { clearApiResponses } from "$lib/stores/apiStore";
+	import { clearApiResponses, apiResponses } from "$lib/stores/apiStore";
+	import { setLanguageFromAPI, shouldSwitchLanguage } from '$lib/stores/languageStore';
+	import type { LanguageCode } from '$lib/i18n';
 
 	interface Props {
 		concept: number;
@@ -13,21 +15,52 @@
 
 	let { concept }: Props = $props();
 
-	let feedbackText = $state("");
+	let transcriptionText = $state("");
 	let isSubmitting = $state(false);
-	let isRecording = $state(false);
+	let isTranscribing = $state(false);
 	let hasError = $state(false);
 	let errorMessage = $state("");
+
+	const displayText = $derived(
+		isTranscribing
+			? $_('recording.transcribing')
+			: transcriptionText.length > 0
+				? $_('recording.addRecording')
+				: $_('recording.startRecording')
+	);
+
+	// Watch for feedback-transcribe endpoint responses and update transcription
+	$effect(() => {
+		const responses = $apiResponses;
+		const latestTranscribeResponse = responses
+			.filter(r => r.endpoint === 'feedback-transcribe')
+			.slice(-1)[0];
+		
+		if (latestTranscribeResponse?.data?.text) {
+			transcriptionText = latestTranscribeResponse.data.text;
+			isTranscribing = false;
+			
+			// Handle language detection from API response
+			if (latestTranscribeResponse.data.language) {
+				const detectedLang = latestTranscribeResponse.data.language as LanguageCode;
+				if (shouldSwitchLanguage(detectedLang)) {
+					setLanguageFromAPI(detectedLang);
+				}
+			}
+		} else if (latestTranscribeResponse?.data?.error) {
+			isTranscribing = false;
+		}
+	});
 
 	function handleRecordingStateChange(
 		recording: boolean,
 		analyzing: boolean,
 	) {
-		isRecording = recording || analyzing;
+		isTranscribing = analyzing;
 	}
 
 	async function handleSubmit() {
-		if (!feedbackText.trim()) {
+		if (!transcriptionText.trim()) {
 			hasError = true;
 			errorMessage = $_("feedback.errorEmpty");
 			return;
@@ -39,7 +72,7 @@
 		try {
 			const currentSessionId = getSessionId();
 			const requestBody: any = {
-				feedback: feedbackText.trim(),
+				feedback: transcriptionText.trim(),
 				concept: concept,
 			};
 
@@ -107,10 +140,47 @@
 		<div class="feedback-form">
 			<textarea
 				class="feedback-textarea"
-				bind:value={feedbackText}
+				dir="auto"
+				bind:value={transcriptionText}
 				placeholder={$_("feedback.placeholder")}
-				disabled={isSubmitting}
+				readonly
 			></textarea>
+
+			<p class="display-text">{displayText}</p>
+
+			<div class="recording-section">
+				<div class="record-button-wrapper">
+					<SingleRecordingSection 
+						endpoint="feedback-transcribe" 
+						recordKey="e"
+						onStateChange={handleRecordingStateChange}
+						existingText={transcriptionText}
+					/>
+					{#if transcriptionText.length > 0}
+						<span class="plus-symbol">+</span>
+					{/if}
+				</div>
+				{#if transcriptionText.length > 0}
+					<div class="verstuur-button-container">
+						<div class="button-wrapper">
+							<ButtonSketchy
+								text={isSubmitting
+									? $_("feedback.submitting")
+									: $_("feedback.submit")}
+								onclick={handleSubmit}
+								disabled={isSubmitting || isTranscribing}
+							/>
+						</div>
+						{#if !isSubmitting}
+							<img
+								src="/images/checkmark.svg"
+								alt="checkmark"
+								class="checkmark-icon"
+							/>
+						{/if}
+					</div>
+				{/if}
+			</div>
 
 			<div class="privacy-info">
 				<ul>
@@ -124,35 +194,6 @@
 					{errorMessage}
 				</div>
 			{/if}
-
-			<div class="submit-section">
-				<div class="record-button-wrapper">
-					<SingleRecordingSection
-						endpoint="feedback"
-						recordKey="e"
-						onStateChange={handleRecordingStateChange}
-					/>
-				</div>
-
-				<div class="verstuur-button-container">
-					<div class="button-wrapper">
-						<ButtonSketchy
-							text={isSubmitting
-								? $_("feedback.submitting")
-								: $_("feedback.submit")}
-							onclick={handleSubmit}
-							disabled={isSubmitting || isRecording}
-						/>
-					</div>
-					{#if !isSubmitting}
-						<img
-							src="/images/checkmark.svg"
-							alt="checkmark"
-							class="checkmark-icon"
-						/>
-					{/if}
-				</div>
-			</div>
 		</div>
 	</div>
 </main>
@@ -187,9 +228,7 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		/* align-items: center; */
 		justify-content: center;
-		/* text-align: center; */
 		max-width: 800px;
 		margin: 0 auto;
 		padding: 2rem;
@@ -248,9 +287,78 @@
 		background-color: rgba(255, 255, 255, 0.15);
 	}
 
-	.feedback-textarea:disabled {
-		opacity: 0.6;
-		cursor: not-allowed;
+	.display-text {
+		font-size: 1.1rem;
+		color: rgba(255, 255, 255, 0.8);
+		margin: 0 0 1.5rem 0;
+		text-align: center;
+	}
+
+	.recording-section {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 3rem;
+		margin-bottom: 2rem;
+	}
+
+	.record-button-wrapper {
+		position: relative;
+		display: inline-block;
+		flex-shrink: 0;
+	}
+
+	.plus-symbol {
+		position: absolute;
+		top: -7px;
+		right: -7px;
+		background: #6c757d;
+		color: white;
+		border-radius: 50%;
+		width: 22px;
+		height: 22px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: 16px;
+		font-weight: bold;
+		z-index: 10;
+	}
+
+	.verstuur-button-container {
+		position: relative;
+		display: inline-block;
+		transition: transform 0.1s ease;
+	}
+
+	.verstuur-button-container:hover {
+		transform: translateY(-2px);
+	}
+
+	.button-wrapper {
+		pointer-events: none;
+	}
+
+	.button-wrapper :global(.svg-button) {
+		pointer-events: auto;
+	}
+
+	.button-wrapper :global(.svg-button:hover:not(:disabled)) {
+		transform: none !important;
+	}
+
+	.button-wrapper :global(.svg-button:hover:not(:disabled) .button-svg) {
+		filter: brightness(1.1);
+	}
+
+	.checkmark-icon {
+		position: absolute;
+		top: 45%;
+		right: 4rem;
+		transform: translateY(-50%) scale(2.5);
+		height: 20px;
+		pointer-events: none;
+		z-index: 11;
 	}
 
 	.privacy-info {
@@ -291,53 +399,6 @@
 		font-size: 0.95rem;
 	}
 
-	.submit-section {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		gap: 3rem;
-	}
-
-	.record-button-wrapper {
-		flex-shrink: 0;
-	}
-
-	.verstuur-button-container {
-		position: relative;
-		display: inline-block;
-		transition: transform 0.1s ease;
-	}
-
-	.verstuur-button-container:hover {
-		transform: translateY(-2px);
-	}
-
-	.button-wrapper {
-		pointer-events: none;
-	}
-
-	.button-wrapper :global(.svg-button) {
-		pointer-events: auto;
-	}
-
-	.button-wrapper :global(.svg-button:hover:not(:disabled)) {
-		transform: none !important;
-	}
-
-	.button-wrapper :global(.svg-button:hover:not(:disabled) .button-svg) {
-		filter: brightness(1.1);
-	}
-
-	.checkmark-icon {
-		position: absolute;
-		top: 45%;
-		right: 4rem;
-		transform: translateY(-50%) scale(2.5);
-		height: 20px;
-		pointer-events: none;
-		z-index: 11;
-	}
-
 	@media (max-width: 768px) {
 		.content {
 			padding: 1rem;
@@ -351,7 +412,7 @@
 			font-size: 1.1rem;
 		}
 
-		.submit-section {
+		.recording-section {
 			flex-direction: column;
 			gap: 2rem;
 		}
