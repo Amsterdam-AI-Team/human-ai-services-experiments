@@ -107,7 +107,7 @@
 
 	function handleClose() {
 		clearApiResponses();
-		goto("/");
+		goto(`/${concept}`);
 	}
 </script>
 
