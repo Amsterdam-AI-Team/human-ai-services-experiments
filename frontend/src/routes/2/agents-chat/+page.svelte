@@ -37,21 +37,14 @@
 			content: string;
 			sender?: string;
 			actions?: string[];
+			isPlaceholder?: boolean;
 		}>
 	>([]);
-
-	// $effect(() => {
-	// 	console.log(conversation);
-	// });
 
 	let yapSessionId = $state<string | null>(null);
 	let isLoading = $state(false);
 	let currentStep = $state(0); // For animating the process steps
 	let isFinished = $state(false);
-	
-	// Chat scrolling references
-	let chatContainer: HTMLElement;
-	let shouldAutoScroll = $state(true);
 
 	// Process steps for animation
 	const processSteps = [
@@ -81,6 +74,16 @@
 			// Start step animation
 			animateSteps();
 
+			// Add gemeente-agent placeholder immediately
+			conversation = [
+				{
+					type: "gemeente-ai",
+					content: "schrijft antwoord...",
+					sender: "Gemeente AI-agent:",
+					isPlaceholder: true
+				}
+			];
+
 			// Call yap/start
 			const result = await sendToEndpoint("yapStart", { text: message });
 			addApiResponse("yapStart", result);
@@ -106,9 +109,19 @@
 
 			// Continue with yap/next if not finished
 			if (!result.finished) {
+				// Add user-agent placeholder for next response
+				conversation = [...conversation, {
+					type: "user-message",
+					content: "schrijft antwoord...",
+					sender: "Burger:",
+					isPlaceholder: true
+				}];
+				
 				// Add a small delay before next call to make conversation feel more natural
 				setTimeout(() => continueYapConversation(), 1500);
 			} else {
+				// Remove any remaining placeholder before finishing
+				conversation = conversation.filter(msg => !msg.isPlaceholder);
 				isFinished = true;
 				isLoading = false;
 			}
@@ -129,7 +142,7 @@
 
 			// Process full conversation from yapNext response
 			if (result.messages && Array.isArray(result.messages)) {
-				conversation = result.messages.map((msg: any) => ({
+				const newConversation = result.messages.map((msg: any) => ({
 					type:
 						msg.speaker === "burger"
 							? "user-message"
@@ -140,15 +153,31 @@
 							? "Burger:"
 							: "Gemeente AI-agent:",
 				}));
-			}
+				
+				conversation = newConversation;
 
-			// Continue if not finished
-			if (!result.finished) {
-				// Add a small delay before next call to make conversation feel more natural
-				setTimeout(() => continueYapConversation(), 1500);
-			} else {
-				isFinished = true;
-				isLoading = false;
+				// Continue if not finished - add placeholder for next response
+				if (!result.finished) {
+					// Determine what type of response comes next
+					const lastMessage = newConversation[newConversation.length - 1];
+					const nextType = lastMessage.type === "gemeente-ai" ? "user-message" : "gemeente-ai";
+					const nextSender = nextType === "gemeente-ai" ? "Gemeente AI-agent:" : "Burger:";
+					
+					conversation = [...conversation, {
+						type: nextType,
+						content: "schrijft antwoord...",
+						sender: nextSender,
+						isPlaceholder: true
+					}];
+					
+					// Add a small delay before next call to make conversation feel more natural
+					setTimeout(() => continueYapConversation(), 1500);
+				} else {
+					// Remove any remaining placeholder before finishing
+					conversation = conversation.filter(msg => !msg.isPlaceholder);
+					isFinished = true;
+					isLoading = false;
+				}
 			}
 		} catch (error) {
 			handleApiError(error, "yapNext");
@@ -166,23 +195,17 @@
 		}, 1000); // Change step every second
 	}
 
-	// Auto-scroll to bottom when new messages arrive
+	// Auto-scroll to bottom when new content is added
 	$effect(() => {
-		if (chatContainer && shouldAutoScroll && conversation.length > 0) {
+		if (conversation.length > 0) {
 			requestAnimationFrame(() => {
-				chatContainer.scrollTop = chatContainer.scrollHeight;
+				window.scrollTo({
+					top: document.body.scrollHeight,
+					behavior: 'smooth'
+				});
 			});
 		}
 	});
-
-	// Handle scroll to detect if user scrolled up
-	function handleScroll() {
-		if (!chatContainer) return;
-		
-		const { scrollTop, scrollHeight, clientHeight } = chatContainer;
-		const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
-		shouldAutoScroll = isAtBottom;
-	}
 
 
 	// Get the final approved result from the API response
@@ -262,52 +285,35 @@
 			{/each}
 		</div>
 
-		<div class="conversation-container" bind:this={chatContainer} onscroll={handleScroll}>
-			<div class="conversation">
-				{#each conversation as message}
-					<div class="message-wrapper">
-						<ChatMessage
-							type={message.type === "user-message"
-								? "user-message"
-								: "gemeente-ai"}
-							content={message.content}
-							sender={message.sender}
-						/>
-						{#if message.type === "user-message"}
-							<div class="user-button-wrapper">
-								<ButtonNormal onclick={() => handleAction('wijziging')} />
-							</div>
-						{/if}
-						{#if message.actions}
-							<div class="message-actions">
-								{#each message.actions as action}
-									<button
-										class="action-button"
-										onclick={() => handleAction(action)}
-									>
-										📝 {action}
-									</button>
-								{/each}
-							</div>
-						{/if}
-					</div>
-				{/each}
-
-				{#if isLoading && !isFinished}
-					<div class="message-wrapper">
-						<div class="loading-indicator">
-							<div class="loading-dots">
-								<span>Gesprek wordt opgebouwd</span>
-								<div class="dots">
-									<span>.</span>
-									<span>.</span>
-									<span>.</span>
-								</div>
-							</div>
+		<div class="conversation">
+			{#each conversation as message}
+				<div class="message-wrapper">
+					<ChatMessage
+						type={message.type === "user-message"
+							? "user-message"
+							: "gemeente-ai"}
+						content={message.content}
+						sender={message.sender}
+					/>
+					<!-- {#if message.type === "user-message" && !message.isPlaceholder}
+						<div class="user-button-wrapper">
+							<ButtonNormal onclick={() => handleAction('wijziging')} />
 						</div>
-					</div>
-				{/if}
-			</div>
+					{/if} -->
+					{#if message.actions}
+						<div class="message-actions">
+							{#each message.actions as action}
+								<button
+									class="action-button"
+									onclick={() => handleAction(action)}
+								>
+									📝 {action}
+								</button>
+							{/each}
+						</div>
+					{/if}
+				</div>
+			{/each}
 		</div>
 
 		<!-- <div class="final-action">
@@ -416,20 +422,11 @@
 		font-weight: 600;
 	}
 
-	.conversation-container {
-		max-height: 60vh;
-		overflow-y: auto;
-		display: flex;
-		flex-direction: column-reverse;
-		scroll-behavior: smooth;
-		margin-bottom: 2rem;
-		padding: 1rem;
-	}
-
 	.conversation {
 		display: flex;
 		flex-direction: column;
 		gap: 1.5rem;
+		margin-bottom: 2rem;
 	}
 
 	.message-wrapper {
@@ -470,50 +467,6 @@
 		background: #2563eb;
 	}
 
-	.loading-indicator {
-		padding: 1rem;
-		margin: 0.5rem 0;
-		background-color: #f8f9fa;
-		border-left: 4px solid #007bff;
-	}
-
-	.loading-dots {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		color: #666;
-		font-style: italic;
-	}
-
-	.dots {
-		display: flex;
-		gap: 0.2rem;
-	}
-
-	.dots span {
-		animation: pulse 1.4s ease-in-out infinite both;
-	}
-
-	.dots span:nth-child(1) {
-		animation-delay: -0.32s;
-	}
-	.dots span:nth-child(2) {
-		animation-delay: -0.16s;
-	}
-	.dots span:nth-child(3) {
-		animation-delay: 0s;
-	}
-
-	@keyframes pulse {
-		0%,
-		80%,
-		100% {
-			opacity: 0.3;
-		}
-		40% {
-			opacity: 1;
-		}
-	}
 
 	.final-action {
 		text-align: center;
