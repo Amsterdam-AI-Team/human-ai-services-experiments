@@ -89,5 +89,23 @@
       "bbq": "Spare rib BBQ",
       "carshow": "Car show"
     }
+  },
+  "feedback": {
+    "title": "Help design the future!",
+    "subtitle": "In the future I want AI within the municipality...",
+    "placeholder": "... speak your idea",
+    "privacy1": "Don't tell personal information, like your name.",
+    "privacy2": "Your idea is converted to text, we don't save audio recordings. This way we ensure your feedback remains anonymous. We use this text to discover what people find important.",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "errorEmpty": "Please enter feedback before submitting.",
+    "errorGeneric": "Something went wrong while submitting your feedback.",
+    "errorNetwork": "Network error. Check your internet connection and try again."
+  },
+  "finalThanks": {
+    "title": "Thank you!",
+    "message": "Your feedback has been successfully submitted. We appreciate your contribution to the future of AI in the municipality.",
+    "goHome": "Go back home",
+    "autoRedirect": "You will be automatically redirected to the homepage in 5 seconds."
   }
 }

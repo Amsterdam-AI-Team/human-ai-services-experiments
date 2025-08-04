@@ -89,5 +89,23 @@
       "bbq": "BBQ côtes levées",
       "carshow": "Salon automobile"
     }
+  },
+  "feedback": {
+    "title": "Aidez à concevoir l'avenir!",
+    "subtitle": "À l'avenir, je veux que l'IA dans la municipalité...",
+    "placeholder": "... exprimez votre idée",
+    "privacy1": "Ne donnez pas d'informations personnelles, comme votre nom.",
+    "privacy2": "Votre idée est convertie en texte, nous ne sauvegardons pas les enregistrements audio. Ainsi nous nous assurons que vos commentaires restent anonymes. Nous utilisons ce texte pour découvrir ce que les gens trouvent important.",
+    "submit": "Soumettre",
+    "submitting": "Soumission...",
+    "errorEmpty": "Veuillez saisir un commentaire avant de soumettre.",
+    "errorGeneric": "Quelque chose s'est mal passé lors de la soumission de vos commentaires.",
+    "errorNetwork": "Erreur réseau. Vérifiez votre connexion internet et réessayez."
+  },
+  "finalThanks": {
+    "title": "Merci!",
+    "message": "Vos commentaires ont été soumis avec succès. Nous apprécions votre contribution à l'avenir de l'IA dans la municipalité.",
+    "goHome": "Retourner à l'accueil",
+    "autoRedirect": "Vous serez automatiquement redirigé vers la page d'accueil dans 5 secondes."
   }
 }

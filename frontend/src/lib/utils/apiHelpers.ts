@@ -1,5 +1,5 @@
 // API helper functions for different endpoints
-export type EndpointType = "analyze" | "chat" | "yap" | "yapStart" | "yapNext";
+export type EndpointType = "analyze" | "chat" | "yap" | "yapStart" | "yapNext" | "feedback";
 
 export interface ApiResponse {
   data: any;
@@ -17,6 +17,7 @@ export async function sendToEndpoint(
     yap: "/api/yap",
     yapStart: "/api/yap/start",
     yapNext: "/api/yap/next",
+    feedback: "/api/feedback",
   };
 
   const url = endpointMap[endpoint];
@@ -30,8 +31,8 @@ export async function sendToEndpoint(
   };
 
   // Handle different data types based on endpoint
-  if (endpoint === "chat") {
-    // chat endpoint supports both JSON and FormData modes
+  if (endpoint === "chat" || endpoint === "feedback") {
+    // chat and feedback endpoints support both JSON and FormData modes
     if (data instanceof FormData) {
       // Multipart mode - don't set Content-Type (let browser set it)
       requestInit.body = data;

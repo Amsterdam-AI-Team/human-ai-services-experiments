@@ -89,5 +89,23 @@
       "bbq": "Sparerib BBQ",
       "carshow": "Autoshow"
     }
+  },
+  "feedback": {
+    "title": "Ontwerp mee aan de toekomst!",
+    "subtitle": "In de toekomst wil ik dat AI binnen de gemeente...",
+    "placeholder": "... spreek je idee in",
+    "privacy1": "Vertel geen persoonlijke gegevens, zoals je naam.",
+    "privacy2": "Je idee wordt omgezet in tekst, we slaan geen geluidsopnames op. Zo zorgen we ervoor dat jouw feedback anoniem blijft. We gebruiken deze tekst om te ontdekken wat mensen belangrijk vinden.",
+    "submit": "Verstuur",
+    "submitting": "Versturen...",
+    "errorEmpty": "Voer feedback in voordat je verstuurt.",
+    "errorGeneric": "Er ging iets mis bij het versturen van je feedback.",
+    "errorNetwork": "Netwerkfout. Controleer je internetverbinding en probeer opnieuw."
+  },
+  "finalThanks": {
+    "title": "Bedankt!",
+    "message": "Je feedback is succesvol verstuurd. We waarderen je bijdrage aan de toekomst van AI in de gemeente.",
+    "goHome": "Terug naar home",
+    "autoRedirect": "Je wordt automatisch doorgestuurd naar de startpagina in 5 seconden."
   }
 }
