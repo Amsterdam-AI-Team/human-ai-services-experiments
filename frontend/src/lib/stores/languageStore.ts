@@ -33,21 +33,10 @@ export function initLanguage() {
   setLanguage(savedLang);
 }
 
-// Function for API-driven language switching (future use with Whisper)
-export function setLanguageFromAPI(
-  languageCode: LanguageCode,
-  confidence?: number,
-) {
-  console.log(
-    `API detected language: ${languageCode} (confidence: ${confidence})`,
-  );
-
-  // You can add confidence threshold logic here
-  // if (confidence && confidence < 0.8) {
-  //   console.log('Low confidence, not switching language');
-  //   return;
-  // }
-
+// Function for API-driven language switching
+export function setLanguageFromAPI(languageCode: LanguageCode) {
+  console.log(`API detected language: ${languageCode}`);
+  
   setLanguage(languageCode);
   // Note: This won't persist to localStorage - only manual switches persist
 }
