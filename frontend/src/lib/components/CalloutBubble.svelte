@@ -49,10 +49,10 @@
 		justify-content: center;
 		/* font-family: 'Patrick Hand', cursive; */
 		font-family: 'Amsterdam Sans', sans-serif;
-		font-size: 1.3rem;
-		line-height: 1.1;
+		font-size: 1rem;
+		line-height: 1.4;
 		text-align: center;
-		padding: 10px 30px;
+		padding: 10px 20px;
 		color: #000;
 	}
 </style>

@@ -35,7 +35,7 @@
     "aiMessage": "Message entrant de votre agent IA personnel:",
     "subsidyQuestion": "Peut-être avez-vous droit à une subvention pour la fête de quartier, dois-je essayer de faire une demande?",
     "ideas": "Quelles idées avez-vous déjà pour la fête de quartier? Alors nous les prendrons en compte.",
-    "callout": "Pour l'instant, notre prototype ne peut vous aider qu'avec quelques scénarios: contraventions de stationnement, déménagements, et X, Y et Z. Essayez-le déjà!",
+    "callout": "Notre prototype ne peut maintenant vous aider qu'avec quelques choses: faire appel d'une contravention de stationnement, signaler une voiture mal garée, signaler quelque chose dans l'espace public, ou demander un permis d'événement pour une fête de quartier. N'hésitez pas à l'essayer!",
     "yourAgent": "Votre agent"
   },
   "recording": {
@@ -66,7 +66,7 @@
   "concept1": {
     "mainHelp": "Comment pouvons-nous vous aider?",
     "helpSubtitle": "Comment pouvons-nous vous aider?",
-    "callout": "Pour l'instant, notre prototype ne peut vous aider qu'avec quelques scénarios: contraventions de stationnement, déménagements, et X, Y et Z. Essayez-le déjà!",
+    "callout": "Notre prototype ne peut maintenant vous aider qu'avec quelques choses: faire appel d'une contravention de stationnement, signaler une voiture mal garée, signaler quelque chose dans l'espace public, ou demander un permis d'événement pour une fête de quartier. N'hésitez pas à l'essayer!",
     "choose": {
       "title": "Choisissez un sujet",
       "subtitle": "Nous vous avons entendu dire: {transcript}. Nous ne savons pas encore exactement ce que vous voulez dire. Ce prototype ne reconnaît que quelques sujets fixes. Choisissez l'un des sujets suivants pour continuer:"

@@ -35,7 +35,7 @@
     "aiMessage": "Incoming message from your personal AI agent:",
     "subsidyQuestion": "Maybe you are eligible for a subsidy for the neighborhood party, shall I try to apply for this?",
     "ideas": "What ideas do you already have for the neighborhood party? Then we'll take those into account.",
-    "callout": "For now our prototype can only help you with a few scenarios: parking tickets, relocations, and X, Y and Z. Try it out already!",
+    "callout": "Our prototype can now only help you with a few things: appealing a parking ticket, reporting a wrongly parked car, reporting something in public space, or requesting an event permit for a neighborhood party. Feel free to try it!",
     "yourAgent": "Your agent"
   },
   "recording": {
@@ -66,7 +66,7 @@
   "concept1": {
     "mainHelp": "How can we help you?",
     "helpSubtitle": "Comment pouvons-nous vous aider?",
-    "callout": "For now our prototype can only help you with a few scenarios: parking tickets, relocations, and X, Y and Z. Try it out already!",
+    "callout": "Our prototype can now only help you with a few things: appealing a parking ticket, reporting a wrongly parked car, reporting something in public space, or requesting an event permit for a neighborhood party. Feel free to try it!",
     "choose": {
       "title": "Choose a topic",
       "subtitle": "We heard you say: {transcript}. We don't yet know exactly what you mean. This prototype only recognizes a few fixed topics. Choose one of the following topics to continue:"

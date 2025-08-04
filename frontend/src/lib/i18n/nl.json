@@ -35,7 +35,7 @@
     "aiMessage": "Inkomend bericht van jouw persoonlijke AI-agent:",
     "subsidyQuestion": "Misschien heb je wel recht op subsidie voor het buurtfeest, zal ik dit proberen aan te vragen?",
     "ideas": "Wat voor ideeën heb je al voor het buurtfeest? Dan nemen we die mee.",
-    "callout": "Ons prototype kan je nu alleen helpen met een paar dingen: bezwaar op een parkeerboete, een fout geparkeerde auto melden, iets melden in de openbare ruimte of een evenement vergunning voor een aanvragen. Probeer het gerust!",
+    "callout": "Ons prototype kan je nu alleen helpen met een paar dingen: bezwaar op een parkeerboete, een fout geparkeerde auto melden, iets melden in de openbare ruimte of een evenement vergunning voor een buurtfeest aanvragen. Probeer het gerust!",
     "yourAgent": "Jouw agent"
   },
   "recording": {
@@ -66,7 +66,7 @@
   "concept1": {
     "mainHelp": "Hoe kunnen we je helpen?",
     "helpSubtitle": "Comment pouvons-nous vous aider?",
-    "callout": "Ons prototype kan je nu alleen helpen met een paar dingen: bezwaar op een parkeerboete, een fout geparkeerde auto melden, iets melden in de openbare ruimte of een evenement vergunning voor een aanvragen. Probeer het gerust!",
+    "callout": "Ons prototype kan je nu alleen helpen met een paar dingen: bezwaar op een parkeerboete, een fout geparkeerde auto melden, iets melden in de openbare ruimte of een evenement vergunning voor een buurtfeest aanvragen. Probeer het gerust!",
     "choose": {
       "title": "Kies een onderwerp",
       "subtitle": "We hoorden je zeggen: {transcript}. We weten nog niet precies wat je bedoelt. Dit prototype herkent alleen een paar vaste onderwerpen. Kies een van de volgende onderwerpen om verder te gaan:"
