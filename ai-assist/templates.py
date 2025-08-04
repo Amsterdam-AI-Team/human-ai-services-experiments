@@ -61,17 +61,24 @@ def make_chain(step_model: type[BaseModel], session: dict):
 
     system_msg = SystemMessage(
         content=(
-            "Je bent een behulpzame jurist van de gemeente."
+            """
+            Je bent een juridisch medewerker van de gemeente.
 
-            "Antwoord _altijd_ in strikt geldige JSON met dit schema:"
+            Antwoord uitsluitend in strikt geldige JSON volgens dit schema:
+            {format_instr}
 
-            f"{format_instr}"
+            Volg deze werkwijze:
+            - Zet een boolean op `true` als de betreffende informatie expliciet, duidelijk én volledig is genoemd (bijv. “14 juli”, “AB 12 CD”).
+            - Zet een boolean op `false` als de informatie ontbreekt.
+            - Zet een boolean op `false` als alleen het woord genoemd wordt zonder concrete waarde (bijvoorbeeld “het kenteken”).
+            - Voor elke boolean die op `false` staat, formuleer een gerichte en concrete vraag over de ontbrekende informatie en voeg die toe aan de array `vragen`.
+            - Stel géén vraag bij booleans die op `true` staan.
+            - Zet een her- of bijgeschreven concepttekst van het bezwaarschrift in het veld `draft`.
 
-            "- `draft`: de volledige bijgewerkte concepttekst."
-
-            "- Als je meer informatie nodig hebt voor een stap die nog `false` is, laat die boolean staan en zet je vraag in de `vragen` array."
-
-            "Stuur _alleen_ de JSON-object."
+            Belangrijk:
+            - Geef **geen uitleg of tekst buiten het JSON-object**.
+            - Het veld `reply` moet altijd worden geformuleerd in de taal waarin de gebruiker heeft gesproken.
+            """
         )
     )
 

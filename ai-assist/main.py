@@ -29,7 +29,6 @@ import logging
 import requests
 from langdetect import detect
 
-
 if "AZURE_OPENAI_API_KEY" not in os.environ:
     print("❌  Missing Azure OpenAI API key")
 
@@ -68,10 +67,10 @@ def _transcribe(path: str) -> str:
     with open(path, "rb") as f:
         try:
             r = requests.post(
-                _AZ_ENDPOINT,
+                f"{_AZ_ENDPOINT}",
                 files={"file": f},
                 data={"model": _AZ_MODEL},
-                headers={"Authorization": f"Bearer {_AZ_KEY}"},
+                headers={"api-key": _AZ_KEY},
                 timeout=60,
             )
             r.raise_for_status()
@@ -110,7 +109,7 @@ YAP_SESSIONS: dict[str, dict] = {}
 # Local embedding model (DL ~430 MB, loads once)
 # ---------------------------------------------------------------------------
 
-_EMBED_MODEL_NAME = "NetherlandsForensicInstitute/robbert-2022-dutch-sentence-transformers"
+_EMBED_MODEL_NAME = 'sentence-transformers/distiluse-base-multilingual-cased-v1'
 _embedder = SentenceTransformer(_EMBED_MODEL_NAME)
 
 
@@ -177,6 +176,7 @@ async def analyze(
     • Accepts a single *audio/* upload.
     • Optional query/form field **top_k** (default = 1) returns the K best‑scoring intents.
     """
+
     if not file.content_type.startswith("audio/"):
         raise HTTPException(400, detail="Uploaded file must be audio/*")
 
