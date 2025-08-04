@@ -82,7 +82,7 @@
 				{
 					type: "gemeente-ai",
 					content: "schrijft antwoord...",
-					sender: "Gemeente AI-agent:",
+					sender: "Gemeente AI-agent",
 					isPlaceholder: true,
 				},
 			];
@@ -105,8 +105,8 @@
 					content: msg.message,
 					sender:
 						msg.speaker === "burger"
-							? "Burger:"
-							: "Gemeente AI-agent:",
+							? "Jouw agent"
+							: "Gemeente AI-agent",
 				}));
 			}
 
@@ -118,7 +118,7 @@
 					{
 						type: "user-message",
 						content: "schrijft antwoord...",
-						sender: "Burger:",
+						sender: "Jouw agent",
 						isPlaceholder: true,
 					},
 				];
@@ -156,8 +156,8 @@
 					content: msg.message,
 					sender:
 						msg.speaker === "burger"
-							? "Burger:"
-							: "Gemeente AI-agent:",
+							? "Jouw agent"
+							: "Gemeente AI-agent",
 				}));
 
 				conversation = newConversation;
@@ -173,8 +173,8 @@
 							: "gemeente-ai";
 					const nextSender =
 						nextType === "gemeente-ai"
-							? "Gemeente AI-agent:"
-							: "Burger:";
+							? "Gemeente AI-agent"
+							: "Jouw agent";
 
 					conversation = [
 						...conversation,
@@ -288,7 +288,7 @@
 		<ChatMessage
 			type="user-message"
 			content={userMessage()}
-			sender="Jouw agent"
+			sender="Jouw eerste bericht"
 		/>
 	</header>
 

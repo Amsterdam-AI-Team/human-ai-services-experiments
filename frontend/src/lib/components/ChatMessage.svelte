@@ -1,36 +1,45 @@
 <!-- ChatMessage.svelte -->
 <script lang="ts">
 	import { _ } from "svelte-i18n";
-	
-	type MessageType = 'gemeente-ai' | 'user-message';
-	
-	let { type, content, sender = '' } = $props<{
+
+	type MessageType = "gemeente-ai" | "user-message";
+
+	let {
+		type,
+		content,
+		sender = "",
+	} = $props<{
 		type: MessageType;
 		content: string;
 		sender?: string;
 	}>();
 
 	// Process content to convert literal \n to actual newlines
-	const processedContent = $derived(() => content.replace(/\\n/g, '\n'));
+	const processedContent = $derived(() => content.replace(/\\n/g, "\n"));
 </script>
 
 <div class="chat-message {type}">
-	{#if type === 'gemeente-ai'}
+	{#if type === "gemeente-ai"}
 		<div class="message-header">
-			<img src="/images/chat-gemeente-avatar.png" alt="Gemeente AI" class="avatar" />
-			<span class="sender-name">{sender || 'Gemeente AI-agent:'}</span>
+			<img
+				src="/images/chat-gemeente-avatar.png"
+				alt="Gemeente AI"
+				class="avatar"
+			/>
+			<span class="sender-name">{sender || "Gemeente AI-agent:"}</span>
 		</div>
 	{/if}
-	{#if type === 'user-message'}
+	{#if type === "user-message"}
 		<div class="message-header">
 			<!-- <img src="/images/chat-gemeente-avatar.png" alt="Gemeente AI" class="avatar" /> -->
-			<span class="sender-name">{$_("messages.yourAgent")}</span>
+			<span class="sender-name">{sender || $_("messages.yourAgent")}</span
+			>
 		</div>
 	{/if}
-	
+
 	<div class="message-content">
-		{#if processedContent().includes('\n')}
-			{#each processedContent().split('\n') as paragraph}
+		{#if processedContent().includes("\n")}
+			{#each processedContent().split("\n") as paragraph}
 				{#if paragraph.trim()}
 					<p>{paragraph}</p>
 				{/if}
@@ -46,7 +55,7 @@
 		padding: 1rem;
 		max-width: 80%;
 		margin-bottom: 1rem;
-		font-family: 'Amsterdam Sans', Arial, sans-serif;
+		font-family: "Amsterdam Sans", Arial, sans-serif;
 	}
 
 	.chat-message.gemeente-ai {
@@ -63,7 +72,7 @@
 	.message-header {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
+		gap: 0rem;
 		margin-bottom: 0.5rem;
 	}
 
@@ -71,6 +80,7 @@
 		width: 36px;
 		height: 36px;
 		flex-shrink: 0;
+		margin-left: -35px;
 	}
 
 	.sender-name {
