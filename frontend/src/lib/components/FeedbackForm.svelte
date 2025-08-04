@@ -97,39 +97,10 @@
 	</button>
 
 	<div class="content">
-		<div class="icon-container">
-			<svg
-				width="72"
-				height="72"
-				viewBox="0 0 72 72"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<rect
-					x="8"
-					y="20"
-					width="56"
-					height="40"
-					rx="4"
-					stroke="white"
-					stroke-width="2"
-				/>
-				<path
-					d="M12 26L36 44L60 26"
-					stroke="white"
-					stroke-width="2"
-					stroke-linecap="round"
-				/>
-				<path
-					d="M8 20L36 8L64 20"
-					stroke="white"
-					stroke-width="2"
-					stroke-linecap="round"
-				/>
-			</svg>
+		<div class="title-section">
+			<img src="/images/feedback-envelope.svg" alt="Feedback envelope" width="72" height="72" />
+			<h1 class="main-title">{$_("feedback.title")}</h1>
 		</div>
-
-		<h1 class="main-title">{$_("feedback.title")}</h1>
 
 		<p class="subtitle">{$_("feedback.subtitle")}</p>
 
@@ -216,30 +187,33 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		align-items: center;
+		/* align-items: center; */
 		justify-content: center;
-		text-align: center;
+		/* text-align: center; */
 		max-width: 800px;
 		margin: 0 auto;
 		padding: 2rem;
 	}
 
-	.icon-container {
-		margin-bottom: 2rem;
+	.title-section {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		margin-bottom: 1.5rem;
 	}
 
 	.main-title {
-		font-size: 3rem;
+		font-size: 2.75rem;
 		font-weight: 600;
 		color: white;
-		margin: 0 0 1.5rem 0;
+		margin: 0;
 		line-height: 1.2;
 	}
 
 	.subtitle {
 		font-size: 1.25rem;
 		color: rgba(255, 255, 255, 0.9);
-		margin: 0 0 3rem 0;
+		margin: 0 0 1rem 0;
 		max-width: 600px;
 		line-height: 1.4;
 	}
@@ -259,7 +233,7 @@
 		font-size: 1rem;
 		font-family: "Amsterdam Sans", sans-serif;
 		resize: vertical;
-		margin-bottom: 2rem;
+		margin-bottom: 1.5rem;
 		border-radius: 4px;
 	}
 

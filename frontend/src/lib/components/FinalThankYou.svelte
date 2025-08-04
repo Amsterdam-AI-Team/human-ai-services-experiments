@@ -26,9 +26,9 @@
 
 <main class="app">
 	<div class="content">
-		<div class="icon-container">
+		<!-- <div class="icon-container">
 			<img src="/images/checkmark.svg" alt="Success checkmark" width="120" height="120" />
-		</div>
+		</div> -->
 
 		<h1 class="main-title">{$_("finalThanks.title")}</h1>
 		
