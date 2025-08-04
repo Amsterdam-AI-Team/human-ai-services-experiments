@@ -24,6 +24,8 @@
 		showTranslatedWarning,
 		showTranslatedInfo,
 	} from "$lib/stores/errorStore";
+	import { setLanguageFromAPI, shouldSwitchLanguage } from '$lib/stores/languageStore';
+	import type { LanguageCode } from '$lib/i18n';
 	import { page } from "$app/state";
 	import { goto } from "$app/navigation";
 
@@ -91,6 +93,15 @@
 			});
 
 			const result = await response.json();
+			
+			// Handle language detection from chat API response
+			if (result?.language) {
+				const detectedLang = result.language as LanguageCode;
+				if (shouldSwitchLanguage(detectedLang)) {
+					setLanguageFromAPI(detectedLang);
+				}
+			}
+			
 			addApiResponse("chat", result);
 
 			// Store session_id from the first chat response

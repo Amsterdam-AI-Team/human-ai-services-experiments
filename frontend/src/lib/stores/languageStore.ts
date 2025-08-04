@@ -55,6 +55,7 @@ export function setLanguageFromAPI(
 // Helper function to check if detected language differs from current
 export function shouldSwitchLanguage(detectedLang: LanguageCode): boolean {
   let current: LanguageCode = "nl";
-  currentLanguage.subscribe((lang) => (current = lang))();
+  const unsubscribe = currentLanguage.subscribe((lang) => (current = lang));
+  unsubscribe(); // Clean up subscription immediately
   return detectedLang !== current && ["nl", "en", "fr"].includes(detectedLang);
 }

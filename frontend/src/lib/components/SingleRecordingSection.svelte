@@ -4,6 +4,8 @@
 	import { addApiResponse } from "$lib/stores/apiStore";
 	import { getSessionId } from "$lib/stores/sessionStore";
 	import { handleApiError } from "$lib/stores/errorStore";
+	import { setLanguageFromAPI, shouldSwitchLanguage } from '$lib/stores/languageStore';
+	import type { LanguageCode } from '$lib/i18n';
 	import { _ as t, isLoading } from 'svelte-i18n';
 	import { get } from 'svelte/store';
 
@@ -78,6 +80,14 @@
 			}
 
 			console.log("API response:", result);
+
+			// Handle language detection from API response
+			if (result?.language && (endpoint === "yap" || endpoint === "analyze")) {
+				const detectedLang = result.language as LanguageCode;
+				if (shouldSwitchLanguage(detectedLang)) {
+					setLanguageFromAPI(detectedLang);
+				}
+			}
 
 			// Store the response in the store
 			addApiResponse(endpoint, result);

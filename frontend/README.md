@@ -5,6 +5,7 @@ A SvelteKit application demonstrating human-AI interaction patterns for municipa
 ## Features
 
 ### Core Functionality
+
 - **Voice Recording**: Browser-based audio recording with MediaRecorder API and multiple recording patterns
 - **Real-time Transcription**: Audio-to-text conversion via Whisper API integration
 - **Intent Analysis**: AI-powered intent recognition from voice input
@@ -12,10 +13,12 @@ A SvelteKit application demonstrating human-AI interaction patterns for municipa
 - **AI Chat Interface**: OpenAI-powered conversational AI for citizen services
 
 ### Two Concept Demonstrations
+
 - **Concept 1**: Intent analysis workflow with dynamic form construction
 - **Concept 2**: Voice recording with transcription and AI agent chat
 
 ### Technical Features
+
 - **Session Management**: Persistent user sessions with localStorage
 - **Error Handling**: Global error management with auto-dismiss
 - **Inactivity Timer**: Automatic session cleanup and redirect
@@ -104,14 +107,17 @@ src/
 ## Development Commands
 
 ### Development
+
 - `pnpm dev` - Start development server
 - `pnpm dev -- --open` - Start development server and open in browser
 
 ### Build & Preview
+
 - `pnpm build` - Build for production
 - `pnpm preview` - Preview production build
 
 ### Code Quality
+
 - `pnpm check` - Run Svelte type checking
 - `pnpm check:watch` - Run Svelte type checking in watch mode
 - `pnpm lint` - Run Prettier and ESLint checks
@@ -128,6 +134,7 @@ The frontend integrates with the ai-assist FastAPI backend located at `../ai-ass
 - **Intent Recognition**: AI-powered analysis of user voice input
 
 ### API Endpoints Used
+
 - `/api/analyze` - Audio analysis for intent recognition
 - `/api/chat` - AI chat interface (supports JSON and FormData)
 - `/api/yap` - Speech-to-text transcription
@@ -137,23 +144,27 @@ The frontend integrates with the ai-assist FastAPI backend located at `../ai-ass
 ## Architecture Highlights
 
 ### State Management
+
 - **Reactive Stores**: 5 Svelte stores for persistent state management
 - **localStorage Integration**: Session persistence across browser sessions
 - **Global Error Handling**: Centralized error management with auto-dismiss
 
 ### Voice Interaction Patterns
+
 - **Hold-to-Record**: Press and hold for recording
 - **Toggle Recording**: Click to start/stop recording
 - **Real-time Transcription**: Live audio-to-text conversion
 - **Session-based Processing**: Continuous conversation context
 
 ### Accessibility & UX
+
 - **Multi-language Support**: 3 languages with automatic detection
 - **Responsive Design**: Mobile-first approach with Amsterdam Design System
 - **Inactivity Management**: Auto-cleanup after 2 minutes of inactivity
 - **Error Recovery**: Graceful error handling with user-friendly messages
 
 ### Development Features
+
 - **API Debugging**: Built-in tools for API response inspection
 - **Device Testing**: Microphone and audio device testing interface
 - **Endpoint Testing**: Live API endpoint testing and validation

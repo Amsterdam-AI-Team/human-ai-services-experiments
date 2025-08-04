@@ -3,6 +3,8 @@
 	import SingleRecordingSection from './SingleRecordingSection.svelte';
 	import ButtonSketchy from './ButtonSketchy.svelte';
 	import { apiResponses } from '$lib/stores/apiStore';
+	import { setLanguageFromAPI, shouldSwitchLanguage } from '$lib/stores/languageStore';
+	import type { LanguageCode } from '$lib/i18n';
 	import { _ } from 'svelte-i18n';
 	import { goto } from '$app/navigation';
 
@@ -31,6 +33,14 @@
 		if (latestYapResponse?.data?.text) {
 			transcriptionText = latestYapResponse.data.text;
 			isTranscribing = false;
+			
+			// Handle language detection from API response
+			if (latestYapResponse.data.language) {
+				const detectedLang = latestYapResponse.data.language as LanguageCode;
+				if (shouldSwitchLanguage(detectedLang)) {
+					setLanguageFromAPI(detectedLang);
+				}
+			}
 		} else if (latestYapResponse?.data?.error) {
 			isTranscribing = false;
 		}
