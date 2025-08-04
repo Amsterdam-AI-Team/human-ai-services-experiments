@@ -42,7 +42,8 @@
     "startRecording": "Cliquez pour commencer l'enregistrement",
     "transcribing": "Transcription en cours...",
     "addRecording": "Ajoutez un enregistrement ou continuez avec la demande",
-    "placeholder": "La transcription apparaîtra ici..."
+    "placeholder": "La transcription apparaîtra ici...",
+    "privacyNotice": "Ce que vous enregistrez n'est pas sauvegardé. C'est automatiquement supprimé."
   },
   "ai": {
     "processing": "L'IA traite votre demande"

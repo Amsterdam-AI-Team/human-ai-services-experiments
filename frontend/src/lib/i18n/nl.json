@@ -35,14 +35,15 @@
     "aiMessage": "Inkomend bericht van jouw persoonlijke AI-agent:",
     "subsidyQuestion": "Misschien heb je wel recht op subsidie voor het buurtfeest, zal ik dit proberen aan te vragen?",
     "ideas": "Wat voor ideeën heb je al voor het buurtfeest? Dan nemen we die mee.",
-    "callout": "Voor nu kan ons prototype je alleen helpen met een paar scenario's: parkeerboetes, verhuizingen, en X, Y en Z. Probeer het alvast uit!",
+    "callout": "Ons prototype kan je nu alleen helpen met een paar dingen: bezwaar op een parkeerboete, een fout geparkeerde auto melden, iets melden in de openbare ruimte of een evenement vergunning voor een aanvragen. Probeer het gerust!",
     "yourAgent": "Jouw agent"
   },
   "recording": {
     "startRecording": "Klik om te starten met opnemen",
     "transcribing": "Bezig met transcriberen...",
     "addRecording": "Voeg een opname toe of ga door met aanvragen",
-    "placeholder": "Transcriptie verschijnt hier..."
+    "placeholder": "Transcriptie verschijnt hier...",
+    "privacyNotice": "Wat je inspreekt, wordt niet bewaard. Het wordt automatisch verwijderd."
   },
   "ai": {
     "processing": "AI is processing your request"
@@ -65,7 +66,7 @@
   "concept1": {
     "mainHelp": "Hoe kunnen we je helpen?",
     "helpSubtitle": "Comment pouvons-nous vous aider?",
-    "callout": "Voor nu kan ons prototype je alleen helpen met een paar scenario's: parkeerboetes, verhuizingen, en X, Y en Z. Probeer het alvast uit!",
+    "callout": "Ons prototype kan je nu alleen helpen met een paar dingen: bezwaar op een parkeerboete, een fout geparkeerde auto melden, iets melden in de openbare ruimte of een evenement vergunning voor een aanvragen. Probeer het gerust!",
     "choose": {
       "title": "Kies een onderwerp",
       "subtitle": "We hoorden je zeggen: {transcript}. We weten nog niet precies wat je bedoelt. Dit prototype herkent alleen een paar vaste onderwerpen. Kies een van de volgende onderwerpen om verder te gaan:"

@@ -42,7 +42,8 @@
     "startRecording": "Click to start recording",
     "transcribing": "Transcribing...",
     "addRecording": "Add a recording or continue with request",
-    "placeholder": "Transcription will appear here..."
+    "placeholder": "Transcription will appear here...",
+    "privacyNotice": "What you record is not saved. It is automatically deleted."
   },
   "ai": {
     "processing": "AI is processing your request"

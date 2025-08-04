@@ -1,31 +1,32 @@
 <script lang="ts">
-	import { _ } from 'svelte-i18n';
-	import MainMessage from '$lib/components/MainMessage.svelte';
-	import AnimatedSubtitle from '$lib/components/AnimatedSubtitle.svelte';
-	import CalloutBubble from '$lib/components/CalloutBubble.svelte';
-	import SingleRecordingSection from '$lib/components/SingleRecordingSection.svelte';
-	import ApiDebugger from '$lib/components/ApiDebugger.svelte';
-	import { apiResponses } from '$lib/stores/apiStore';
-	import { configStore } from '$lib/stores/configStore';
-	import { goto } from '$app/navigation';
+	import { _ } from "svelte-i18n";
+	import MainMessage from "$lib/components/MainMessage.svelte";
+	import AnimatedSubtitle from "$lib/components/AnimatedSubtitle.svelte";
+	import CalloutBubble from "$lib/components/CalloutBubble.svelte";
+	import SingleRecordingSection from "$lib/components/SingleRecordingSection.svelte";
+	import ApiDebugger from "$lib/components/ApiDebugger.svelte";
+	import { apiResponses } from "$lib/stores/apiStore";
+	import { configStore } from "$lib/stores/configStore";
+	import { goto } from "$app/navigation";
 
 	// Watch for analyze responses and redirect based on configurable similarity threshold
 	// To modify the threshold, use: configStore.setSimilarityThreshold(0.7) or update configStore.ts
 	$effect(() => {
 		const responses = $apiResponses;
 		const latestAnalyzeResponse = responses
-			.filter(r => r.endpoint === 'analyze')
+			.filter((r) => r.endpoint === "analyze")
 			.slice(-1)[0];
-		
+
 		if (latestAnalyzeResponse?.data?.matches) {
-			const highestMatch = latestAnalyzeResponse.data.matches.reduce((prev: any, current: any) => 
-				(prev.similarity > current.similarity) ? prev : current
+			const highestMatch = latestAnalyzeResponse.data.matches.reduce(
+				(prev: any, current: any) =>
+					prev.similarity > current.similarity ? prev : current,
 			);
-			
+
 			if (highestMatch.similarity > $configStore.similarityThreshold) {
 				goto(`/1/construct/${highestMatch.intent.intentcode}`);
 			} else {
-				goto('/1/choose');
+				goto("/1/choose");
 			}
 		}
 	});
@@ -34,18 +35,20 @@
 <main class="app">
 	<div class="content">
 		<div class="main-section">
-			<MainMessage center mainText={$_('concept1.mainHelp')} />
+			<MainMessage center mainText={$_("concept1.mainHelp")} />
 			<AnimatedSubtitle />
 		</div>
 
-		<CalloutBubble
-			text={$_('concept1.callout')}
-		/>
+		<CalloutBubble text={$_("concept1.callout")} />
 
 		<SingleRecordingSection endpoint="analyze" />
-		
+		<p class="recording-message">
+			{$_("recording.startRecording")}<br />
+			<em>{$_("recording.privacyNotice")}</em>
+		</p>
 	</div>
-</main> 
+</main>
+
 <!-- <ApiDebugger endpoint="analyze" /> -->
 
 <style>
@@ -73,11 +76,16 @@
 		margin-bottom: 80px;
 	}
 
+	.recording-message {
+		font-size: 1.1rem;
+		color: #666;
+	}
+
 	@media (max-width: 768px) {
 		.content {
 			padding: 1rem;
 		}
-		
+
 		.main-section {
 			margin-bottom: 40px;
 		}

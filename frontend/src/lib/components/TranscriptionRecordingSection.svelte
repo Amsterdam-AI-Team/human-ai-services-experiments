@@ -66,22 +66,23 @@
 	<div class="button-container">
 		<div class="record-button-wrapper">
 			<SingleRecordingSection 
-				endpoint="yap" 
-				recordKey="e"
-				onStateChange={handleRecordingStateChange}
-				existingText={transcriptionText}
+			endpoint="yap" 
+			recordKey="e"
+			onStateChange={handleRecordingStateChange}
+			existingText={transcriptionText}
 			/>
 			{#if transcriptionText.length > 0}
-				<span class="plus-symbol">+</span>
+			<span class="plus-symbol">+</span>
 			{/if}
 		</div>
 		{#if transcriptionText.length > 0}
-			<ButtonSketchy
-				text={$_('buttons.continue')}
-				onclick={handleContinue}
-			/>
+		<ButtonSketchy
+		text={$_('buttons.continue')}
+		onclick={handleContinue}
+		/>
 		{/if}
 	</div>
+	<p><em>{$_('recording.privacyNotice')}</em></p>
 </div>
 
 <style>
