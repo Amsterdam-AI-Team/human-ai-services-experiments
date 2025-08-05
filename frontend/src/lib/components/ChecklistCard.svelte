@@ -1,5 +1,7 @@
 <!-- ChecklistCard.svelte -->
 <script lang="ts">
+	import { _ } from "svelte-i18n";
+	
 	interface ChecklistItem {
 		id: string;
 		text: string;
@@ -53,7 +55,7 @@
 		<div class="progress-bar">
 			<div class="progress-fill" style="width: {progressPercentage}%"></div>
 		</div>
-		<span class="progress-text">{progressPercentage}% compleet</span>
+		<span class="progress-text">{progressPercentage}% {$_("progress.complete")}</span>
 	</div>
 </div>
 

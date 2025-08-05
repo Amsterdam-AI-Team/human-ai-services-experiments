@@ -29,6 +29,9 @@
     "back": "Terug",
     "button": "Button"
   },
+  "progress": {
+    "complete": "compleet"
+  },
   "messages": {
     "help": "Hoe kunnen we je helpen?",
     "helpSubtitle": "Comment pouvons-nous vous aider?",
