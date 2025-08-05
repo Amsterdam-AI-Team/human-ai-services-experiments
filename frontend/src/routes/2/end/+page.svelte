@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Confetti from "svelte-confetti";
 	import { goto } from '$app/navigation';
+	import { _ } from 'svelte-i18n';
 
 	// Using Svelte 5 effect for the redirect timer
 	$effect(() => {
@@ -14,7 +15,7 @@
 
 <main class="app">
 	<div class="content">
-		<h1 class="success-header">Je aanvraag is verstuurd!</h1>
+		<h1 class="success-header">{$_('success.requestSent')}</h1>
 	</div>
 </main>
 

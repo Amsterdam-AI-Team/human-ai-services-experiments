@@ -122,5 +122,11 @@
     "message": "Je feedback is succesvol verstuurd. We waarderen je bijdrage aan de toekomst van AI in de gemeente.",
     "goHome": "Terug naar home",
     "autoRedirect": "Je wordt automatisch doorgestuurd naar de startpagina in 5 seconden."
+  },
+  "success": {
+    "requestSent": "Je aanvraag is verstuurd!"
+  },
+  "plan": {
+    "adjustedDescription": "Omschrijving aangepast plan:"
   }
 }

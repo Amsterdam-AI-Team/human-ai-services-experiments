@@ -358,7 +358,7 @@
 					<h3>{result?.title}</h3>
 				</div>
 				<div class="approval-subtitle">
-					Omschrijving aangepast plan:
+					{$_('plan.adjustedDescription')}
 				</div>
 				<p class="approval-description">{result?.description}</p>
 
