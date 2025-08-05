@@ -145,6 +145,17 @@ async def _init_db():
             );
             """
         )
+        await conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS yap_log (
+                id SERIAL PRIMARY KEY,
+                session_id UUID NOT NULL,
+                speaker TEXT NOT NULL,
+                content TEXT NOT NULL,
+                ts TIMESTAMPTZ DEFAULT now()
+            );
+            """
+        )
 
 
 # --------------------------------------------------------------
