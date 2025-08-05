@@ -394,6 +394,10 @@
 		pointer-events: auto;
 	}
 
+	.button-wrapper :global(.record-button) {
+		pointer-events: auto;
+	}
+
 	.button-wrapper :global(.svg-button:hover:not(:disabled)) {
 		transform: none !important;
 	}
