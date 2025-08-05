@@ -122,5 +122,11 @@
     "message": "Your feedback has been successfully submitted. We appreciate your contribution to the future of AI in the municipality.",
     "goHome": "Go back home",
     "autoRedirect": "You will be automatically redirected to the homepage in 5 seconds."
+  },
+  "success": {
+    "requestSent": "Your request has been sent!"
+  },
+  "plan": {
+    "adjustedDescription": "Adjusted plan description:"
   }
 }

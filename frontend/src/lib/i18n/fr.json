@@ -122,5 +122,11 @@
     "message": "Vos commentaires ont été soumis avec succès. Nous apprécions votre contribution à l'avenir de l'IA dans la municipalité.",
     "goHome": "Retourner à l'accueil",
     "autoRedirect": "Vous serez automatiquement redirigé vers la page d'accueil dans 5 secondes."
+  },
+  "success": {
+    "requestSent": "Votre demande a été envoyée!"
+  },
+  "plan": {
+    "adjustedDescription": "Description du plan ajusté:"
   }
 }
