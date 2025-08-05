@@ -128,5 +128,8 @@
   },
   "plan": {
     "adjustedDescription": "Description du plan ajusté:"
+  },
+  "chat": {
+    "senderYou": "Vous"
   }
 }
