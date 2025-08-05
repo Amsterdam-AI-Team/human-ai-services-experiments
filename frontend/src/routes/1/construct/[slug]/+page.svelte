@@ -277,16 +277,11 @@
 
 					{#if isSendingChat}
 						<div class="message-wrapper">
-							<div class="loading-indicator">
-								<div class="loading-dots">
-									<span>{$_("concept1.construct.loadingAI")}</span>
-									<div class="dots">
-										<span>.</span>
-										<span>.</span>
-										<span>.</span>
-									</div>
-								</div>
-							</div>
+							<ChatMessage
+								type="gemeente-ai"
+								content={$_("concept2.writingResponse")}
+								sender={$_("concept1.construct.senderAI")}
+							/>
 						</div>
 					{/if}
 				</div>
@@ -519,49 +514,4 @@
 		}
 	}
 
-	.loading-indicator {
-		padding: 1rem;
-		margin: 0.5rem 0;
-		background-color: #f8f9fa;
-		/* border-radius: 8px; */
-		border-left: 4px solid #007bff;
-	}
-
-	.loading-dots {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		color: #666;
-		font-style: italic;
-	}
-
-	.dots {
-		display: flex;
-		gap: 0.2rem;
-	}
-
-	.dots span {
-		animation: pulse 1.4s ease-in-out infinite both;
-	}
-
-	.dots span:nth-child(1) {
-		animation-delay: -0.32s;
-	}
-	.dots span:nth-child(2) {
-		animation-delay: -0.16s;
-	}
-	.dots span:nth-child(3) {
-		animation-delay: 0s;
-	}
-
-	@keyframes pulse {
-		0%,
-		80%,
-		100% {
-			opacity: 0.3;
-		}
-		40% {
-			opacity: 1;
-		}
-	}
 </style>
