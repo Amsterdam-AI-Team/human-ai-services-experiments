@@ -124,8 +124,8 @@
 			showConfetti = true;
 			setTimeout(() => {
 				showConfetti = false;
-			}, 6000); // Duration matches the confetti duration
-		}, 8000); 
+			}, 2000); // Duration matches the confetti duration
+		}, 5000); 
 
 		return () => clearInterval(sparkleInterval);
 	});
@@ -165,8 +165,8 @@
 						x={[-0.5, 0.5]}
 						colorRange={[30, 50]}
 						amount={25}
-						fallDistance="0px"
-						duration={6000}
+						fallDistance="10px"
+						duration={2000}
 						size={4}
 					/>
 				</div>
