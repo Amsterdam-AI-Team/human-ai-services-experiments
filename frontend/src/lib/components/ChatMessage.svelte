@@ -77,10 +77,10 @@
 	}
 
 	.avatar {
-		width: 36px;
-		height: 36px;
+		width: 6px;
+		height: 20px;
 		flex-shrink: 0;
-		margin-left: -35px;
+		margin: 0 10px 0 0;
 	}
 
 	.sender-name {
