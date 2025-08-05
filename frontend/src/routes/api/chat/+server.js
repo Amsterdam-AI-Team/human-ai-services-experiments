@@ -14,11 +14,12 @@ export async function POST({ request }) {
       });
     } else {
       // Handle JSON (text messages)
-      const { message, intentcode, session_id } = await request.json();
+      const { message, intentcode, session_id, language } = await request.json();
       const requestBody = {
         message,
         ...(intentcode && { intentcode }),
         ...(session_id && { session_id }),
+        ...(language && { language }),
       };
 
       response = await fetch(`${AI_API_ENDPOINT}/chat`, {

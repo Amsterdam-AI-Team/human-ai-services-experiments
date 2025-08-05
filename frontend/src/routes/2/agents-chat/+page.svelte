@@ -12,6 +12,8 @@
 	} from "$lib/stores/apiStore";
 	import { sendToEndpoint } from "$lib/utils/apiHelpers";
 	import { handleApiError } from "$lib/stores/errorStore";
+	import { currentLanguage } from "$lib/stores/languageStore";
+	import { get } from "svelte/store";
 
 	// Get the latest YAP response for the user's initial message
 	const latestYapResponse = $derived(() => {
@@ -88,7 +90,8 @@
 			];
 
 			// Call yap/start
-			const result = await sendToEndpoint("yapStart", { text: message });
+			const lang = get(currentLanguage);
+			const result = await sendToEndpoint("yapStart", { text: message }, lang);
 			addApiResponse("yapStart", result);
 
 			if (result.yap_session_id) {
@@ -141,9 +144,10 @@
 		if (!yapSessionId || isFinished) return;
 
 		try {
+			const lang = get(currentLanguage);
 			const result = await sendToEndpoint("yapNext", {
 				yap_session_id: yapSessionId,
-			});
+			}, lang);
 			addApiResponse("yapNext", result);
 
 			// Process full conversation from yapNext response

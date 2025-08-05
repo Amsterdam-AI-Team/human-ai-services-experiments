@@ -10,6 +10,7 @@ export interface ApiResponse {
 export async function sendToEndpoint(
   endpoint: EndpointType,
   data: any,
+  language?: string,
 ): Promise<any> {
   const endpointMap = {
     analyze: "/api/analyze",
@@ -35,23 +36,31 @@ export async function sendToEndpoint(
   if (endpoint === "chat" || endpoint === "feedback" || endpoint === "feedback-transcribe") {
     // chat, feedback, and feedback-transcribe endpoints support both JSON and FormData modes
     if (data instanceof FormData) {
-      // Multipart mode - don't set Content-Type (let browser set it)
+      // Multipart mode - add language to FormData if provided
+      if (language) {
+        data.append("language", language);
+      }
       requestInit.body = data;
     } else {
-      // JSON mode
+      // JSON mode - add language to data object if provided
+      const requestData = language ? { ...data, language } : data;
       requestInit.headers = { "Content-Type": "application/json" };
-      requestInit.body = JSON.stringify(data);
+      requestInit.body = JSON.stringify(requestData);
     }
   } else if (endpoint === "yapStart") {
-    // JSON for yapStart
+    // JSON for yapStart - add language to data object if provided
+    const requestData = language ? { ...data, language } : data;
     requestInit.headers = { "Content-Type": "application/json" };
-    requestInit.body = JSON.stringify(data);
+    requestInit.body = JSON.stringify(requestData);
   } else if (endpoint === "yapNext") {
     // yapNext needs query parameter handling
     const { yap_session_id } = data;
     if (yap_session_id) {
       const url = new URL(endpointMap[endpoint], window.location.origin);
       url.searchParams.set("yap_session_id", yap_session_id);
+      if (language) {
+        url.searchParams.set("language", language);
+      }
       return fetch(url.toString(), { method: "POST" }).then((response) => {
         if (!response.ok) {
           return response.json().then((result) => {
@@ -64,7 +73,10 @@ export async function sendToEndpoint(
       throw new Error("yap_session_id is required for yapNext endpoint");
     }
   } else {
-    // FormData for audio endpoints (analyze, yap)
+    // FormData for audio endpoints (analyze, yap) - add language if provided
+    if (language) {
+      data.append("language", language);
+    }
     requestInit.body = data;
   }
 

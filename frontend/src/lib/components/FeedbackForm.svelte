@@ -6,10 +6,12 @@
 	import { handleApiError } from "$lib/stores/errorStore";
 	import { getSessionId } from "$lib/stores/sessionStore";
 	import { clearApiResponses, apiResponses } from "$lib/stores/apiStore";
+	import { get } from "svelte/store";
 	import {
 		setLanguageFromAPI,
 		shouldSwitchLanguage,
 		setLanguage,
+		currentLanguage,
 	} from "$lib/stores/languageStore";
 	import type { LanguageCode } from "$lib/i18n";
 	import { Confetti } from "svelte-confetti";
@@ -78,6 +80,7 @@
 
 		try {
 			const currentSessionId = getSessionId();
+			const lang = get(currentLanguage);
 			const requestBody: any = {
 				feedback: transcriptionText.trim(),
 				concept: concept,
@@ -85,6 +88,10 @@
 
 			if (currentSessionId) {
 				requestBody.session_id = currentSessionId;
+			}
+			
+			if (lang) {
+				requestBody.language = lang;
 			}
 
 			const response = await fetch("/api/feedback", {

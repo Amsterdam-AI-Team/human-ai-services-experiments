@@ -4,7 +4,7 @@
 	import { addApiResponse } from "$lib/stores/apiStore";
 	import { getSessionId } from "$lib/stores/sessionStore";
 	import { handleApiError } from "$lib/stores/errorStore";
-	import { setLanguageFromAPI, shouldSwitchLanguage } from '$lib/stores/languageStore';
+	import { setLanguageFromAPI, shouldSwitchLanguage, currentLanguage } from '$lib/stores/languageStore';
 	import type { LanguageCode } from '$lib/i18n';
 	import { _ as t, isLoading } from 'svelte-i18n';
 	import { get } from 'svelte/store';
@@ -67,9 +67,12 @@
 				}, 30000);
 			});
 
+			// Get current language to pass to API
+			const lang = get(currentLanguage);
+			
 			// Race between API call and timeout
 			const result = await Promise.race([
-				sendToEndpoint(endpoint, formData),
+				sendToEndpoint(endpoint, formData, lang),
 				timeoutPromise
 			]);
 

@@ -3,6 +3,7 @@ import { AI_API_ENDPOINT } from "$env/static/private";
 export async function POST({ request, url }) {
   try {
     const yap_session_id = url.searchParams.get("yap_session_id");
+    const language = url.searchParams.get("language");
 
     if (!yap_session_id) {
       return new Response(
@@ -14,12 +15,14 @@ export async function POST({ request, url }) {
       );
     }
 
-    const response = await fetch(
-      `${AI_API_ENDPOINT}/yap/next?yap_session_id=${encodeURIComponent(yap_session_id)}`,
-      {
-        method: "POST",
-      },
-    );
+    let backendUrl = `${AI_API_ENDPOINT}/yap/next?yap_session_id=${encodeURIComponent(yap_session_id)}`;
+    if (language) {
+      backendUrl += `&language=${encodeURIComponent(language)}`;
+    }
+
+    const response = await fetch(backendUrl, {
+      method: "POST",
+    });
 
     const result = await response.json();
     return new Response(JSON.stringify(result), {
