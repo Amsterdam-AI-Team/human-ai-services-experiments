@@ -77,7 +77,9 @@
       "backButton": "Start over",
       "formTitle": "This is what you will submit:",
       "formLabel": "Subject: Appeal against parking fine",
-      "formPlaceholder": "Describe your situation"
+      "formPlaceholder": "Describe your situation",
+      "formSuffix": "form",
+      "subjectLabel": "Subject:"
     }
   },
   "concept2": {

@@ -242,7 +242,7 @@
 					<div class="message-wrapper">
 						<Pill
 							icon="/images/document.svg"
-							text={`${intentHeading()} formulier`}
+							text={`${intentHeading()} ${$_("concept1.construct.formSuffix")}`}
 							onclick={() => console.log("Pill clicked")}
 						/>
 					</div>
@@ -314,7 +314,7 @@
 
 					<div class="form-field">
 						<label class="field-label" for="bezwaar-textarea"
-							>Betreft: {intentHeading()}</label
+							>{$_("concept1.construct.subjectLabel")} {intentHeading()}</label
 						>
 						<textarea
 							id="bezwaar-textarea"
