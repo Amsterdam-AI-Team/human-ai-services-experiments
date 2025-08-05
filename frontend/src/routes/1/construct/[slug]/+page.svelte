@@ -226,7 +226,6 @@
 	function handleBezwaarVersturen() {
 		// Clear all stores
 		clearApiResponses();
-		setLanguage('nl');
 		clearSession();
 
 		// Navigate to /1/end
