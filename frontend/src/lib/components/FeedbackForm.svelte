@@ -151,13 +151,6 @@
 
 	<div class="content">
 		<div class="title-section">
-			<img
-				src="/images/feedback-envelope.svg"
-				alt="Feedback envelope"
-				width="72"
-				height="72"
-			/>
-			<h1 class="main-title">{$_("feedback.title")}</h1>
 			{#if showConfetti}
 				<div class="confetti-container">
 					<Confetti
@@ -171,6 +164,13 @@
 					/>
 				</div>
 			{/if}
+			<img
+				src="/images/feedback-envelope.svg"
+				alt="Feedback envelope"
+				width="72"
+				height="72"
+			/>
+			<h1 class="main-title">{$_("feedback.title")}</h1>
 		</div>
 
 		<p class="subtitle">{$_("feedback.subtitle")}</p>
@@ -288,7 +288,6 @@
 		width: 100%;
 		height: 100%;
 		pointer-events: none;
-		z-index: 1;
 	}
 
 	.main-title {
