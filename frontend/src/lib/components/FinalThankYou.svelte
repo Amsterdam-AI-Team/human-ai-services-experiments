@@ -70,9 +70,6 @@
 		padding: 2rem;
 	}
 
-	.icon-container {
-		margin-bottom: 2rem;
-	}
 
 	.main-title {
 		font-size: 3rem;

@@ -391,20 +391,7 @@
 		gap: 1rem;
 	}
 
-	.status-indicator {
-		background: #f3f4f6;
-		padding: 1rem;
-		font-size: 1rem;
-		flex: 1;
-	}
 
-	.user-style {
-		background: #e5e5e5;
-		text-align: right;
-		font-size: 1rem;
-		max-width: 300px;
-		margin-left: auto;
-	}
 
 	.content {
 		max-width: 1000px;
@@ -511,24 +498,8 @@
 		background: #2563eb;
 	}
 
-	.final-action {
-		text-align: center;
-		margin-bottom: 2rem;
-	}
 
-	.primary-button {
-		background: #3b82f6;
-		color: white;
-		border: none;
-		padding: 0.75rem 1.5rem;
-		font-size: 1rem;
-		cursor: pointer;
-		font-family: "Amsterdam Sans", Arial, sans-serif;
-	}
 
-	.primary-button:hover {
-		background: #2563eb;
-	}
 
 	.approved-result {
 		background: #f0fdf4;
@@ -567,27 +538,8 @@
 		color: #166534;
 	}
 
-	.reset-section {
-		margin-top: 2rem;
-		text-align: center;
-		padding: 1rem;
-		border-top: 1px solid #e5e7eb;
-	}
 
-	.reset-button {
-		background: #6b7280;
-		color: white;
-		border: none;
-		padding: 0.75rem 1.5rem;
-		font-size: 0.875rem;
-		cursor: pointer;
-		transition: background-color 0.2s;
-		font-family: "Amsterdam Sans", Arial, sans-serif;
-	}
 
-	.reset-button:hover {
-		background: #4b5563;
-	}
 
 	.submit-section {
 		display: flex;
@@ -595,11 +547,6 @@
 		margin-top: 1.5rem;
 	}
 
-	.user-button-wrapper {
-		display: flex;
-		justify-content: flex-end;
-		margin-top: 0.5rem;
-	}
 
 	@media (max-width: 768px) {
 		.agents-chat {
