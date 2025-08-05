@@ -82,7 +82,8 @@
       "formLabel": "Objet: Objection contre l'amende de stationnement",
       "formPlaceholder": "Décrivez votre situation",
       "formSuffix": "formulaire",
-      "subjectLabel": "Objet:"
+      "subjectLabel": "Objet:",
+      "checklistSubtitle": "Fournissez les détails suivants pour une demande complète:"
     }
   },
   "concept2": {

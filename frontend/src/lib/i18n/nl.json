@@ -82,7 +82,8 @@
       "formLabel": "Betreft: Bezwaar tegen parkeerboete",
       "formPlaceholder": "Omschrijf je situatie",
       "formSuffix": "formulier",
-      "subjectLabel": "Betreft:"
+      "subjectLabel": "Betreft:",
+      "checklistSubtitle": "Vermeld de volgende gegevens voor een complete aanvraag:"
     }
   },
   "concept2": {

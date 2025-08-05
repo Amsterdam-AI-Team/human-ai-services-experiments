@@ -11,7 +11,7 @@
 	let { 
 		items = [], 
 		title = 'Checklist', 
-		subtitle = 'Vermeld de volgende gegevens voor een complete aanvraag:',
+		subtitle = $_("concept1.construct.checklistSubtitle"),
 		onItemChange 
 	} = $props<{
 		items: ChecklistItem[];

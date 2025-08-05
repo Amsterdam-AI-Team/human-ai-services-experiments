@@ -82,7 +82,8 @@
       "formLabel": "Subject: Appeal against parking fine",
       "formPlaceholder": "Describe your situation",
       "formSuffix": "form",
-      "subjectLabel": "Subject:"
+      "subjectLabel": "Subject:",
+      "checklistSubtitle": "Provide the following details for a complete request:"
     }
   },
   "concept2": {
