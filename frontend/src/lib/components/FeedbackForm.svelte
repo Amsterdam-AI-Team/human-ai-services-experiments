@@ -6,7 +6,7 @@
 	import { handleApiError } from "$lib/stores/errorStore";
 	import { getSessionId } from "$lib/stores/sessionStore";
 	import { clearApiResponses, apiResponses } from "$lib/stores/apiStore";
-	import { setLanguageFromAPI, shouldSwitchLanguage } from '$lib/stores/languageStore';
+	import { setLanguageFromAPI, shouldSwitchLanguage, setLanguage } from '$lib/stores/languageStore';
 	import type { LanguageCode } from '$lib/i18n';
 
 	interface Props {
@@ -107,6 +107,7 @@
 
 	function handleClose() {
 		clearApiResponses();
+		setLanguage('nl');
 		goto(`/${concept}`);
 	}
 </script>

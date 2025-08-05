@@ -2,6 +2,7 @@
 	import { _ } from 'svelte-i18n';
 	import { apiResponses, clearApiResponses } from "$lib/stores/apiStore";
 	import { goto } from "$app/navigation";
+	import { setLanguage } from "$lib/stores/languageStore";
 	import SketchyCard from "$lib/components/SketchyCard.svelte";
 	import ApiDebugger from "$lib/components/ApiDebugger.svelte";
 	import ButtonSketchySecondary from "$lib/components/ButtonSketchySecondary.svelte";
@@ -34,6 +35,7 @@
 
 	function handleBackClick() {
 		clearApiResponses();
+		setLanguage('nl');
 		goto("/1");
 	}
 </script>

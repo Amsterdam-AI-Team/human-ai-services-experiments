@@ -1,6 +1,7 @@
 import { browser } from "$app/environment";
 import { goto } from "$app/navigation";
 import { clearApiResponses } from "$lib/stores/apiStore";
+import { setLanguage } from "$lib/stores/languageStore";
 
 const INACTIVITY_TIMEOUT = 2 * 60 * 1000; // 2 minutes in milliseconds
 
@@ -58,6 +59,7 @@ export class InactivityTimer {
   private handleInactivity() {
     // Clear all API store data
     clearApiResponses();
+    setLanguage('nl');
 
     // Redirect to the appropriate concept root
     goto(this.resetPath);

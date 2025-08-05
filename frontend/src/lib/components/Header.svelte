@@ -30,6 +30,7 @@
 
 	function handleBackClick() {
 		clearApiResponses();
+		setLanguage('nl');
 		goto("/1");
 	}
 </script>

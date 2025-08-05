@@ -18,6 +18,7 @@
 		clearSession,
 		sessionData,
 	} from "$lib/stores/sessionStore";
+	import { setLanguage } from "$lib/stores/languageStore";
 	import {
 		handleApiError,
 		showTranslatedError,
@@ -225,6 +226,7 @@
 	function handleBezwaarVersturen() {
 		// Clear all stores
 		clearApiResponses();
+		setLanguage('nl');
 		clearSession();
 
 		// Navigate to /1/end
