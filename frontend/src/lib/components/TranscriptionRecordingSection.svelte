@@ -1,42 +1,44 @@
 <!-- TranscriptionRecordingSection.svelte -->
 <script lang="ts">
-	import SingleRecordingSection from './SingleRecordingSection.svelte';
-	import ButtonSketchy from './ButtonSketchy.svelte';
-	import { apiResponses } from '$lib/stores/apiStore';
-	import { setLanguageFromAPI, shouldSwitchLanguage } from '$lib/stores/languageStore';
-	import type { LanguageCode } from '$lib/i18n';
-	import { _ } from 'svelte-i18n';
-	import { goto } from '$app/navigation';
+	import SingleRecordingSection from "./SingleRecordingSection.svelte";
+	import ButtonSketchy from "./ButtonSketchy.svelte";
+	import { apiResponses } from "$lib/stores/apiStore";
+	import {
+		setLanguageFromAPI,
+		shouldSwitchLanguage,
+	} from "$lib/stores/languageStore";
+	import type { LanguageCode } from "$lib/i18n";
+	import { _ } from "svelte-i18n";
+	import { goto } from "$app/navigation";
 
-	let {
-		continueUrl = '/2/agents-chat'
-	} = $props();
+	let { continueUrl = "/2/agents-chat" } = $props();
 
-	let transcriptionText = $state('');
+	let transcriptionText = $state("");
 	let isTranscribing = $state(false);
 
 	const displayText = $derived(
 		isTranscribing
-			? $_('recording.transcribing')
+			? $_("recording.transcribing")
 			: transcriptionText.length > 0
-				? $_('recording.addRecording')
-				: $_('recording.startRecording')
+				? $_("recording.addRecording")
+				: $_("recording.startRecording"),
 	);
 
 	// Watch for yap endpoint responses and update transcription
 	$effect(() => {
 		const responses = $apiResponses;
 		const latestYapResponse = responses
-			.filter(r => r.endpoint === 'yap')
+			.filter((r) => r.endpoint === "yap")
 			.slice(-1)[0];
-		
+
 		if (latestYapResponse?.data?.text) {
 			transcriptionText = latestYapResponse.data.text;
 			isTranscribing = false;
-			
+
 			// Handle language detection from API response
 			if (latestYapResponse.data.language) {
-				const detectedLang = latestYapResponse.data.language as LanguageCode;
+				const detectedLang = latestYapResponse.data
+					.language as LanguageCode;
 				if (shouldSwitchLanguage(detectedLang)) {
 					setLanguageFromAPI(detectedLang);
 				}
@@ -46,7 +48,10 @@
 		}
 	});
 
-	function handleRecordingStateChange(recording: boolean, analyzing: boolean) {
+	function handleRecordingStateChange(
+		recording: boolean,
+		analyzing: boolean,
+	) {
 		isTranscribing = analyzing;
 	}
 
@@ -60,29 +65,31 @@
 		class="transcription-textarea"
 		dir="auto"
 		bind:value={transcriptionText}
-		placeholder={$_('recording.placeholder')}
+		placeholder={$_("recording.placeholder")}
 	></textarea>
-	<p>{displayText}</p>
 	<div class="button-container">
 		<div class="record-button-wrapper">
-			<SingleRecordingSection 
-			endpoint="yap" 
-			recordKey="e"
-			onStateChange={handleRecordingStateChange}
-			existingText={transcriptionText}
+			<SingleRecordingSection
+				endpoint="yap"
+				recordKey="e"
+				onStateChange={handleRecordingStateChange}
+				existingText={transcriptionText}
 			/>
 			{#if transcriptionText.length > 0}
-			<span class="plus-symbol">+</span>
+				<span class="plus-symbol">+</span>
 			{/if}
 		</div>
 		{#if transcriptionText.length > 0}
-		<ButtonSketchy
-		text={$_('buttons.continue')}
-		onclick={handleContinue}
-		/>
+			<ButtonSketchy
+				text={$_("buttons.continue")}
+				onclick={handleContinue}
+			/>
 		{/if}
 	</div>
-	<p><em>{$_('recording.privacyNotice')}</em></p>
+	<p>
+		{displayText}<br />
+		<em>{$_("recording.privacyNotice")}</em>
+	</p>
 </div>
 
 <style>
