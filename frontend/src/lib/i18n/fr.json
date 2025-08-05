@@ -81,6 +81,14 @@
     }
   },
   "concept2": {
+    "pageTitle": "Demande de subvention pour fête de quartier",
+    "firstMessage": "Votre premier message",
+    "writingResponse": "écrit la réponse...",
+    "processSteps": {
+      "searchRules": "rechercher les réglementations",
+      "writeProposal": "écrire une proposition",
+      "consultAgent": "consulter l'agent IA municipal"
+    },
     "tags": {
       "people": "50 personnes",
       "champagne": "Fontaine de champagne",

@@ -48,11 +48,11 @@
 
 	// Process steps for animation
 	const processSteps = [
-		{ icon: "/images/agent-icon-search.svg", text: "regels opzoeken" },
-		{ icon: "/images/agent-icon-edit.svg", text: "voorstel schrijven" },
+		{ icon: "/images/agent-icon-search.svg", text: $_('concept2.processSteps.searchRules') },
+		{ icon: "/images/agent-icon-edit.svg", text: $_('concept2.processSteps.writeProposal') },
 		{
 			icon: "/images/agent-icon-agree.svg",
-			text: "overleggen met gemeente AI-agent",
+			text: $_('concept2.processSteps.consultAgent'),
 		},
 	];
 
@@ -81,8 +81,8 @@
 			conversation = [
 				{
 					type: "gemeente-ai",
-					content: "schrijft antwoord...",
-					sender: "Gemeente AI-agent",
+					content: $_('concept2.writingResponse'),
+					sender: $_('concept1.construct.senderAI'),
 					isPlaceholder: true,
 				},
 			];
@@ -105,8 +105,8 @@
 					content: msg.message,
 					sender:
 						msg.speaker === "burger"
-							? "Jouw agent"
-							: "Gemeente AI-agent",
+							? $_('messages.yourAgent')
+							: $_('concept1.construct.senderAI'),
 				}));
 			}
 
@@ -117,8 +117,8 @@
 					...conversation,
 					{
 						type: "user-message",
-						content: "schrijft antwoord...",
-						sender: "Jouw agent",
+						content: $_('concept2.writingResponse'),
+						sender: $_('messages.yourAgent'),
 						isPlaceholder: true,
 					},
 				];
@@ -156,8 +156,8 @@
 					content: msg.message,
 					sender:
 						msg.speaker === "burger"
-							? "Jouw agent"
-							: "Gemeente AI-agent",
+							? $_('messages.yourAgent')
+							: $_('concept1.construct.senderAI'),
 				}));
 
 				conversation = newConversation;
@@ -173,14 +173,14 @@
 							: "gemeente-ai";
 					const nextSender =
 						nextType === "gemeente-ai"
-							? "Gemeente AI-agent"
-							: "Jouw agent";
+							? $_('concept1.construct.senderAI')
+							: $_('messages.yourAgent');
 
 					conversation = [
 						...conversation,
 						{
 							type: nextType,
-							content: "schrijft antwoord...",
+							content: $_('concept2.writingResponse'),
 							sender: nextSender,
 							isPlaceholder: true,
 						},
@@ -288,12 +288,12 @@
 		<ChatMessage
 			type="user-message"
 			content={userMessage()}
-			sender="Jouw eerste bericht"
+			sender={$_('concept2.firstMessage')}
 		/>
 	</header>
 
 	<div class="content">
-		<h1 class="page-title">Buurtfeest subsidie aanvragen</h1>
+		<h1 class="page-title">{$_('concept2.pageTitle')}</h1>
 
 		<div class="process-steps">
 			{#each processSteps as step, index}

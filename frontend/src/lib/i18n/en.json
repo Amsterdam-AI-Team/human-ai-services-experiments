@@ -81,6 +81,14 @@
     }
   },
   "concept2": {
+    "pageTitle": "Neighborhood party subsidy application",
+    "firstMessage": "Your first message",
+    "writingResponse": "writing response...",
+    "processSteps": {
+      "searchRules": "search regulations",
+      "writeProposal": "write proposal",
+      "consultAgent": "consult with municipal AI agent"
+    },
     "tags": {
       "people": "50 people",
       "champagne": "Champagne fountain",

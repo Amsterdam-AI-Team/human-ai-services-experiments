@@ -81,6 +81,14 @@
     }
   },
   "concept2": {
+    "pageTitle": "Buurtfeest subsidie aanvragen",
+    "firstMessage": "Jouw eerste bericht",
+    "writingResponse": "schrijft antwoord...",
+    "processSteps": {
+      "searchRules": "regels opzoeken",
+      "writeProposal": "voorstel schrijven",
+      "consultAgent": "overleggen met gemeente AI-agent"
+    },
     "tags": {
       "people": "50 mensen",
       "champagne": "Champagnefontijn",
