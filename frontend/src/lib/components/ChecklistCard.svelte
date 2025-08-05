@@ -11,7 +11,7 @@
 	let { 
 		items = [], 
 		title = 'Checklist', 
-		subtitle = $_("concept1.construct.checklistSubtitle"),
+		subtitle,
 		onItemChange 
 	} = $props<{
 		items: ChecklistItem[];
@@ -19,6 +19,9 @@
 		subtitle?: string;
 		onItemChange?: (id: string, checked: boolean) => void;
 	}>();
+
+	// Make subtitle reactive to language changes with fallback to translation
+	const reactiveSubtitle = $derived(subtitle ?? $_("concept1.construct.checklistSubtitle"));
 
 	const completedCount = $derived(items.filter((item: ChecklistItem) => item.checked).length);
 	const totalCount = $derived(items.length);
@@ -34,7 +37,7 @@
 <div class="checklist-card">
 	<div class="checklist-header">
 		<h3 class="checklist-title">{title}</h3>
-		<p class="checklist-subtitle">{subtitle}</p>
+		<p class="checklist-subtitle">{reactiveSubtitle}</p>
 	</div>
 
 	<div class="checklist-items">
