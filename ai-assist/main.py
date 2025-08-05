@@ -209,7 +209,7 @@ async def analyze(
         # 2️⃣ transcribe in background thread
         loop = asyncio.get_running_loop()
         text = await loop.run_in_executor(None, _transcribe, tmp_path)
-        language = _detect_language(text)
+        detected_language = _detect_language(text)
 
         # 3️⃣ similarity search
         q_vec = _embedder.encode(text, convert_to_numpy=True, normalize_embeddings=True)
@@ -220,15 +220,27 @@ async def analyze(
         top_idx = sims.argsort()[-k:][::-1]    # laatste k indices, hoog → laag
         # ---------------------------------------------------------------------
 
-        # Get localized intents
-        localized_intents = get_intents(lang_code)
+        # Get localized intents using detected language instead of query parameter
+        localized_intents = get_intents(detected_language)
         
-        matches = [
-            {"intent": localized_intents[i], "similarity": float(sims[i])}
-            for i in top_idx
-        ]
+        # Create a mapping from intentcode to localized intent
+        intent_map = {intent["intentcode"]: intent for intent in localized_intents}
+        
+        matches = []
+        for i in top_idx:
+            original_intent = INTENTS[i]
+            intentcode = original_intent["intentcode"]
+            
+            # Use localized version if available, otherwise fall back to original
+            localized_intent = intent_map.get(intentcode, original_intent)
+            
+            matches.append({
+                "intent": localized_intent, 
+                "similarity": float(sims[i])
+            })
+        
 
-        return AnalyzeResponse(transcript=text, matches=matches, language=language)
+        return AnalyzeResponse(transcript=text, matches=matches, language=detected_language)
 
     finally:
         os.remove(tmp_path)
