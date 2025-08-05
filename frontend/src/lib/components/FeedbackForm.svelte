@@ -245,7 +245,6 @@
 		position: relative;
 		color: white;
 		font-family: "Amsterdam Sans", sans-serif;
-		z-index: -2;
 	}
 
 	.close-button {
@@ -391,10 +390,6 @@
 	}
 
 	.button-wrapper :global(.svg-button) {
-		pointer-events: auto;
-	}
-
-	.button-wrapper :global(.record-button) {
 		pointer-events: auto;
 	}
 
