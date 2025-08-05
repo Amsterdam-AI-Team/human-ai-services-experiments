@@ -7,8 +7,9 @@ from langchain_core.output_parsers.pydantic import PydanticOutputParser
 from models import BaseModel
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, BaseMessage
 import socket
-from models import GemeenteTurn, BurgerTurn
+from models import GemeenteTurn, BurgerTurn, create_burger_turn_model, create_gemeente_turn_model
 from langchain.output_parsers import OutputFixingParser
+from i18n import get_system_prompt, get_language_suffix, normalize_language_code
 
 
 # ── Workaround for WSL DNS issues: force host resolution to the public IP ──
@@ -46,8 +47,8 @@ llm = AzureChatOpenAI(
 llm = llm.bind(response_format="json_object")
 
 
-# Updated: make_chain now takes session dict so it can persist state (e.g. draft)
-def make_chain(step_model: type[BaseModel], session: dict):
+# Updated: make_chain now takes session dict so it can persist state (e.g. draft) and language
+def make_chain(step_model: type[BaseModel], session: dict, language: str = "nl"):
     """
     Bouwt één LangChain-chain die:
       1. De JSON-schema instructies infereren van het Pydantic-model
@@ -58,29 +59,25 @@ def make_chain(step_model: type[BaseModel], session: dict):
     parser = PydanticOutputParser(pydantic_object=step_model)
     json_parser = JsonOutputParser(pydantic_object=step_model)
     format_instr = json_parser.get_format_instructions()
+    
+    # Get localized system prompt
+    lang_code = normalize_language_code(language)
+    prompt_data = get_system_prompt(lang_code, "juridisch_medewerker")
+    language_suffix = get_language_suffix(lang_code)
 
-    system_msg = SystemMessage(
-        content=(
-            """
-            Je bent een juridisch medewerker van de gemeente.
+    system_content = f"""
+{prompt_data['role']}
 
-            Antwoord uitsluitend in strikt geldige JSON volgens dit schema:
-            {format_instr}
+{prompt_data['instructions']}
+{format_instr}
 
-            Volg deze werkwijze:
-            - Zet een boolean op `true` als de betreffende informatie expliciet, duidelijk én volledig is genoemd (bijv. “14 juli”, “AB 12 CD”).
-            - Zet een boolean op `false` als de informatie ontbreekt.
-            - Zet een boolean op `false` als alleen het woord genoemd wordt zonder concrete waarde (bijvoorbeeld “het kenteken”).
-            - Voor elke boolean die op `false` staat, formuleer een gerichte en concrete vraag over de ontbrekende informatie en voeg die toe aan de array `vragen`.
-            - Stel géén vraag bij booleans die op `true` staan.
-            - Zet een her- of bijgeschreven concepttekst van het bezwaarschrift in het veld `draft`.
+{prompt_data['workflow']}
 
-            Belangrijk:
-            - Geef **geen uitleg of tekst buiten het JSON-object**.
-            - Het veld `reply` moet altijd worden geformuleerd in de taal waarin de gebruiker heeft gesproken.
-            """
-        )
-    )
+{prompt_data['important']}
+- {language_suffix}
+"""
+
+    system_msg = SystemMessage(content=system_content)
 
     def to_message(d: dict):
         """Zet history- en user dict om in BaseMessage-objecten"""
@@ -136,6 +133,84 @@ yap_llm_burger = AzureChatOpenAI(
     api_version=os.getenv("OPENAI_API_VERSION"),
     temperature=0.4,
 ).bind(response_format={"type": "json_object"})
+
+
+def build_burger_system_prompt(transcript: str, schema: str, format: str, language: str = "nl") -> str:
+    """Build localized BURGER_SYSTEM prompt."""
+    lang_code = normalize_language_code(language)
+    prompt_data = get_system_prompt(lang_code, "burger_system")
+    language_suffix = get_language_suffix(lang_code)
+    
+    return f"""
+<Context>
+{prompt_data['context']}
+Transcript (door de gebruiker aangeleverd):
+{transcript}
+</Context>
+
+<Objective>
+{prompt_data['objective']}
+</Objective>
+
+<Style>
+{prompt_data['style']}
+Geef ALTIJD strikt geldige JSON volgens dit schema:
+<schema>{schema}</schema>
+
+<format>{format}</format>
+</Style>
+
+<Tone>
+{prompt_data['tone']}
+</Tone>
+
+<Audience>
+{prompt_data['audience']}
+</Audience>
+
+<Response>
+{prompt_data['response']}
+{language_suffix}
+</Response>
+""".strip()
+
+
+def build_gemeente_system_prompt(schema: str, format: str, language: str = "nl") -> str:
+    """Build localized GEMEENTE_SYSTEM prompt."""
+    lang_code = normalize_language_code(language)
+    prompt_data = get_system_prompt(lang_code, "gemeente_system")
+    language_suffix = get_language_suffix(lang_code)
+    
+    return f"""
+<Context>
+{prompt_data['context']}
+</Context>
+
+<Objective>
+{prompt_data['objective']}
+</Objective>
+
+<Style>
+{prompt_data['style']}
+Geef ALTIJD strikt geldige JSON volgens dit schema:  
+<schema>{schema}</schema>
+
+<format>{format}</format>
+</Style>
+
+<Tone>
+{prompt_data['tone']}
+</Tone>
+
+<Audience>
+{prompt_data['audience']}
+</Audience>
+
+<Response>
+{prompt_data['response']}
+{language_suffix}
+</Response>
+""".strip()
 
 
 BURGER_SYSTEM = """
@@ -223,23 +298,27 @@ Geef alleen je eigen boodschap, zonder systeem‑ of rol‑labels.
 """.strip()
 
 
-async def _yap_generate(role: str, transcript: str, history: list[dict]) -> dict:
+async def _yap_generate(role: str, transcript: str, history: list[dict], language: str = "nl") -> dict:
     # 1. Kies schema + parser
+    lang_code = normalize_language_code(language)
+    
     if role == "burger":
-        parser = PydanticOutputParser(pydantic_object=BurgerTurn)
+        BurgerTurnModel = create_burger_turn_model(lang_code)
+        parser = PydanticOutputParser(pydantic_object=BurgerTurnModel)
         fmt = parser.get_format_instructions()
-        schema_json = json.dumps(BurgerTurn.model_json_schema(),
+        schema_json = json.dumps(BurgerTurnModel.model_json_schema(),
                                  ensure_ascii=False, indent=2)
         schema_json = schema_json.replace("{", "{{").replace("}", "}}")   # accolades escapen
-        sys_template = BURGER_SYSTEM.replace("<schema>", schema_json).replace("<format>", fmt)
+        sys_template = build_burger_system_prompt(transcript, schema_json, fmt, lang_code)
     else:
-        parser = PydanticOutputParser(pydantic_object=GemeenteTurn)
+        GemeenteTurnModel = create_gemeente_turn_model(lang_code)
+        parser = PydanticOutputParser(pydantic_object=GemeenteTurnModel)
         fmt = parser.get_format_instructions()
-        schema_json = json.dumps(GemeenteTurn.model_json_schema(), ensure_ascii=False, indent=2)
+        schema_json = json.dumps(GemeenteTurnModel.model_json_schema(), ensure_ascii=False, indent=2)
         schema_json = schema_json.replace("{", "{{").replace("}", "}}")   # accolades escapen
-        sys_template = GEMEENTE_SYSTEM.replace("<schema>", schema_json).replace("<format>", fmt)
+        sys_template = build_gemeente_system_prompt(schema_json, fmt, lang_code)
 
-    sys_msg = SystemMessage(content=sys_template.replace("{transcript}", transcript))
+    sys_msg = SystemMessage(content=sys_template)
 
     # 2. Bouw berichten met correcte HUMAN/ASSISTANT‑mapping
     msgs = [sys_msg]
@@ -260,7 +339,7 @@ async def _yap_generate(role: str, transcript: str, history: list[dict]) -> dict
     return safe_parser.parse(response.content)
 
 
-def _yap_check_finished(history: list[dict]) -> tuple[bool, str | None]:
+def _yap_check_finished(history: list[dict], language: str = "nl") -> tuple[bool, str | None]:
     """
     Heuristiek: als de laatste gemeente-bericht woorden bevat als 'akkoord' OF 'subsidie'
     en 'samenvatting' of 'hier is het concept', dan beschouwen we het gesprek als afgerond
@@ -272,8 +351,13 @@ def _yap_check_finished(history: list[dict]) -> tuple[bool, str | None]:
     if last["speaker"] != "gemeente":
         return False, None
 
+    # Get localized keywords for completion detection
+    from i18n import get_translation
+    lang_code = normalize_language_code(language)
+    keywords = get_translation(lang_code, "responses.yap_check_keywords", ["akkoord", "goedgekeurd", "subsidie toegekend"])
+    
     text = last["message"].lower()
-    if any(w in text for w in ("akkoord", "goedgekeurd", "subsidie toegekend")):
+    if any(w in text for w in keywords):
         # draft = laatste gemeente-uitspraak; in praktijk kun je hier nog
         # een aparte 'maak samenvatting' call doen.
         draft = history[-1]["message"]

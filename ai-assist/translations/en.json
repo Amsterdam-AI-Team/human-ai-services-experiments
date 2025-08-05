@@ -1,0 +1,164 @@
+{
+  "system_prompts": {
+    "juridisch_medewerker": {
+      "role": "You are a legal assistant of the municipality.",
+      "instructions": "Answer exclusively in strictly valid JSON according to this schema:",
+      "workflow": "Follow this workflow:\n- Set a boolean to `true` if the relevant information is explicitly, clearly and completely mentioned (e.g., \"July 14\", \"AB 12 CD\").\n- Set a boolean to `false` if the information is missing.\n- Set a boolean to `false` if only the word is mentioned without a concrete value (e.g., \"the license plate\").\n- For each boolean that is set to `false`, formulate a targeted and concrete question about the missing information and add it to the `vragen` array.\n- Do not ask questions for booleans that are set to `true`.\n- Put a rewritten or amended draft text of the objection letter in the `draft` field.",
+      "important": "Important:\n- Give **no explanation or text outside the JSON object**.\n- The `reply` field must always be formulated in the language the user spoke."
+    },
+    "burger_system": {
+      "context": "You are the personal AI assistant (\"BURGER_SYSTEM\") of an Amsterdam resident applying for a neighborhood festival subsidy. The municipality has its own AI agent (\"GEMEENTE_SYSTEM\").",
+      "objective": "• Take the user input (location, idea, atmosphere, …) and independently create a complete and realistic festival plan.\n• Submit the plan to GEMEENTE_SYSTEM, negotiate and adjust to reasonable counterproposals.\n• Strive to obtain the subsidy (≈ 60% of sessions should succeed, ≈ 40% fail with acceptance of the outcome).\n• Maximum 5 messages of ≤ 50 words each.",
+      "style": "Colloquial, short and clear; show empathy and remain constructive. Always answer in the user's language.",
+      "tone": "Diplomatic but persistent: arrange as much as possible for your citizen.",
+      "audience": "AI civil servant of the municipality (\"GEMEENTE_SYSTEM\").",
+      "response": "Write only your answer without further explanation or role tags."
+    },
+    "gemeente_system": {
+      "context": "You are the AI civil servant (\"GEMEENTE_SYSTEM\") of the municipality of Amsterdam and assess subsidy applications for neighborhood festivals.",
+      "objective": "• Wait for the proposal from BURGER_SYSTEM (don't start yourself).\n• Check the plan strictly against municipal policy and risks: noise standards (no loud music after 10 PM), permits (alcohol, live music in public spaces), safety, sustainability, inclusivity, max. 250 participants, …\n• Ask critical questions or limitations – **each on a new line within one text field**.\n• Be willing to approve the plan if adjustments are sufficient. About 60% of conversations end with approval (\"agreed\"), 40% with a clear rejection and reason.\n• Use at most 5 messages of ≤ 50 words each.",
+      "style": "Business-like and point-by-point, formal but cooperative.",
+      "tone": "Helpful, but strictly guard the subsidy and policy criteria.",
+      "audience": "Personal AI assistant of the citizen (\"BURGER_SYSTEM\").",
+      "response": "Give only your own message, without system or role labels."
+    }
+  },
+  "intents": [
+    {
+      "intent": "Parking fine objection",
+      "intentcode": "objection_parking_fine",
+      "steps": [
+        {
+          "title": "Why do you disagree with this decision?",
+          "description": "For example, incorrect data or unreasonableness."
+        },
+        {
+          "title": "What is your desired outcome?",
+          "description": "For example, review or cancellation."
+        },
+        {
+          "title": "What is the license plate number?",
+          "description": "Provide the license plate of the vehicle for which the fine was issued."
+        },
+        {
+          "title": "What is the date?",
+          "description": "Provide the date on which the parking fine was issued."
+        }
+      ]
+    },
+    {
+      "intent": "Parking problem report",
+      "intentcode": "report_parking_issue",
+      "steps": [
+        {
+          "title": "What is the problem?",
+          "description": "For example, incorrectly parked vehicle or defective meter."
+        },
+        {
+          "title": "Where is the problem?",
+          "description": "Provide the address, street name or location description."
+        },
+        {
+          "title": "When did the problem occur?",
+          "description": "Provide the date and time of the problem."
+        },
+        {
+          "title": "Any additional details",
+          "description": "For example, license plate of the vehicle or meter number."
+        }
+      ]
+    },
+    {
+      "intent": "Public space issue report",
+      "intentcode": "report_public_space_issue",
+      "steps": [
+        {
+          "title": "What is the problem?",
+          "description": "For example, broken street lamp, litter or sunken sidewalk."
+        },
+        {
+          "title": "Where is the problem located?",
+          "description": "Provide the address, street name or description of the location."
+        },
+        {
+          "title": "How serious is the problem?",
+          "description": "For example, dangerous, bothersome or urgent."
+        },
+        {
+          "title": "Any additional details",
+          "description": "For example, how long the problem has existed."
+        }
+      ]
+    },
+    {
+      "intent": "Event permit application",
+      "intentcode": "event_permit_application",
+      "steps": [
+        {
+          "title": "What kind of event do you want to organize?",
+          "description": "For example, concert, market or sports event."
+        },
+        {
+          "title": "Where and when will the event take place?",
+          "description": "Provide the location, date and time."
+        },
+        {
+          "title": "How many visitors do you expect?",
+          "description": "Provide an estimate of the number of visitors."
+        },
+        {
+          "title": "What facilities do you need?",
+          "description": "For example, electricity, toilets or traffic controllers."
+        },
+        {
+          "title": "Any safety measures",
+          "description": "For example, first aid or security."
+        }
+      ]
+    },
+    {
+      "intent": "Debt assistance request",
+      "intentcode": "debt_assistance_request",
+      "steps": [
+        {
+          "title": "What is your current financial situation?",
+          "description": "For example, income, expenses and debts."
+        },
+        {
+          "title": "What are the causes of your debts?",
+          "description": "For example, job loss or medical costs."
+        },
+        {
+          "title": "What help do you need?",
+          "description": "For example, payment arrangement or budget management."
+        },
+        {
+          "title": "Have you already had contact with creditors?",
+          "description": "For example, agreements or letters."
+        },
+        {
+          "title": "Any additional information",
+          "description": "For example, urgency or family situation."
+        }
+      ]
+    }
+  ],
+  "responses": {
+    "all_steps_completed": "All steps are completed!",
+    "yap_opening": "I would like to apply for a subsidy for a neighborhood festival. Details:",
+    "error_unknown_session": "Unknown yap_session_id",
+    "error_audio_required": "Uploaded file must be audio/*",
+    "error_intentcode_required": "'intentcode' is required",
+    "error_message_or_audio": "Either 'message' field or audio file required",
+    "yap_check_keywords": ["agreed", "approved", "subsidy granted"]
+  },
+  "model_descriptions": {
+    "draft": "A running draft of the output document. E.g. the objection letter text or address-change request.",
+    "vragen": "English follow-up questions",
+    "burger_message": "Citizen's response",
+    "gemeente_finished": "Agreement reached?",
+    "gemeente_message": "Outstanding questions (one string, lines separated by \\n)",
+    "gemeente_draft": "Final summary or concept text"
+  },
+  "language_suffix": "Answer strictly in English"
+}
