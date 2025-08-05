@@ -25,7 +25,7 @@
 	let isTranscribing = $state(false);
 	let hasError = $state(false);
 	let errorMessage = $state("");
-	let showConfetti = $state(false);
+	let showConfetti = $state(true);
 
 	const displayText = $derived(
 		isTranscribing
@@ -124,8 +124,8 @@
 			showConfetti = true;
 			setTimeout(() => {
 				showConfetti = false;
-			}, 3000); // Duration matches the confetti duration
-		}, 4000); // Sparkle every 1
+			}, 6000); // Duration matches the confetti duration
+		}, 8000); 
 
 		return () => clearInterval(sparkleInterval);
 	});
@@ -164,9 +164,9 @@
 						y={[-0.5, 0.5]}
 						x={[-0.5, 0.5]}
 						colorRange={[30, 50]}
-						amount={20}
+						amount={25}
 						fallDistance="0px"
-						duration={3000}
+						duration={6000}
 						size={4}
 					/>
 				</div>
