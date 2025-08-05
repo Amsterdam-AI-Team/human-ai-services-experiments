@@ -46,15 +46,15 @@
 	let currentStep = $state(0); // For animating the process steps
 	let isFinished = $state(false);
 
-	// Process steps for animation
-	const processSteps = [
+	// Process steps for animation - reactive to language changes
+	const processSteps = $derived([
 		{ icon: "/images/agent-icon-search.svg", text: $_('concept2.processSteps.searchRules') },
 		{ icon: "/images/agent-icon-edit.svg", text: $_('concept2.processSteps.writeProposal') },
 		{
 			icon: "/images/agent-icon-agree.svg",
 			text: $_('concept2.processSteps.consultAgent'),
 		},
-	];
+	]);
 
 	// Start the yap conversation when user message is available
 	$effect(() => {
