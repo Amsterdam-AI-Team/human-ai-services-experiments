@@ -26,7 +26,7 @@
 				alt="Gemeente AI"
 				class="avatar"
 			/>
-			<span class="sender-name">{sender || "Gemeente AI-agent:"}</span>
+			<span class="sender-name">{sender || "Gemeente AI-agent"}</span>
 		</div>
 	{/if}
 	{#if type === "user-message"}

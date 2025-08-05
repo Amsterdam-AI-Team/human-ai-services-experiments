@@ -76,7 +76,7 @@
     },
     "construct": {
       "loadingAI": "AI is processing your request",
-      "senderAI": "Gemeente AI-agent:",
+      "senderAI": "Gemeente AI-agent",
       "backButton": "Opnieuw beginnen",
       "formTitle": "Dit ga je opsturen:",
       "formLabel": "Betreft: Bezwaar tegen parkeerboete",

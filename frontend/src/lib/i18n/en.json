@@ -76,7 +76,7 @@
     },
     "construct": {
       "loadingAI": "AI is processing your request",
-      "senderAI": "Municipal AI agent:",
+      "senderAI": "Municipal AI agent",
       "backButton": "Start over",
       "formTitle": "This is what you will submit:",
       "formLabel": "Subject: Appeal against parking fine",
