@@ -251,17 +251,19 @@
 							<ChatMessage
 								type="user-message"
 								content={initialTranscript()}
-							/>
-						</div>
-					{/if}
-
-					{#each chatResponses() as response}
-						{#if response.data?.reply}
+								sender={$_("chat.senderYou")}
+								/>
+							</div>
+							{/if}
+							
+							{#each chatResponses() as response}
+							{#if response.data?.reply}
 							{#if initialTranscript() !== response.data.user_text}
-								<div class="message-wrapper">
-									<ChatMessage
-										type="user-message"
-										content={response.data.user_text}
+							<div class="message-wrapper">
+								<ChatMessage
+								type="user-message"
+								content={response.data.user_text}
+								sender={$_("chat.senderYou")}
 									/>
 								</div>
 							{/if}

@@ -128,5 +128,8 @@
   },
   "plan": {
     "adjustedDescription": "Omschrijving aangepast plan:"
+  },
+  "chat": {
+    "senderYou": "Jij"
   }
 }
