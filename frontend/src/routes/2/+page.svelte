@@ -1,23 +1,33 @@
-<script>
-	import MainMessage from '$lib/components/MainMessage.svelte';
-	import ButtonSketchy from '$lib/components/ButtonSketchy.svelte';
+<script lang="ts">
+	import MainMessage from "$lib/components/MainMessage.svelte";
+	import ButtonSketchy from "$lib/components/ButtonSketchy.svelte";
+	import { _ } from "svelte-i18n";
+	import {
+		apiResponses,
+		addApiResponse,
+		clearApiResponsesForEndpoint,
+	} from "$lib/stores/apiStore";
+
+	clearApiResponsesForEndpoint('yap')
+	clearApiResponsesForEndpoint('yapStart')
+	clearApiResponsesForEndpoint('yapNext')
 </script>
 
 <main class="app">
 	<div class="content">
 		<MainMessage
-			headerText="Inkomend bericht van jouw persoonlijke AI-agent:"
-			mainText="Misschien heb je wel recht op subsidie voor het buurtfeest, zal ik dit proberen aan te vragen?"
+			headerText={$_("messages.aiMessage")}
+			mainText={$_("messages.subsidyQuestion")}
 		/>
 		<a href="/2/record">
-			<ButtonSketchy text="Ja, start →" />
+			<ButtonSketchy text={$_("buttons.start")} />
 		</a>
 	</div>
 </main>
 
 <style>
 	.app {
-		height: calc(100vh - 70px - 4rem);
+		height: calc(100vh - 100px);
 		background-color: #f8f9fa;
 		display: flex;
 		flex-direction: column;

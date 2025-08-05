@@ -1,0 +1,126 @@
+{
+  "welcome": {
+    "header": "Welcome to AI Services Prototype",
+    "main": "Explore our experimental AI-powered municipal services",
+    "subtitle": "Choose a concept to get started"
+  },
+  "navigation": {
+    "main": "Main navigation"
+  },
+  "concepts": {
+    "concept1": {
+      "title": "Concept 1: Intent Analysis",
+      "description": "AI-powered intent recognition and form construction for municipal services. Record your voice and let our AI understand what you need.",
+      "button": "Try Concept 1 →"
+    },
+    "concept2": {
+      "title": "Concept 2: Voice Recording",
+      "description": "Voice-to-text transcription and AI assistance for municipal requests. Perfect for accessibility and hands-free interaction.",
+      "button": "Try Concept 2 →"
+    }
+  },
+  "footer": {
+    "disclaimer": "This is a prototype for experimental AI municipal services. For testing purposes only."
+  },
+  "buttons": {
+    "start": "Yes, start →",
+    "continue": "submit request →",
+    "submit": "Submit",
+    "back": "Back",
+    "button": "Button"
+  },
+  "progress": {
+    "complete": "complete"
+  },
+  "messages": {
+    "help": "How can we help you?",
+    "helpSubtitle": "Comment pouvons-nous vous aider?",
+    "aiMessage": "Incoming message from your personal AI agent:",
+    "subsidyQuestion": "Maybe you are eligible for a subsidy for the neighborhood party, shall I try to apply for this?",
+    "ideas": "What ideas do you already have for the neighborhood party? Then we'll take those into account.",
+    "callout": "Our prototype can now only help you with a few things: appealing a parking ticket, reporting a wrongly parked car, reporting something in public space, or requesting an event permit for a neighborhood party. Feel free to try it!",
+    "yourAgent": "Your agent"
+  },
+  "recording": {
+    "startRecording": "Click to start recording",
+    "transcribing": "Transcribing...",
+    "addRecording": "Add a recording or continue with request",
+    "placeholder": "Transcription will appear here...",
+    "privacyNotice": "What you record is not saved. It is automatically deleted."
+  },
+  "ai": {
+    "processing": "AI is processing your request"
+  },
+  "errors": {
+    "microphoneAccess": "Microphone access",
+    "transcriptionFailed": "Transcription failed. Please try recording again.",
+    "audioTranscription": "Audio transcription",
+    "chatSending": "Sending transcript to chat",
+    "apiCall": "API call",
+    "apiConnectionFailed": "API connection failed",
+    "unknownError": "Unknown error occurred",
+    "testError": "This is a test error message",
+    "testWarning": "This is a test warning message",
+    "testInfo": "This is a test info message",
+    "dismissLabel": "Dismiss error",
+    "recordingAnalysis": "Recording analysis",
+    "transcriptionTimeout": "Transcribing took longer than 20 seconds, please try again"
+  },
+  "concept1": {
+    "mainHelp": "How can we help you?",
+    "helpSubtitle": "Comment pouvons-nous vous aider?",
+    "callout": "Our prototype can now only help you with a few things: appealing a parking ticket, reporting a wrongly parked car, reporting something in public space, or requesting an event permit for a neighborhood party. Feel free to try it!",
+    "choose": {
+      "title": "Choose a topic",
+      "subtitle": "We heard you say: {transcript}. We don't yet know exactly what you mean. This prototype only recognizes a few fixed topics. Choose one of the following topics to continue:"
+    },
+    "construct": {
+      "loadingAI": "AI is processing your request",
+      "senderAI": "Municipal AI agent",
+      "backButton": "Start over",
+      "formTitle": "This is what you will submit:",
+      "formLabel": "Subject: Appeal against parking fine",
+      "formPlaceholder": "Describe your situation",
+      "formSuffix": "form",
+      "subjectLabel": "Subject:",
+      "checklistSubtitle": "Provide the following details for a complete request:"
+    }
+  },
+  "concept2": {
+    "pageTitle": "Neighborhood party subsidy application",
+    "firstMessage": "Your first message",
+    "writingResponse": "writing response...",
+    "processSteps": {
+      "searchRules": "search regulations",
+      "writeProposal": "write proposal",
+      "consultAgent": "consult with municipal AI agent"
+    },
+    "tags": {
+      "people": "50 people",
+      "champagne": "Champagne fountain",
+      "games": "Games afternoon",
+      "band": "Big band",
+      "fireworks": "Fireworks show",
+      "bbq": "Spare rib BBQ",
+      "carshow": "Car show"
+    }
+  },
+  "feedback": {
+    "title": "Help design the future!",
+    "subtitle": "In the future I want AI within the municipality...",
+    "placeholder": "... speak your idea",
+    "privacy1": "Don't tell personal information, like your name.",
+    "privacy2": "Your idea is converted to text, we don't save audio recordings. This way we ensure your feedback remains anonymous. We use this text to discover what people find important.",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "errorEmpty": "Please enter feedback before submitting.",
+    "errorGeneric": "Something went wrong while submitting your feedback.",
+    "errorNetwork": "Network error. Check your internet connection and try again."
+  },
+  "finalThanks": {
+    "title": "Thank you!",
+    "message": "Your feedback has been successfully submitted. We appreciate your contribution to the future of AI in the municipality.",
+    "goHome": "Go back home",
+    "autoRedirect": "You will be automatically redirected to the homepage in 5 seconds."
+  }
+}

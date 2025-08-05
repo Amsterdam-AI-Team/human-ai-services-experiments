@@ -1,0 +1,126 @@
+{
+  "welcome": {
+    "header": "Bienvenue au Prototype de Services IA",
+    "main": "Explorez nos services municipaux expérimentaux alimentés par l'IA",
+    "subtitle": "Choisissez un concept pour commencer"
+  },
+  "navigation": {
+    "main": "Navigation principale"
+  },
+  "concepts": {
+    "concept1": {
+      "title": "Concept 1: Analyse d'Intention",
+      "description": "Reconnaissance d'intention alimentée par l'IA et construction de formulaires pour les services municipaux. Enregistrez votre voix et laissez notre IA comprendre ce dont vous avez besoin.",
+      "button": "Essayer Concept 1 →"
+    },
+    "concept2": {
+      "title": "Concept 2: Enregistrement Vocal",
+      "description": "Transcription vocal-texte et assistance IA pour les demandes municipales. Parfait pour l'accessibilité et l'interaction mains libres.",
+      "button": "Essayer Concept 2 →"
+    }
+  },
+  "footer": {
+    "disclaimer": "Ceci est un prototype pour des services municipaux IA expérimentaux. Uniquement à des fins de test."
+  },
+  "buttons": {
+    "start": "Oui, commencer →",
+    "continue": "soumettre la demande →",
+    "submit": "Soumettre",
+    "back": "Retour",
+    "button": "Bouton"
+  },
+  "progress": {
+    "complete": "terminé"
+  },
+  "messages": {
+    "help": "Comment pouvons-nous vous aider?",
+    "helpSubtitle": "Comment pouvons-nous vous aider?",
+    "aiMessage": "Message entrant de votre agent IA personnel:",
+    "subsidyQuestion": "Peut-être avez-vous droit à une subvention pour la fête de quartier, dois-je essayer de faire une demande?",
+    "ideas": "Quelles idées avez-vous déjà pour la fête de quartier? Alors nous les prendrons en compte.",
+    "callout": "Notre prototype ne peut maintenant vous aider qu'avec quelques choses: faire appel d'une contravention de stationnement, signaler une voiture mal garée, signaler quelque chose dans l'espace public, ou demander un permis d'événement pour une fête de quartier. N'hésitez pas à l'essayer!",
+    "yourAgent": "Votre agent"
+  },
+  "recording": {
+    "startRecording": "Cliquez pour commencer l'enregistrement",
+    "transcribing": "Transcription en cours...",
+    "addRecording": "Ajoutez un enregistrement ou continuez avec la demande",
+    "placeholder": "La transcription apparaîtra ici...",
+    "privacyNotice": "Ce que vous enregistrez n'est pas sauvegardé. C'est automatiquement supprimé."
+  },
+  "ai": {
+    "processing": "L'IA traite votre demande"
+  },
+  "errors": {
+    "microphoneAccess": "Accès au microphone",
+    "transcriptionFailed": "La transcription a échoué. Veuillez essayer d'enregistrer à nouveau.",
+    "audioTranscription": "Transcription audio",
+    "chatSending": "Envoi de la transcription au chat",
+    "apiCall": "Appel API",
+    "apiConnectionFailed": "Connexion API échouée",
+    "unknownError": "Erreur inconnue survenue",
+    "testError": "Ceci est un message d'erreur de test",
+    "testWarning": "Ceci est un message d'avertissement de test",
+    "testInfo": "Ceci est un message d'information de test",
+    "dismissLabel": "Fermer l'erreur",
+    "recordingAnalysis": "Analyse d'enregistrement",
+    "transcriptionTimeout": "La transcription a pris plus de 20 secondes, veuillez réessayer"
+  },
+  "concept1": {
+    "mainHelp": "Comment pouvons-nous vous aider?",
+    "helpSubtitle": "Comment pouvons-nous vous aider?",
+    "callout": "Notre prototype ne peut maintenant vous aider qu'avec quelques choses: faire appel d'une contravention de stationnement, signaler une voiture mal garée, signaler quelque chose dans l'espace public, ou demander un permis d'événement pour une fête de quartier. N'hésitez pas à l'essayer!",
+    "choose": {
+      "title": "Choisissez un sujet",
+      "subtitle": "Nous vous avons entendu dire: {transcript}. Nous ne savons pas encore exactement ce que vous voulez dire. Ce prototype ne reconnaît que quelques sujets fixes. Choisissez l'un des sujets suivants pour continuer:"
+    },
+    "construct": {
+      "loadingAI": "L'IA traite votre demande",
+      "senderAI": "Agent IA municipal",
+      "backButton": "Recommencer",
+      "formTitle": "Voici ce que vous allez soumettre:",
+      "formLabel": "Objet: Objection contre l'amende de stationnement",
+      "formPlaceholder": "Décrivez votre situation",
+      "formSuffix": "formulaire",
+      "subjectLabel": "Objet:",
+      "checklistSubtitle": "Fournissez les détails suivants pour une demande complète:"
+    }
+  },
+  "concept2": {
+    "pageTitle": "Demande de subvention pour fête de quartier",
+    "firstMessage": "Votre premier message",
+    "writingResponse": "écrit la réponse...",
+    "processSteps": {
+      "searchRules": "rechercher les réglementations",
+      "writeProposal": "écrire une proposition",
+      "consultAgent": "consulter l'agent IA municipal"
+    },
+    "tags": {
+      "people": "50 personnes",
+      "champagne": "Fontaine de champagne",
+      "games": "Après-midi de jeux",
+      "band": "Grand orchestre",
+      "fireworks": "Feu d'artifice",
+      "bbq": "BBQ côtes levées",
+      "carshow": "Salon automobile"
+    }
+  },
+  "feedback": {
+    "title": "Aidez à concevoir l'avenir!",
+    "subtitle": "À l'avenir, je veux que l'IA dans la municipalité...",
+    "placeholder": "... exprimez votre idée",
+    "privacy1": "Ne donnez pas d'informations personnelles, comme votre nom.",
+    "privacy2": "Votre idée est convertie en texte, nous ne sauvegardons pas les enregistrements audio. Ainsi nous nous assurons que vos commentaires restent anonymes. Nous utilisons ce texte pour découvrir ce que les gens trouvent important.",
+    "submit": "Soumettre",
+    "submitting": "Soumission...",
+    "errorEmpty": "Veuillez saisir un commentaire avant de soumettre.",
+    "errorGeneric": "Quelque chose s'est mal passé lors de la soumission de vos commentaires.",
+    "errorNetwork": "Erreur réseau. Vérifiez votre connexion internet et réessayez."
+  },
+  "finalThanks": {
+    "title": "Merci!",
+    "message": "Vos commentaires ont été soumis avec succès. Nous apprécions votre contribution à l'avenir de l'IA dans la municipalité.",
+    "goHome": "Retourner à l'accueil",
+    "autoRedirect": "Vous serez automatiquement redirigé vers la page d'accueil dans 5 secondes."
+  }
+}

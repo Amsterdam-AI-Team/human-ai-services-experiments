@@ -1,92 +1,7 @@
-<script>
-	import MainMessage from '$lib/components/MainMessage.svelte';
-	import ButtonSketchy from '$lib/components/ButtonSketchy.svelte';
-
-	let isRecording = $state(false);
-	let mediaRecorder = $state();
-	let audioChunks = $state([]);
-	let transcriptionText = $state('');
-	let isTranscribing = $state(false);
-
-	function startRecording() {
-		if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-			navigator.mediaDevices
-				.getUserMedia({ audio: true })
-				.then((stream) => {
-					mediaRecorder = new MediaRecorder(stream);
-					mediaRecorder.start();
-					isRecording = true;
-
-					mediaRecorder.addEventListener('dataavailable', (event) => {
-						audioChunks.push(event.data);
-					});
-
-					mediaRecorder.addEventListener('stop', async () => {
-						const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-						console.log('Recording stopped', audioBlob);
-						audioChunks = [];
-						isRecording = false;
-
-						// Start transcription
-						await transcribeAudio(audioBlob);
-					});
-				})
-				.catch((error) => {
-					console.error('Error accessing microphone:', error);
-				});
-		}
-	}
-
-	function stopRecording() {
-		if (mediaRecorder && mediaRecorder.state !== 'inactive') {
-			mediaRecorder.stop();
-			mediaRecorder.stream.getTracks().forEach((track) => track.stop());
-		}
-	}
-
-	function toggleRecording() {
-		if (isRecording) {
-			stopRecording();
-		} else {
-			startRecording();
-		}
-	}
-
-	const displayText = $derived(isTranscribing 
-		? 'Bezig met transcriberen...' 
-		: (transcriptionText.length > 0 ? 'Voeg een opname toe of ga door met aanvragen' : 'Klik om te starten met opnemen'));
-
-	async function transcribeAudio(audioBlob) {
-		isTranscribing = true;
-
-		const formData = new FormData();
-		formData.append('audio', audioBlob);
-
-		try {
-			const response = await fetch('/2/record/transcribe', {
-				method: 'POST',
-				body: formData
-			});
-
-			const result = await response.json();
-			console.log('Server response:', result);
-
-			if (result.success && result.transcription) {
-				// Append transcription to existing text
-				if (transcriptionText.length > 0) {
-					transcriptionText += ' ' + result.transcription;
-				} else {
-					transcriptionText = result.transcription;
-				}
-			} else {
-				console.error('Transcription failed:', result);
-			}
-		} catch (error) {
-			console.error('Transcription error:', error);
-		} finally {
-			isTranscribing = false;
-		}
-	}
+<script lang="ts">
+	import MainMessage from "$lib/components/MainMessage.svelte";
+	import TranscriptionRecordingSection from "$lib/components/TranscriptionRecordingSection.svelte";
+	import { _ } from "svelte-i18n";
 </script>
 
 <main class="app">
@@ -96,56 +11,31 @@
 
 	<div class="content">
 		<MainMessage
-			headerText="Inkomend bericht van jouw persoonlijke AI-agent:"
-			mainText="Wat voor ideeën heb je al voor het buurtfeest? Dan nemen we die mee."
+			headerText={$_("messages.aiMessage")}
+			mainText={$_("messages.ideas")}
 		/>
 
 		<div class="tags">
-			<span class="tag">🎉&nbsp;&nbsp;50 mensen</span>
-			<span class="tag">🍾&nbsp;&nbsp;Champagnefontijn</span>
-			<span class="tag">🎯&nbsp;&nbsp;Spelletjesmiddag</span>
-			<span class="tag">🎵&nbsp;&nbsp;Grote band</span>
-			<span class="tag">🎆&nbsp;&nbsp;Vuurwerkshow</span>
-			<span class="tag">🍖&nbsp;&nbsp;Sparerib BBQ</span>
-			<span class="tag">🚗&nbsp;&nbsp;Autoshow</span>
+			<span class="tag">🎉&nbsp;&nbsp;{$_("concept2.tags.people")}</span>
+			<span class="tag"
+				>🍾&nbsp;&nbsp;{$_("concept2.tags.champagne")}</span
+			>
+			<span class="tag">🎯&nbsp;&nbsp;{$_("concept2.tags.games")}</span>
+			<span class="tag">🎵&nbsp;&nbsp;{$_("concept2.tags.band")}</span>
+			<span class="tag"
+				>🎆&nbsp;&nbsp;{$_("concept2.tags.fireworks")}</span
+			>
+			<span class="tag">🍖&nbsp;&nbsp;{$_("concept2.tags.bbq")}</span>
+			<span class="tag">🚗&nbsp;&nbsp;{$_("concept2.tags.carshow")}</span>
 		</div>
 
-		<div class="recording-section">
-			<textarea
-				class="ams-text-area"
-				dir="auto"
-				bind:value={transcriptionText}
-				placeholder="Transcriptie verschijnt hier..."
-			></textarea>
-			<p>{displayText}</p>
-			<div class="button-container">
-				<div class="record-button-wrapper">
-					<button
-						class="record-button"
-						on:click={toggleRecording}
-						class:recording={isRecording}
-						disabled={isTranscribing}
-					>
-						<img
-							src={isRecording ? '/images/record-button-stop.svg' : '/images/record-button.svg'}
-							alt="Record button"
-						/>
-					</button>
-					{#if transcriptionText.length > 0}
-						<span class="plus-symbol">+</span>
-					{/if}
-				</div>
-				{#if transcriptionText.length > 0}
-					<ButtonSketchy text="aanvragen →" />
-				{/if}
-			</div>
-		</div>
+		<TranscriptionRecordingSection continueUrl="/2/agents-chat" />
 	</div>
 </main>
 
 <style>
 	.app {
-		height: 100vh;
+		height: calc(100vh - 100px);
 		background-color: #f8f9fa;
 		display: flex;
 		flex-direction: column;
@@ -183,7 +73,7 @@
 		flex-wrap: wrap;
 		gap: 1rem;
 		justify-content: flex-start;
-		margin-bottom: 4rem;
+		margin-bottom: 3rem;
 		width: 1400px;
 		margin-left: -100px;
 	}
@@ -197,90 +87,9 @@
 		border: 1px solid #dee2e6;
 	}
 
-	.recording-section {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: 1rem;
-		width: 100%;
-		justify-content: center;
-	}
-
-	.recording-section p {
-		font-size: 1.1rem;
-		color: #666;
-		margin: 0;
-	}
-
-	.button-container {
-		display: flex;
-		align-items: center;
-		gap: 2rem;
-		justify-content: center;
-	}
-
-	.record-button-wrapper {
-		position: relative;
-		display: inline-block;
-	}
-
-	.plus-symbol {
-		position: absolute;
-		top: -7px;
-		right: -7px;
-		background: #6c757d;
-		color: white;
-		border-radius: 50%;
-		width: 22px;
-		height: 22px;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		font-size: 16px;
-		font-weight: bold;
-		z-index: 10;
-	}
-
-	.record-button {
-		background: none;
-		border: none;
-		cursor: pointer;
-		transition: transform 0.2s;
-		padding: 0;
-	}
-
-	.record-button:hover {
-		transform: scale(1.05);
-	}
-
-	.record-button.recording {
-		animation: pulse 1s infinite;
-	}
-
-	.record-button img {
-		width: 100px;
-		height: 100px;
-	}
-
-	@keyframes pulse {
-		0% {
-			transform: scale(1);
-		}
-		50% {
-			transform: scale(1.1);
-		}
-		100% {
-			transform: scale(1);
-		}
-	}
-
 	@media (max-width: 768px) {
 		.content {
 			padding: 1rem;
-		}
-
-		h1 {
-			font-size: 2rem;
 		}
 
 		.tags {
