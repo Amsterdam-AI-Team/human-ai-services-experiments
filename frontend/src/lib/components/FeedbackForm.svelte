@@ -6,8 +6,13 @@
 	import { handleApiError } from "$lib/stores/errorStore";
 	import { getSessionId } from "$lib/stores/sessionStore";
 	import { clearApiResponses, apiResponses } from "$lib/stores/apiStore";
-	import { setLanguageFromAPI, shouldSwitchLanguage, setLanguage } from '$lib/stores/languageStore';
-	import type { LanguageCode } from '$lib/i18n';
+	import {
+		setLanguageFromAPI,
+		shouldSwitchLanguage,
+		setLanguage,
+	} from "$lib/stores/languageStore";
+	import type { LanguageCode } from "$lib/i18n";
+	import { Confetti } from "svelte-confetti";
 
 	interface Props {
 		concept: number;
@@ -20,29 +25,31 @@
 	let isTranscribing = $state(false);
 	let hasError = $state(false);
 	let errorMessage = $state("");
+	let showConfetti = $state(false);
 
 	const displayText = $derived(
 		isTranscribing
-			? $_('recording.transcribing')
+			? $_("recording.transcribing")
 			: transcriptionText.length > 0
-				? $_('recording.addRecording')
-				: $_('recording.startRecording')
+				? $_("recording.addRecording")
+				: $_("recording.startRecording"),
 	);
 
 	// Watch for feedback-transcribe endpoint responses and update transcription
 	$effect(() => {
 		const responses = $apiResponses;
 		const latestTranscribeResponse = responses
-			.filter(r => r.endpoint === 'feedback-transcribe')
+			.filter((r) => r.endpoint === "feedback-transcribe")
 			.slice(-1)[0];
-		
+
 		if (latestTranscribeResponse?.data?.text) {
 			transcriptionText = latestTranscribeResponse.data.text;
 			isTranscribing = false;
-			
+
 			// Handle language detection from API response
 			if (latestTranscribeResponse.data.language) {
-				const detectedLang = latestTranscribeResponse.data.language as LanguageCode;
+				const detectedLang = latestTranscribeResponse.data
+					.language as LanguageCode;
 				if (shouldSwitchLanguage(detectedLang)) {
 					setLanguageFromAPI(detectedLang);
 				}
@@ -107,9 +114,21 @@
 
 	function handleClose() {
 		clearApiResponses();
-		setLanguage('nl');
+		setLanguage("nl");
 		goto(`/${concept}`);
 	}
+
+	// Periodic confetti sparkle effect
+	$effect(() => {
+		const sparkleInterval = setInterval(() => {
+			showConfetti = true;
+			setTimeout(() => {
+				showConfetti = false;
+			}, 3000); // Duration matches the confetti duration
+		}, 4000); // Sparkle every 1
+
+		return () => clearInterval(sparkleInterval);
+	});
 </script>
 
 <main class="app">
@@ -132,8 +151,26 @@
 
 	<div class="content">
 		<div class="title-section">
-			<img src="/images/feedback-envelope.svg" alt="Feedback envelope" width="72" height="72" />
+			<img
+				src="/images/feedback-envelope.svg"
+				alt="Feedback envelope"
+				width="72"
+				height="72"
+			/>
 			<h1 class="main-title">{$_("feedback.title")}</h1>
+			{#if showConfetti}
+				<div class="confetti-container">
+					<Confetti
+						y={[-0.5, 0.5]}
+						x={[-0.5, 0.5]}
+						colorRange={[30, 50]}
+						amount={20}
+						fallDistance="0px"
+						duration={3000}
+						size={4}
+					/>
+				</div>
+			{/if}
 		</div>
 
 		<p class="subtitle">{$_("feedback.subtitle")}</p>
@@ -151,8 +188,8 @@
 
 			<div class="recording-section">
 				<div class="record-button-wrapper">
-					<SingleRecordingSection 
-						endpoint="feedback-transcribe" 
+					<SingleRecordingSection
+						endpoint="feedback-transcribe"
 						recordKey="e"
 						onStateChange={handleRecordingStateChange}
 						existingText={transcriptionText}
@@ -208,6 +245,7 @@
 		position: relative;
 		color: white;
 		font-family: "Amsterdam Sans", sans-serif;
+		z-index: -2;
 	}
 
 	.close-button {
@@ -240,6 +278,18 @@
 		align-items: center;
 		gap: 1rem;
 		margin-bottom: 1.5rem;
+		position: relative;
+	}
+
+	.confetti-container {
+		position: absolute;
+		top: 50%;
+		left: 100%;
+		transform: translate(-5%, -60%);
+		width: 100%;
+		height: 100%;
+		pointer-events: none;
+		z-index: -1;
 	}
 
 	.main-title {
