@@ -18,7 +18,7 @@
 		clearSession,
 		sessionData,
 	} from "$lib/stores/sessionStore";
-	import { setLanguage } from "$lib/stores/languageStore";
+	import { setLanguage, currentLanguage } from "$lib/stores/languageStore";
 	import {
 		handleApiError,
 		showTranslatedError,
@@ -79,6 +79,7 @@
 			const requestBody: any = {
 				message: transcript,
 				intentcode: intentcode,
+				language: $currentLanguage, // Add current language to request
 			};
 
 			if (currentSessionId) {

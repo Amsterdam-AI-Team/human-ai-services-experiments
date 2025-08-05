@@ -160,5 +160,8 @@
     "gemeente_message": "Outstanding questions (one string, lines separated by \\n)",
     "gemeente_draft": "Final summary or concept text"
   },
-  "language_suffix": "Answer strictly in English"
+  "language_suffix": "Answer strictly in English",
+  "labels": {
+    "transcript": "Transcript (provided by the user):"
+  }
 }

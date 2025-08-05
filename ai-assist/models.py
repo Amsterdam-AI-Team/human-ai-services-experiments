@@ -21,6 +21,14 @@ except ImportError:
 def build_step_model(intent: dict, language: str = "nl") -> type[BaseModel]:
     lang_code = normalize_language_code(language)
     
+    # Get localized intent to use for step titles
+    from i18n import get_intents
+    localized_intents = get_intents(lang_code)
+    localized_intent = next(
+        (i for i in localized_intents if i["intentcode"] == intent["intentcode"]),
+        intent  # fallback to original if not found
+    )
+    
     # 1. Start with a draft field
     draft_desc = get_translation(lang_code, "model_descriptions.draft", 
                                 "A running draft of the output document. E.g. the objection letter text or address-change request.")
@@ -34,8 +42,8 @@ def build_step_model(intent: dict, language: str = "nl") -> type[BaseModel]:
         )
     }
 
-    # 2. Then one boolean per checklist step
-    for step in intent["steps"]:
+    # 2. Then one boolean per checklist step - use localized steps
+    for step in localized_intent["steps"]:
         key = slugify(step["title"])
         fields[key] = (bool, Field(default=False, description=step["title"]))
 

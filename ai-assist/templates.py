@@ -141,10 +141,16 @@ def build_burger_system_prompt(transcript: str, schema: str, format: str, langua
     prompt_data = get_system_prompt(lang_code, "burger_system")
     language_suffix = get_language_suffix(lang_code)
     
+    # Get localized text for JSON instruction
+    from i18n import get_translation
+    json_instruction = get_translation(lang_code, "system_prompts.juridisch_medewerker.instructions", 
+                                     "Geef ALTIJD strikt geldige JSON volgens dit schema:")
+    transcript_label = get_translation(lang_code, "labels.transcript", "Transcript (door de gebruiker aangeleverd):")
+    
     return f"""
 <Context>
 {prompt_data['context']}
-Transcript (door de gebruiker aangeleverd):
+{transcript_label}
 {transcript}
 </Context>
 
@@ -154,7 +160,7 @@ Transcript (door de gebruiker aangeleverd):
 
 <Style>
 {prompt_data['style']}
-Geef ALTIJD strikt geldige JSON volgens dit schema:
+{json_instruction}
 <schema>{schema}</schema>
 
 <format>{format}</format>
@@ -181,6 +187,11 @@ def build_gemeente_system_prompt(schema: str, format: str, language: str = "nl")
     prompt_data = get_system_prompt(lang_code, "gemeente_system")
     language_suffix = get_language_suffix(lang_code)
     
+    # Get localized text for JSON instruction
+    from i18n import get_translation
+    json_instruction = get_translation(lang_code, "system_prompts.juridisch_medewerker.instructions", 
+                                     "Geef ALTIJD strikt geldige JSON volgens dit schema:")
+    
     return f"""
 <Context>
 {prompt_data['context']}
@@ -192,7 +203,7 @@ def build_gemeente_system_prompt(schema: str, format: str, language: str = "nl")
 
 <Style>
 {prompt_data['style']}
-Geef ALTIJD strikt geldige JSON volgens dit schema:  
+{json_instruction}
 <schema>{schema}</schema>
 
 <format>{format}</format>

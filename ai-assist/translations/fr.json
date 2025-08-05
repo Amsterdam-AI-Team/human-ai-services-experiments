@@ -160,5 +160,8 @@
     "gemeente_message": "Questions en suspens (une chaîne, lignes séparées par \\n)",
     "gemeente_draft": "Résumé final ou texte conceptuel"
   },
-  "language_suffix": "Répondez strictement en français"
+  "language_suffix": "Répondez strictement en français",
+  "labels": {
+    "transcript": "Transcription (fournie par l'utilisateur) :"
+  }
 }

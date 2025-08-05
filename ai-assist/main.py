@@ -280,6 +280,7 @@ async def chat(
 
     # Normalize language code
     lang_code = normalize_language_code(language)
+    logging.info(f"Chat endpoint - original language: {language}, normalized: {lang_code}")
     
     if not intentcode:
         error_msg = get_translation(lang_code, "responses.error_intentcode_required", 
@@ -319,6 +320,7 @@ async def chat(
             "checklist": {},
             "intentcode": intentcode,
             "draft": "",
+            "language": None,  # Track current language
         },
     )
 
@@ -326,8 +328,13 @@ async def chat(
     intent = next(i for i in INTENTS if i["intentcode"] == session["intentcode"])
     StepModel = build_step_model(intent, lang_code)
 
-    if "chain" not in session:
+    # Recreate chain if language changed or doesn't exist
+    if "chain" not in session or session.get("language") != lang_code:
+        logging.info(f"Creating new chain for language: {lang_code} (previous: {session.get('language')})")
         session["chain"] = make_chain(StepModel, session, lang_code)  # async fn
+        session["language"] = lang_code
+    else:
+        logging.info(f"Reusing existing chain for language: {lang_code}")
 
     step_obj: StepModel = await session["chain"](
         {"message": user_text, "history": session["history"]}
