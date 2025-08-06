@@ -63,25 +63,49 @@ _AZ_KEY = os.getenv("TRANSCRIPTION_API_KEY")
 
 def _transcribe(path: str) -> str:
     """
-    Return only the transcript text using GPT‑4o‑Transcribe.
-    Falls back to local Whisper if the cloud call fails.
+    Transcribes audio using Azure OpenAI transcription endpoint with Bearer auth.
+    Falls back to local Whisper if the Azure call fails.
     """
-    with open(path, "rb") as f:
-        try:
+    api_key = os.getenv("TRANSCRIPTION_API_KEY")
+    if not api_key:
+        raise RuntimeError("TRANSCRIPTION_API_KEY not set")
+
+    try:
+        with open(path, "rb") as f:
+            files = {
+                "file": ("audio.mp3", f, "audio/mpeg"),
+                "model": (None, "gpt-4o-transcribe"),  # fixed to match -F "model=..."
+            }
+
+            headers = {
+                "Authorization": f"Bearer {api_key}"
+            }
+
             r = requests.post(
-                f"{_AZ_ENDPOINT}",
-                files={"file": f},
-                data={"model": _AZ_MODEL},
-                headers={"api-key": _AZ_KEY},
-                timeout=60,
+                _AZ_ENDPOINT,
+                files=files,
+                headers=headers,
+                timeout=120
             )
-            r.raise_for_status()
-            return r.json()["text"].strip()
-        except Exception as e:
-            # log & fallback
-            logging.warning("Azure GPT‑4o failed (%s) – using local Whisper", e)
-            res = _whisper_model.transcribe(path)
-            return res["text"].strip()
+
+        r.raise_for_status()
+        text = r.json()["text"].strip()
+        logging.info(f"Azure transcription succeeded – text length: {len(text)}")
+        return text
+
+    except Exception as e:
+        logging.warning("Azure transcription failed (%s) – falling back to local Whisper", e)
+        res = _whisper_model.transcribe(path)
+        return res["text"].strip()
+
+
+    except Exception as e:
+        logging.warning("Azure transcription failed (%s) – falling back to local Whisper", e)
+        res = _whisper_model.transcribe(path)
+        return res["text"].strip()
+
+
+
 
 
 def _detect_language(text: str) -> str:
