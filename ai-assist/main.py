@@ -99,15 +99,6 @@ def _transcribe(path: str) -> str:
         return res["text"].strip()
 
 
-    except Exception as e:
-        logging.warning("Azure transcription failed (%s) – falling back to local Whisper", e)
-        res = _whisper_model.transcribe(path)
-        return res["text"].strip()
-
-
-
-
-
 def _detect_language(text: str) -> str:
     """Lightweight n‑gram language ID (ISO‑639‑1)."""
     try:
