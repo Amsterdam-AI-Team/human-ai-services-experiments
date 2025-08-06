@@ -1,9 +1,15 @@
 from typing import List, Dict, Any
+from i18n import get_intents as get_translated_intents
 
 # ---------------------------------------------------------------------------
 # Intent knowledge base – extend / load from file / DB as needed
 # ---------------------------------------------------------------------------
 
+def get_intents_for_language(language: str = "nl") -> List[Dict[str, Any]]:
+    """Get localized intents for a specific language."""
+    return get_translated_intents(language)
+
+# Default Dutch intents for backwards compatibility
 INTENTS: List[Dict[str, Any]] = [
     {
         "intent": "Bezwaar parkeerboete",

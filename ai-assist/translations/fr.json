@@ -1,0 +1,167 @@
+{
+  "system_prompts": {
+    "juridisch_medewerker": {
+      "role": "Vous êtes un assistant juridique de la municipalité.",
+      "instructions": "Répondez exclusivement en JSON strictement valide selon ce schéma :",
+      "workflow": "Suivez cette procédure :\n- Mettez un booléen à `true` si l'information pertinente est mentionnée explicitement, clairement et complètement (par ex. \"14 juillet\", \"AB 12 CD\").\n- Mettez un booléen à `false` si l'information manque.\n- Mettez un booléen à `false` si seulement le mot est mentionné sans valeur concrète (par ex. \"la plaque d'immatriculation\").\n- Pour chaque booléen mis à `false`, formulez une question ciblée et concrète sur l'information manquante et ajoutez-la au tableau `vragen`.\n- Ne posez pas de questions pour les booléens mis à `true`.\n- Mettez un texte de brouillon réécrit ou amendé de la lettre d'objection dans le champ `draft`.",
+      "important": "Important :\n- Ne donnez **aucune explication ou texte en dehors de l'objet JSON**.\n- Le champ `reply` doit toujours être formulé dans la langue parlée par l'utilisateur."
+    },
+    "burger_system": {
+      "context": "Vous êtes l'assistant IA personnel (\"BURGER_SYSTEM\") d'un résident d'Amsterdam qui demande une subvention pour un festival de quartier. La municipalité a son propre agent IA (\"GEMEENTE_SYSTEM\").",
+      "objective": "• Prenez les données utilisateur (lieu, idée, ambiance, …) et créez de manière autonome un plan de festival complet et réaliste.\n• Soumettez le plan à GEMEENTE_SYSTEM, négociez et ajustez aux contre-propositions raisonnables.\n• Efforcez-vous d'obtenir la subvention (≈ 60% des sessions doivent réussir, ≈ 40% échouer avec acceptation du résultat).\n• Maximum 5 messages de ≤ 50 mots chacun.",
+      "style": "Langage familier, court et clair ; montrez de l'empathie et restez constructif. Répondez toujours dans la langue de l'utilisateur.",
+      "tone": "Diplomatique mais persistant : arrangez autant que possible pour votre citoyen.",
+      "audience": "Fonctionnaire IA de la municipalité (\"GEMEENTE_SYSTEM\").",
+      "response": "Écrivez seulement votre réponse sans explication supplémentaire ou étiquettes de rôle."
+    },
+    "gemeente_system": {
+      "context": "Vous êtes le fonctionnaire IA (\"GEMEENTE_SYSTEM\") de la municipalité d'Amsterdam et évaluez les demandes de subvention pour les festivals de quartier.",
+      "objective": "• Attendez la proposition de BURGER_SYSTEM (ne commencez pas vous-même).\n• Vérifiez le plan strictement contre la politique municipale et les risques : normes de bruit (pas de musique forte après 22h), permis (alcool, musique live dans les espaces publics), sécurité, durabilité, inclusivité, max. 250 participants, …\n• Posez des questions critiques ou des limitations – **chacune sur une nouvelle ligne dans un champ de texte**.\n• Soyez prêt à approuver le plan si les ajustements sont suffisants. Environ 60% des conversations se terminent par une approbation (\"d'accord\"), 40% par un refus clair et une raison.\n• Utilisez au maximum 5 messages de ≤ 50 mots chacun.",
+      "style": "Professionnel et point par point, formel mais coopératif.",
+      "tone": "Utile, mais gardez strictement les critères de subvention et de politique.",
+      "audience": "Assistant IA personnel du citoyen (\"BURGER_SYSTEM\").",
+      "response": "Donnez seulement votre propre message, sans étiquettes de système ou de rôle."
+    }
+  },
+  "intents": [
+    {
+      "intent": "Objection à une amende de stationnement",
+      "intentcode": "objection_parking_fine",
+      "steps": [
+        {
+          "title": "Pourquoi n'êtes-vous pas d'accord avec cette décision ?",
+          "description": "Par exemple, données incorrectes ou caractère déraisonnable."
+        },
+        {
+          "title": "Quel est le résultat souhaité ?",
+          "description": "Par exemple, révision ou annulation."
+        },
+        {
+          "title": "Quel est le numéro de plaque d'immatriculation ?",
+          "description": "Fournissez la plaque d'immatriculation du véhicule pour lequel l'amende a été émise."
+        },
+        {
+          "title": "Quelle est la date ?",
+          "description": "Fournissez la date à laquelle l'amende de stationnement a été émise."
+        }
+      ]
+    },
+    {
+      "intent": "Signalement de problème de stationnement",
+      "intentcode": "report_parking_issue",
+      "steps": [
+        {
+          "title": "Quel est le problème ?",
+          "description": "Par exemple, véhicule mal garé ou parcmètre défectueux."
+        },
+        {
+          "title": "Où se trouve le problème ?",
+          "description": "Fournissez l'adresse, le nom de la rue ou une description de l'emplacement."
+        },
+        {
+          "title": "Quand le problème s'est-il produit ?",
+          "description": "Fournissez la date et l'heure du problème."
+        },
+        {
+          "title": "Détails supplémentaires éventuels",
+          "description": "Par exemple, plaque d'immatriculation du véhicule ou numéro du parcmètre."
+        }
+      ]
+    },
+    {
+      "intent": "Signalement de problème d'espace public",
+      "intentcode": "report_public_space_issue",
+      "steps": [
+        {
+          "title": "Quel est le problème ?",
+          "description": "Par exemple, lampadaire cassé, détritus ou trottoir affaissé."
+        },
+        {
+          "title": "Où se trouve le problème ?",
+          "description": "Fournissez l'adresse, le nom de la rue ou une description de l'emplacement."
+        },
+        {
+          "title": "À quel point le problème est-il grave ?",
+          "description": "Par exemple, dangereux, gênant ou urgent."
+        },
+        {
+          "title": "Détails supplémentaires éventuels",
+          "description": "Par exemple, depuis combien de temps le problème existe."
+        }
+      ]
+    },
+    {
+      "intent": "Demande de permis d'événement",
+      "intentcode": "event_permit_application",
+      "steps": [
+        {
+          "title": "Quel type d'événement voulez-vous organiser ?",
+          "description": "Par exemple, concert, marché ou événement sportif."
+        },
+        {
+          "title": "Où et quand l'événement aura-t-il lieu ?",
+          "description": "Fournissez le lieu, la date et l'heure."
+        },
+        {
+          "title": "Combien de visiteurs attendez-vous ?",
+          "description": "Fournissez une estimation du nombre de visiteurs."
+        },
+        {
+          "title": "De quelles installations avez-vous besoin ?",
+          "description": "Par exemple, électricité, toilettes ou contrôleurs de circulation."
+        },
+        {
+          "title": "Mesures de sécurité éventuelles",
+          "description": "Par exemple, premiers secours ou sécurité."
+        }
+      ]
+    },
+    {
+      "intent": "Demande d'aide pour les dettes",
+      "intentcode": "debt_assistance_request",
+      "steps": [
+        {
+          "title": "Quelle est votre situation financière actuelle ?",
+          "description": "Par exemple, revenus, dépenses et dettes."
+        },
+        {
+          "title": "Quelles sont les causes de vos dettes ?",
+          "description": "Par exemple, perte d'emploi ou frais médicaux."
+        },
+        {
+          "title": "De quelle aide avez-vous besoin ?",
+          "description": "Par exemple, arrangement de paiement ou gestion de budget."
+        },
+        {
+          "title": "Avez-vous déjà eu des contacts avec les créanciers ?",
+          "description": "Par exemple, accords ou lettres."
+        },
+        {
+          "title": "Informations supplémentaires éventuelles",
+          "description": "Par exemple, urgence ou situation familiale."
+        }
+      ]
+    }
+  ],
+  "responses": {
+    "all_steps_completed": "Toutes les étapes sont terminées !",
+    "yap_opening": "Je voudrais demander une subvention pour un festival de quartier. Détails :",
+    "error_unknown_session": "yap_session_id inconnu",
+    "error_audio_required": "Le fichier téléchargé doit être audio/*",
+    "error_intentcode_required": "'intentcode' est requis",
+    "error_message_or_audio": "Soit le champ 'message' soit un fichier audio est requis",
+    "yap_check_keywords": ["d'accord", "approuvé", "subvention accordée"]
+  },
+  "model_descriptions": {
+    "draft": "Un brouillon en cours du document de sortie. Par ex. le texte de la lettre d'objection ou la demande de changement d'adresse.",
+    "vragen": "Questions de suivi en français",
+    "burger_message": "Réponse du citoyen",
+    "gemeente_finished": "Accord atteint ?",
+    "gemeente_message": "Questions en suspens (une chaîne, lignes séparées par \\n)",
+    "gemeente_draft": "Résumé final ou texte conceptuel"
+  },
+  "language_suffix": "Répondez strictement en français",
+  "labels": {
+    "transcript": "Transcription (fournie par l'utilisateur) :"
+  }
+}

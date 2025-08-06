@@ -18,6 +18,8 @@ from models import (build_step_model, ChatResponse,
 
 from intents import INTENTS
 from templates import (make_chain, _yap_generate)
+from i18n import (get_intents, get_translation, normalize_language_code, 
+                  extract_language_from_request)
 
 import os
 
@@ -61,25 +63,40 @@ _AZ_KEY = os.getenv("TRANSCRIPTION_API_KEY")
 
 def _transcribe(path: str) -> str:
     """
-    Return only the transcript text using GPT‑4o‑Transcribe.
-    Falls back to local Whisper if the cloud call fails.
+    Transcribes audio using Azure OpenAI transcription endpoint with Bearer auth.
+    Falls back to local Whisper if the Azure call fails.
     """
-    with open(path, "rb") as f:
-        try:
+    api_key = os.getenv("TRANSCRIPTION_API_KEY")
+    if not api_key:
+        raise RuntimeError("TRANSCRIPTION_API_KEY not set")
+
+    try:
+        with open(path, "rb") as f:
+            files = {
+                "file": ("audio.mp3", f, "audio/mpeg"),
+                "model": (None, "gpt-4o-transcribe"),  # fixed to match -F "model=..."
+            }
+
+            headers = {
+                "Authorization": f"Bearer {api_key}"
+            }
+
             r = requests.post(
-                f"{_AZ_ENDPOINT}",
-                files={"file": f},
-                data={"model": _AZ_MODEL},
-                headers={"api-key": _AZ_KEY},
-                timeout=60,
+                _AZ_ENDPOINT,
+                files=files,
+                headers=headers,
+                timeout=120
             )
-            r.raise_for_status()
-            return r.json()["text"].strip()
-        except Exception as e:
-            # log & fallback
-            logging.warning("Azure GPT‑4o failed (%s) – using local Whisper", e)
-            res = _whisper_model.transcribe(path)
-            return res["text"].strip()
+
+        r.raise_for_status()
+        text = r.json()["text"].strip()
+        logging.info(f"Azure transcription succeeded – text length: {len(text)}")
+        return text
+
+    except Exception as e:
+        logging.warning("Azure transcription failed (%s) – falling back to local Whisper", e)
+        res = _whisper_model.transcribe(path)
+        return res["text"].strip()
 
 
 def _detect_language(text: str) -> str:
@@ -143,6 +160,17 @@ async def _init_db():
             );
             """
         )
+        await conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS yap_log (
+                id SERIAL PRIMARY KEY,
+                session_id UUID NOT NULL,
+                speaker TEXT NOT NULL,
+                content TEXT NOT NULL,
+                ts TIMESTAMPTZ DEFAULT now()
+            );
+            """
+        )
 
 
 # --------------------------------------------------------------
@@ -171,14 +199,20 @@ async def _store_yap(session_id: str, speaker: str, content: str) -> None:
 async def analyze(
     file: UploadFile = File(...),
     top_k: int = Query(1, ge=1, description="Return the K best matches"),
+    language: str = Query(None, description="Language code (nl, en, fr)"),
 ) -> AnalyzeResponse:
     """
     • Accepts a single *audio/* upload.
     • Optional query/form field **top_k** (default = 1) returns the K best‑scoring intents.
     """
 
+    # Normalize language code
+    lang_code = normalize_language_code(language)
+
     if not file.content_type.startswith("audio/"):
-        raise HTTPException(400, detail="Uploaded file must be audio/*")
+        error_msg = get_translation(lang_code, "responses.error_audio_required", 
+                                  "Uploaded file must be audio/*")
+        raise HTTPException(400, detail=error_msg)
 
     # 1️⃣ save upload
     with tempfile.NamedTemporaryFile(delete=False, suffix=".tmp") as tmp:
@@ -190,7 +224,7 @@ async def analyze(
         # 2️⃣ transcribe in background thread
         loop = asyncio.get_running_loop()
         text = await loop.run_in_executor(None, _transcribe, tmp_path)
-        language = _detect_language(text)
+        detected_language = _detect_language(text)
 
         # 3️⃣ similarity search
         q_vec = _embedder.encode(text, convert_to_numpy=True, normalize_embeddings=True)
@@ -201,12 +235,27 @@ async def analyze(
         top_idx = sims.argsort()[-k:][::-1]    # laatste k indices, hoog → laag
         # ---------------------------------------------------------------------
 
-        matches = [
-            {"intent": INTENTS[i], "similarity": float(sims[i])}
-            for i in top_idx
-        ]
+        # Get localized intents using detected language instead of query parameter
+        localized_intents = get_intents(detected_language)
+        
+        # Create a mapping from intentcode to localized intent
+        intent_map = {intent["intentcode"]: intent for intent in localized_intents}
+        
+        matches = []
+        for i in top_idx:
+            original_intent = INTENTS[i]
+            intentcode = original_intent["intentcode"]
+            
+            # Use localized version if available, otherwise fall back to original
+            localized_intent = intent_map.get(intentcode, original_intent)
+            
+            matches.append({
+                "intent": localized_intent, 
+                "similarity": float(sims[i])
+            })
+        
 
-        return AnalyzeResponse(transcript=text, matches=matches, language=language)
+        return AnalyzeResponse(transcript=text, matches=matches, language=detected_language)
 
     finally:
         os.remove(tmp_path)
@@ -231,6 +280,7 @@ async def chat(
     intentcode: str | None = Form(None),
     message: str | None = Form(None),
     session_id: str | None = Form(None),
+    language: str | None = Form(None),
     audio: UploadFile | None = File(None),
 ):
     if (
@@ -241,15 +291,24 @@ async def chat(
         intentcode = body.get("intentcode")
         message = body.get("message")
         session_id = body.get("session_id")
+        language = body.get("language")
 
+    # Normalize language code
+    lang_code = normalize_language_code(language)
+    logging.info(f"Chat endpoint - original language: {language}, normalized: {lang_code}")
+    
     if not intentcode:
-        raise HTTPException(422, detail="'intentcode' is required")
+        error_msg = get_translation(lang_code, "responses.error_intentcode_required", 
+                                  "'intentcode' is required")
+        raise HTTPException(422, detail=error_msg)
 
     # ── 2. Derive user_text ────────────────────────────────────────────────
     if audio is not None:
         ct = (audio.content_type or "").lower()
         if not (ct.startswith("audio") or ct == "application/octet-stream"):
-            raise HTTPException(400, detail="Uploaded file must be audio/*")
+            error_msg = get_translation(lang_code, "responses.error_audio_required", 
+                                      "Uploaded file must be audio/*")
+            raise HTTPException(400, detail=error_msg)
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=".tmp") as tmp:
             tmp.write(await audio.read())
@@ -263,9 +322,9 @@ async def chat(
     else:
         user_text = message or ""
         if not user_text:
-            raise HTTPException(
-                400, detail="Either 'message' field or audio file required"
-            )
+            error_msg = get_translation(lang_code, "responses.error_message_or_audio", 
+                                      "Either 'message' field or audio file required")
+            raise HTTPException(400, detail=error_msg)
 
     # ── 3. Session bookkeeping ────────────────────────────────────────────
     sid = session_id or str(uuid4())
@@ -276,15 +335,21 @@ async def chat(
             "checklist": {},
             "intentcode": intentcode,
             "draft": "",
+            "language": None,  # Track current language
         },
     )
 
     # ── 4. Build / reuse LangChain runnable ───────────────────────────────
     intent = next(i for i in INTENTS if i["intentcode"] == session["intentcode"])
-    StepModel = build_step_model(intent)
+    StepModel = build_step_model(intent, lang_code)
 
-    if "chain" not in session:
-        session["chain"] = make_chain(StepModel, session)  # async fn
+    # Recreate chain if language changed or doesn't exist
+    if "chain" not in session or session.get("language") != lang_code:
+        logging.info(f"Creating new chain for language: {lang_code} (previous: {session.get('language')})")
+        session["chain"] = make_chain(StepModel, session, lang_code)  # async fn
+        session["language"] = lang_code
+    else:
+        logging.info(f"Reusing existing chain for language: {lang_code}")
 
     step_obj: StepModel = await session["chain"](
         {"message": user_text, "history": session["history"]}
@@ -302,7 +367,7 @@ async def chat(
     await _store_message(
         sid,
         "assistant",
-        step_obj.vragen[0] if step_obj.vragen else "Alle stappen zijn afgerond!",
+        step_obj.vragen[0] if step_obj.vragen else get_translation(lang_code, "responses.all_steps_completed", "Alle stappen zijn afgerond!"),
     )
 
     # 5️⃣ checklist ---------------------------------------------------------
@@ -311,7 +376,7 @@ async def chat(
 
     return ChatResponse(
         session_id=sid,
-        reply=step_obj.vragen[0] if step_obj.vragen else "Alle stappen zijn afgerond!",
+        reply=step_obj.vragen[0] if step_obj.vragen else get_translation(lang_code, "responses.all_steps_completed", "Alle stappen zijn afgerond!"),
         checklist=session["checklist"],
         finished=finished,
         user_text=user_text
@@ -324,6 +389,7 @@ async def yap_accumulate(
     text: str | None = Form(None),
     audio: UploadFile | None = File(None),
     append: str | None = Form(None),
+    language: str | None = Form(None),
 ):
     """
     Accumuleer audio naar tekst. Opties:
@@ -336,13 +402,19 @@ async def yap_accumulate(
         body = await request.json()
         text = body.get("text", "")
         append = body.get("append", "")
+        language = body.get("language")
+    
+    # Normalize language code
+    lang_code = normalize_language_code(language)
 
     base_text = text or ""
 
     if audio is not None:
         ct = (audio.content_type or "").lower()
         if not (ct.startswith("audio") or ct == "application/octet-stream"):
-            raise HTTPException(400, detail="Uploaded file must be audio/*")
+            error_msg = get_translation(lang_code, "responses.error_audio_required", 
+                                      "Uploaded file must be audio/*")
+            raise HTTPException(400, detail=error_msg)
 
         with tempfile.NamedTemporaryFile(delete=False, suffix=".tmp") as tmp:
             tmp.write(await audio.read())
@@ -378,16 +450,18 @@ async def yap_accumulate(
 @app.post("/yap/start", response_model=YapStartResponse)
 async def yap_start(req: YapStartRequest):
     sid = str(uuid4())
+    
+    # Normalize language code
+    lang_code = normalize_language_code(req.language)
 
     # 1. burger opent gesprek
-    opening = (
-        "Ik wil graag subsidie aanvragen voor een buurtfeest. Details:\n"
-        f"{req.text}"
-    )
+    opening_template = get_translation(lang_code, "responses.yap_opening", 
+                                     "Ik wil graag subsidie aanvragen voor een buurtfeest. Details:")
+    opening = f"{opening_template}\n{req.text}"
     msgs = [{"speaker": "burger", "message": opening}]
 
     # 2. gemeente‑reactie
-    gemeente_reply = await _yap_generate("gemeente", req.text, msgs)
+    gemeente_reply = await _yap_generate("gemeente", req.text, msgs, lang_code)
     msgs.append({"speaker": "gemeente", "message": gemeente_reply.message})
 
     # 3. cache in RAM  ✅ transcript back
@@ -397,6 +471,7 @@ async def yap_start(req: YapStartRequest):
         "turn": 2,                   # volgende = burger
         "finished": False,
         "draft": None,
+        "language": lang_code,        # <── added language
     }
 
     # 4. persist two rows + the transcript once
@@ -418,9 +493,14 @@ async def yap_start(req: YapStartRequest):
 @app.post("/yap/next", response_model=YapNextResponse)
 async def yap_next(
     yap_session_id: str = Query(..., description="ID from /yap/start"),
+    language: str = Query(None, description="Language code (nl, en, fr)"),
 ):
+    lang_code = normalize_language_code(language)
+    
     if yap_session_id not in YAP_SESSIONS:
-        raise HTTPException(404, detail="Unknown yap_session_id")
+        error_msg = get_translation(lang_code, "responses.error_unknown_session", 
+                                  "Unknown yap_session_id")
+        raise HTTPException(404, detail=error_msg)
 
     sess = YAP_SESSIONS[yap_session_id]
 
@@ -441,7 +521,9 @@ async def yap_next(
     role = "burger" if last_speaker == "gemeente" else "gemeente"
 
     # structured output (BurgerTurn of GemeenteTurn)
-    step_obj = await _yap_generate(role, sess["transcript"], sess["messages"])
+    # Use stored language or fallback to query parameter
+    session_lang = sess.get("language", lang_code)
+    step_obj = await _yap_generate(role, sess["transcript"], sess["messages"], session_lang)
 
     # 1.  sla de boodschap op
     sess["messages"].append({"speaker": role, "message": step_obj.message})
