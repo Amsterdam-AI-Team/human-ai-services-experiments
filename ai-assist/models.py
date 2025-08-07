@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field, create_model
 from slugify import slugify
 from typing import Dict, Any, List, Optional, Literal
+from uuid import UUID
 
 # Import i18n when module is loaded
 try:
@@ -151,3 +152,10 @@ def create_gemeente_turn_model(language: str = "nl") -> type[BaseModel]:
 # Backward compatibility - default Dutch models
 BurgerTurn = create_burger_turn_model("nl")
 GemeenteTurn = create_gemeente_turn_model("nl")
+
+
+class FeedbackRequest(BaseModel):
+    feedback: str
+    concept: int | None = None
+    language: str | None = None
+    session_id: UUID | None = None
