@@ -171,6 +171,16 @@ async def _init_db():
             );
             """
         )
+        await conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS feedback_log (
+                id SERIAL PRIMARY KEY,
+                session_id UUID,
+                text TEXT NOT NULL,
+                ts TIMESTAMPTZ DEFAULT now()
+            );
+            """
+        )
 
 
 # --------------------------------------------------------------
@@ -541,3 +551,22 @@ async def yap_next(
         finished=sess["finished"],
         draft=sess["draft"],
     )
+
+
+@app.post("/feedback")
+async def submit_feedback(
+    text: str = Form(...),
+    session_id: str | None = Form(None),
+):
+    """
+    Store feedback from UI with optional session_id.
+    """
+    async with app.state.pool.acquire() as conn:
+        await conn.execute(
+            """
+            INSERT INTO feedback_log (session_id, text)
+            VALUES ($1, $2)
+            """,
+            session_id, text
+        )
+    return {"status": "ok"}
