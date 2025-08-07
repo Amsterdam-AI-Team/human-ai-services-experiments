@@ -555,7 +555,7 @@ async def yap_next(
 
 @app.post("/feedback")
 async def submit_feedback(
-    text: str = Form(...),
+    feedback: str = Form(...),
     session_id: str | None = Form(None),
 ):
     """
@@ -567,6 +567,6 @@ async def submit_feedback(
             INSERT INTO feedback_log (session_id, text)
             VALUES ($1, $2)
             """,
-            session_id, text
+            session_id, feedback
         )
     return {"status": "ok"}
