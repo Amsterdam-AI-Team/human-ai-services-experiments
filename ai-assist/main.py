@@ -14,7 +14,7 @@ import numpy as np
 from models import (build_step_model, ChatResponse,
                     AnalyzeResponse, YapAccumResponse,
                     YapStartRequest, YapStartResponse,
-                    YapNextResponse)
+                    YapNextResponse, FeedbackRequest)
 
 from intents import INTENTS
 from templates import (make_chain, _yap_generate)
@@ -555,8 +555,7 @@ async def yap_next(
 
 @app.post("/feedback")
 async def submit_feedback(
-    feedback: str = Form(...),
-    session_id: str | None = Form(None),
+    payload: FeedbackRequest
 ):
     """
     Store feedback from UI with optional session_id.
@@ -567,6 +566,6 @@ async def submit_feedback(
             INSERT INTO feedback_log (session_id, text)
             VALUES ($1, $2)
             """,
-            session_id, feedback
+            payload.session_id, payload.feedback
         )
     return {"status": "ok"}
