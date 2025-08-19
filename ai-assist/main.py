@@ -31,6 +31,11 @@ import logging
 import requests
 from langdetect import detect
 
+import mimetypes
+import subprocess
+import uuid
+from pathlib import Path
+
 if "AZURE_OPENAI_API_KEY" not in os.environ:
     print("❌  Missing Azure OpenAI API key")
 
@@ -43,6 +48,9 @@ for var in [
     "AZURE_OPENAI_DEPLOYMENT_NAME",
     "WHISPER_MODEL_NAME",
     "DATABASE_URL",
+    "TRANSCRIPTION_AZ_ENDPOINT",
+    "TRANSCRIPTION_AZ_MODEL",
+    "TRANSCRIPTION_API_KEY"
 ]:
     logging.info(f"{var}={os.getenv(var)}")
 
@@ -61,44 +69,6 @@ _AZ_MODEL = os.getenv("TRANSCRIPTION_AZ_MODEL")
 _AZ_KEY = os.getenv("TRANSCRIPTION_API_KEY")
 
 
-def _transcribe(path: str) -> str:
-    """
-    Transcribes audio using Azure OpenAI transcription endpoint with Bearer auth.
-    Falls back to local Whisper if the Azure call fails.
-    """
-    api_key = os.getenv("TRANSCRIPTION_API_KEY")
-    if not api_key:
-        raise RuntimeError("TRANSCRIPTION_API_KEY not set")
-
-    try:
-        with open(path, "rb") as f:
-            files = {
-                "file": ("audio.mp3", f, "audio/mpeg"),
-                "model": (None, "gpt-4o-transcribe"),  # fixed to match -F "model=..."
-            }
-
-            headers = {
-                "Authorization": f"Bearer {api_key}"
-            }
-
-            r = requests.post(
-                _AZ_ENDPOINT,
-                files=files,
-                headers=headers,
-                timeout=120
-            )
-
-        r.raise_for_status()
-        text = r.json()["text"].strip()
-        logging.info(f"Azure transcription succeeded – text length: {len(text)}")
-        return text
-
-    except Exception as e:
-        logging.warning("Azure transcription failed (%s) – falling back to local Whisper", e)
-        res = _whisper_model.transcribe(path)
-        return res["text"].strip()
-
-
 def _detect_language(text: str) -> str:
     """Lightweight n‑gram language ID (ISO‑639‑1)."""
     try:
@@ -106,6 +76,74 @@ def _detect_language(text: str) -> str:
     except Exception:
         return "und"                 # undefined
 
+def _transcribe(path: str, filename: str | None = None, content_type: str | None = None) -> str:
+    """
+    Always transcodes the incoming audio to MP3 (mono, 16 kHz) with ffmpeg,
+    then sends that MP3 to the Azure endpoint using your existing headers/model.
+    Falls back to local Whisper on any failure.
+    """
+    api_key = os.getenv("TRANSCRIPTION_API_KEY")
+    if not api_key:
+        raise RuntimeError("TRANSCRIPTION_API_KEY not set")
+
+    # Prepare an MP3 temp file
+    mp3_path = Path(tempfile.gettempdir()) / f"cast-{uuid.uuid4().hex}.mp3"
+    ffmpeg_cmd = [
+        "/usr/bin/ffmpeg", "-y",         # absolute path avoids PATH issues under systemd
+        "-i", path,                      # source file (any format)
+        "-ac", "1",                      # mono
+        "-ar", "16000",                  # 16 kHz
+        "-codec:a", "libmp3lame",
+        "-b:a", "128k",
+        str(mp3_path)
+    ]
+
+    try:
+        # 1) ALWAYS transcode to MP3
+        subprocess.run(ffmpeg_cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+
+        send_path = str(mp3_path)
+        send_name = "audio.mp3"
+        send_ct = "audio/mpeg"
+
+        logging.info(
+            "Transcribe → sending to Azure (forced MP3): name=%s ct=%s size=%d bytes",
+            send_name, send_ct, os.path.getsize(send_path)
+        )
+
+        # 2) Send MP3 to Azure with your existing headers/model
+        with open(send_path, "rb") as f:
+            files = {
+                "file": (send_name, f, send_ct),
+                "model": (None, "gpt-4o-transcribe"),  # keep your current behavior
+            }
+            headers = {"Authorization": f"Bearer {api_key}"}
+
+            r = requests.post(_AZ_ENDPOINT, files=files, headers=headers, timeout=120)
+
+        try:
+            r.raise_for_status()
+        except requests.HTTPError:
+            logging.error("Azure transcription HTTP %s: %s", r.status_code, r.text)
+            raise
+
+        text = r.json().get("text", "").strip()
+        logging.info("Azure transcription succeeded – text length: %d", len(text))
+        return text
+
+    except Exception as e:
+        logging.warning("Azure transcription failed (%s) – falling back to local Whisper", e)
+        # If casting failed (e.g., ffmpeg missing), or Azure rejected, use original file locally
+        res = _whisper_model.transcribe(path)
+        return res["text"].strip()
+
+    finally:
+        # Clean up the temp MP3 if it exists
+        try:
+            if mp3_path.exists():
+                mp3_path.unlink()
+        except Exception:
+            pass
 
 # ---------------------------------------------------------------------------
 # FastAPI app config
@@ -233,7 +271,16 @@ async def analyze(
 
         # 2️⃣ transcribe in background thread
         loop = asyncio.get_running_loop()
-        text = await loop.run_in_executor(None, _transcribe, tmp_path)
+        #text = await loop.run_in_executor(None, _transcribe, tmp_path)
+        
+        text = await loop.run_in_executor(
+        None,
+        _transcribe,
+        tmp_path,
+        file.filename or "audio",      # <-- pass through
+        (file.content_type or "").lower() or None  # <-- pass through
+         )
+
         detected_language = _detect_language(text)
 
         # 3️⃣ similarity search
@@ -326,7 +373,14 @@ async def chat(
 
         try:
             loop = asyncio.get_running_loop()
-            user_text = await loop.run_in_executor(None, _transcribe, tmp_path)
+            #user_text = await loop.run_in_executor(None, _transcribe, tmp_path)
+            user_text = await loop.run_in_executor(
+                None,
+                _transcribe,
+                tmp_path,
+                audio.filename or "audio",
+                (audio.content_type or "").lower() or None
+            )
         finally:
             os.remove(tmp_path)
     else:
@@ -432,8 +486,14 @@ async def yap_accumulate(
 
         try:
             loop = asyncio.get_running_loop()
-            new_text = await loop.run_in_executor(None, _transcribe, tmp_path)
-
+            #new_text = await loop.run_in_executor(None, _transcribe, tmp_path)
+            new_text = await loop.run_in_executor(
+                None,
+                _transcribe,
+                tmp_path,
+                audio.filename or "audio",
+                (audio.content_type or "").lower() or None
+            )
         finally:
             os.remove(tmp_path)
 
