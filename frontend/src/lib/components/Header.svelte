@@ -33,6 +33,17 @@
 		setLanguage('nl');
 		goto("/1");
 	}
+
+	function handleLogoPanicClick() {
+		clearApiResponses();
+		
+		// Determine current concept from URL and navigate to concept root
+		if (currentRoute?.startsWith("/2")) {
+			goto("/2");
+		} else {
+			goto("/1");
+		}
+	}
 </script>
 
 <header class="header">
@@ -40,11 +51,13 @@
 		<div class="header-layout">
 			<div class="header-left">
 				<div class="logo-container">
-					<img
-						src="/images/logo-sketchy.svg"
-						alt="Logo"
-						class="logo"
-					/>
+					<button onclick={handleLogoPanicClick} class="logo-button">
+						<img
+							src="/images/logo-sketchy.svg"
+							alt="Logo"
+							class="logo"
+						/>
+					</button>
 					<button onclick={handleBackClick} class="back-button">
 						<img
 							src="/images/chevron-left.svg"
@@ -87,7 +100,9 @@
 	{:else}
 		<!-- Default header for all other routes including homepage -->
 		<div class="logo-container">
-			<img src="/images/logo-sketchy.svg" alt="Logo" class="logo" />
+			<button onclick={handleLogoPanicClick} class="logo-button">
+				<img src="/images/logo-sketchy.svg" alt="Logo" class="logo" />
+			</button>
 		</div>
 
 		<!-- Always show language dropdown on non-construct pages -->
@@ -189,6 +204,13 @@
 
 	.back-text {
 		font-size: 1.1rem;
+	}
+
+	.logo-button {
+		background: none;
+		border: none;
+		cursor: pointer;
+		padding: 0;
 	}
 
 	.logo {
