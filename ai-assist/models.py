@@ -21,7 +21,7 @@ except ImportError:
 
 def build_step_model(intent: dict, language: str = "nl") -> type[BaseModel]:
     lang_code = normalize_language_code(language)
-    
+
     # Get localized intent to use for step titles
     from i18n import get_intents
     localized_intents = get_intents(lang_code)
@@ -29,9 +29,9 @@ def build_step_model(intent: dict, language: str = "nl") -> type[BaseModel]:
         (i for i in localized_intents if i["intentcode"] == intent["intentcode"]),
         intent  # fallback to original if not found
     )
-    
+
     # 1. Start with a draft field
-    draft_desc = get_translation(lang_code, "model_descriptions.draft", 
+    draft_desc = get_translation(lang_code, "model_descriptions.draft",
                                 "A running draft of the output document. E.g. the objection letter text or address-change request.")
     fields = {
         "draft": (
@@ -70,6 +70,7 @@ class ChatResponse(BaseModel):
     session_id: str
     reply: str
     checklist: dict
+    draft: str = Field(default="", description="Werkversie van de samengestelde tekst/bezwaarschrift; mag onvolledig zijn.")
     finished: bool
     user_text: str
 
