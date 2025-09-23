@@ -7,9 +7,8 @@ from langchain_core.output_parsers.pydantic import PydanticOutputParser
 from models import BaseModel
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, BaseMessage
 import socket
-from models import GemeenteTurn, BurgerTurn, create_burger_turn_model, create_gemeente_turn_model
+from models import GemeenteTurn, BurgerTurn
 from langchain.output_parsers import OutputFixingParser
-from i18n import get_system_prompt, get_language_suffix, normalize_language_code
 
 
 # ── Workaround for WSL DNS issues: force host resolution to the public IP ──
@@ -47,8 +46,8 @@ llm = AzureChatOpenAI(
 llm = llm.bind(response_format="json_object", temperature=0)
 
 
-# Updated: make_chain now takes session dict so it can persist state (e.g. draft) and language
-def make_chain(step_model: type[BaseModel], session: dict, language: str = "nl"):
+# Updated: make_chain now takes session dict so it can persist state (e.g. draft)
+def make_chain(step_model: type[BaseModel], session: dict):
     """
     Bouwt één LangChain-chain die:
       1. De JSON-schema instructies infereren van het Pydantic-model
@@ -132,6 +131,7 @@ yap_llm_burger = AzureChatOpenAI(
     api_version=os.getenv("OPENAI_API_VERSION"),
     temperature=0.4,
 ).bind(response_format={"type": "json_object"})
+
 
 
 def build_burger_system_prompt(transcript: str, schema: str, format: str, language: str = "nl") -> str:
@@ -223,7 +223,6 @@ def build_gemeente_system_prompt(schema: str, format: str, language: str = "nl")
                 </Response>
             """.strip()
 
-
 BURGER_SYSTEM = """
                     <Context>
                     Je bent de persoonlijke AI‑assistent (“BURGER_SYSTEM”) van een Amsterdamse
@@ -308,28 +307,27 @@ GEMEENTE_SYSTEM = """
                 """.strip()
 
 
-async def _yap_generate(role: str, transcript: str, history: list[dict], language: str = "nl") -> dict:
+async def _yap_generate(role: str, transcript: str, history: list[dict]) -> dict:
     # 1. Kies schema + parser
-    lang_code = normalize_language_code(language)
 
+    lang_code = normalize_language_code(language)
     if role == "burger":
-        BurgerTurnModel = create_burger_turn_model(lang_code)
-        parser = PydanticOutputParser(pydantic_object=BurgerTurnModel)
+        parser = PydanticOutputParser(pydantic_object=BurgerTurn)
         fmt = parser.get_format_instructions()
-        schema_json = json.dumps(BurgerTurnModel.model_json_schema(),
+        schema_json = json.dumps(BurgerTurn.model_json_schema(),
                                  ensure_ascii=False, indent=2)
         schema_json = schema_json.replace("{", "{{").replace("}", "}}")   # accolades escapen
-        sys_template = build_burger_system_prompt(transcript, schema_json, fmt, lang_code)
+        sys_template = BURGER_SYSTEM.replace("<schema>", schema_json).replace("<format>", fmt)
     else:
-        GemeenteTurnModel = create_gemeente_turn_model(lang_code)
-        parser = PydanticOutputParser(pydantic_object=GemeenteTurnModel)
+        parser = PydanticOutputParser(pydantic_object=GemeenteTurn)
         fmt = parser.get_format_instructions()
         schema_json = json.dumps(GemeenteTurnModel.model_json_schema(),
                                  ensure_ascii=False, indent=2)
-        schema_json = schema_json.replace("{", "{{").replace("}", "}}")   # accolades escapen
-        sys_template = build_gemeente_system_prompt(schema_json, fmt, lang_code)
 
-    sys_msg = SystemMessage(content=sys_template)
+        schema_json = schema_json.replace("{", "{{").replace("}", "}}")   # accolades escapen
+        sys_template = GEMEENTE_SYSTEM.replace("<schema>", schema_json).replace("<format>", fmt)
+
+    sys_msg = SystemMessage(content=sys_template.replace("{transcript}", transcript))
 
     # 2. Bouw berichten met correcte HUMAN/ASSISTANT‑mapping
     msgs = [sys_msg]
@@ -350,7 +348,7 @@ async def _yap_generate(role: str, transcript: str, history: list[dict], languag
     return safe_parser.parse(response.content)
 
 
-def _yap_check_finished(history: list[dict], language: str = "nl") -> tuple[bool, str | None]:
+def _yap_check_finished(history: list[dict]) -> tuple[bool, str | None]:
     """
     Heuristiek: als de laatste gemeente-bericht woorden bevat als 'akkoord' OF 'subsidie'
     en 'samenvatting' of 'hier is het concept', dan beschouwen we het gesprek als afgerond
@@ -368,8 +366,9 @@ def _yap_check_finished(history: list[dict], language: str = "nl") -> tuple[bool
     keywords = get_translation(lang_code, "responses.yap_check_keywords", [
                                "akkoord", "goedgekeurd", "subsidie toegekend"])
 
+
     text = last["message"].lower()
-    if any(w in text for w in keywords):
+    if any(w in text for w in ("akkoord", "goedgekeurd", "subsidie toegekend")):
         # draft = laatste gemeente-uitspraak; in praktijk kun je hier nog
         # een aparte 'maak samenvatting' call doen.
         draft = history[-1]["message"]

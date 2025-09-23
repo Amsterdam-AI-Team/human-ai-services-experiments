@@ -3,7 +3,7 @@ import { goto } from "$app/navigation";
 import { clearApiResponses } from "$lib/stores/apiStore";
 import { setLanguage } from "$lib/stores/languageStore";
 
-const INACTIVITY_TIMEOUT = 2 * 60 * 1000; // 2 minutes in milliseconds
+const INACTIVITY_TIMEOUT = 2 * 60 * 1000 * 100; // 2 minutes in milliseconds
 
 export class InactivityTimer {
   private timer: number | null = null;
