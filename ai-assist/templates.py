@@ -9,7 +9,7 @@ from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, Base
 import socket
 from models import GemeenteTurn, BurgerTurn
 from langchain.output_parsers import OutputFixingParser
-
+from i18n import *
 
 # ── Workaround for WSL DNS issues: force host resolution to the public IP ──
 PUBLIC_IP = "100.64.1.20"  # replace with your resource's actual public front-door IP
@@ -47,7 +47,7 @@ llm = llm.bind(response_format="json_object", temperature=0)
 
 
 # Updated: make_chain now takes session dict so it can persist state (e.g. draft)
-def make_chain(step_model: type[BaseModel], session: dict):
+def make_chain(step_model: type[BaseModel], session: dict, language="nl"):
     """
     Bouwt één LangChain-chain die:
       1. De JSON-schema instructies infereren van het Pydantic-model
