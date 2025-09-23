@@ -50,11 +50,17 @@
 
 	// Process steps for animation - reactive to language changes
 	const processSteps = $derived([
-		{ icon: "/images/agent-icon-search.svg", text: $_('concept2.processSteps.searchRules') },
-		{ icon: "/images/agent-icon-edit.svg", text: $_('concept2.processSteps.writeProposal') },
+		{
+			icon: "/images/agent-icon-search.svg",
+			text: $_("concept2.processSteps.searchRules"),
+		},
+		{
+			icon: "/images/agent-icon-edit.svg",
+			text: $_("concept2.processSteps.writeProposal"),
+		},
 		{
 			icon: "/images/agent-icon-agree.svg",
-			text: $_('concept2.processSteps.consultAgent'),
+			text: $_("concept2.processSteps.consultAgent"),
 		},
 	]);
 
@@ -83,15 +89,19 @@
 			conversation = [
 				{
 					type: "gemeente-ai",
-					content: $_('concept2.writingResponse'),
-					sender: $_('concept1.construct.senderAI'),
+					content: $_("concept2.writingResponse"),
+					sender: $_("concept1.construct.senderAI"),
 					isPlaceholder: true,
 				},
 			];
 
 			// Call yap/start
 			const lang = get(currentLanguage);
-			const result = await sendToEndpoint("yapStart", { text: message }, lang);
+			const result = await sendToEndpoint(
+				"yapStart",
+				{ text: message },
+				lang,
+			);
 			addApiResponse("yapStart", result);
 
 			if (result.yap_session_id) {
@@ -108,8 +118,8 @@
 					content: msg.message,
 					sender:
 						msg.speaker === "burger"
-							? $_('messages.yourAgent')
-							: $_('concept1.construct.senderAI'),
+							? $_("messages.yourAgent")
+							: $_("concept1.construct.senderAI"),
 				}));
 			}
 
@@ -120,8 +130,8 @@
 					...conversation,
 					{
 						type: "user-message",
-						content: $_('concept2.writingResponse'),
-						sender: $_('messages.yourAgent'),
+						content: $_("concept2.writingResponse"),
+						sender: $_("messages.yourAgent"),
 						isPlaceholder: true,
 					},
 				];
@@ -145,9 +155,13 @@
 
 		try {
 			const lang = get(currentLanguage);
-			const result = await sendToEndpoint("yapNext", {
-				yap_session_id: yapSessionId,
-			}, lang);
+			const result = await sendToEndpoint(
+				"yapNext",
+				{
+					yap_session_id: yapSessionId,
+				},
+				lang,
+			);
 			addApiResponse("yapNext", result);
 
 			// Process full conversation from yapNext response
@@ -160,8 +174,8 @@
 					content: msg.message,
 					sender:
 						msg.speaker === "burger"
-							? $_('messages.yourAgent')
-							: $_('concept1.construct.senderAI'),
+							? $_("messages.yourAgent")
+							: $_("concept1.construct.senderAI"),
 				}));
 
 				conversation = newConversation;
@@ -177,14 +191,14 @@
 							: "gemeente-ai";
 					const nextSender =
 						nextType === "gemeente-ai"
-							? $_('concept1.construct.senderAI')
-							: $_('messages.yourAgent');
+							? $_("concept1.construct.senderAI")
+							: $_("messages.yourAgent");
 
 					conversation = [
 						...conversation,
 						{
 							type: nextType,
-							content: $_('concept2.writingResponse'),
+							content: $_("concept2.writingResponse"),
 							sender: nextSender,
 							isPlaceholder: true,
 						},
@@ -256,6 +270,7 @@
 		const description = sentences.slice(1).join(" ").trim() || message;
 
 		return {
+			message,
 			title,
 			description,
 		};
@@ -292,12 +307,12 @@
 		<ChatMessage
 			type="user-message"
 			content={userMessage()}
-			sender={$_('concept2.firstMessage')}
+			sender={$_("concept2.firstMessage")}
 		/>
 	</header>
 
 	<div class="content">
-		<h1 class="page-title">{$_('concept2.pageTitle')}</h1>
+		<h1 class="page-title">{$_("concept2.pageTitle")}</h1>
 
 		<div class="process-steps">
 			{#each processSteps as step, index}
@@ -355,12 +370,13 @@
 			<div class="approved-result">
 				<div class="approval-header">
 					<span class="checkmark">✅</span>
-					<h3>{result?.title}</h3>
+					<!-- <h3>{result?.title}</h3> -->
+					<h3>Uw subsidie is toegekend</h3>
 				</div>
 				<div class="approval-subtitle">
-					{$_('plan.adjustedDescription')}
+					{$_("plan.adjustedDescription")}
 				</div>
-				<p class="approval-description">{result?.description}</p>
+				<p class="approval-description">{result?.message}</p>
 
 				<div class="submit-section">
 					<ButtonSketchySmall
@@ -394,8 +410,6 @@
 		align-items: center;
 		gap: 1rem;
 	}
-
-
 
 	.content {
 		max-width: 1000px;
@@ -502,9 +516,6 @@
 		background: #2563eb;
 	}
 
-
-
-
 	.approved-result {
 		background: #f0fdf4;
 		border: 2px solid #22c55e;
@@ -524,13 +535,13 @@
 
 	.approval-header h3 {
 		margin: 0;
-		font-size: 1.125rem;
+		font-size: 1.25rem;
 		font-weight: 600;
 		color: #16a34a;
 	}
 
 	.approval-subtitle {
-		font-size: 0.875rem;
+		font-size: 1rem;
 		color: #16a34a;
 		font-weight: 600;
 		margin-bottom: 0.5rem;
@@ -540,17 +551,14 @@
 		margin: 0;
 		line-height: 1.6;
 		color: #166534;
+		font-size: 1.125rem;
 	}
-
-
-
 
 	.submit-section {
 		display: flex;
 		justify-content: flex-end;
 		margin-top: 1.5rem;
 	}
-
 
 	@media (max-width: 768px) {
 		.agents-chat {
