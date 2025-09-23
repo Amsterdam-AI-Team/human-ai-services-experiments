@@ -410,7 +410,7 @@ async def chat(
     # Recreate chain if language changed or doesn't exist
     if "chain" not in session or session.get("language") != lang_code:
         logging.info(f"Creating new chain for language: {lang_code} (previous: {session.get('language')})")
-        session["chain"] = make_chain(StepModel, session, lang_code)  # async fn
+        session["chain"] = make_chain(StepModel, session, language=lang_code)  # async fn
         session["language"] = lang_code
     else:
         logging.info(f"Reusing existing chain for language: {lang_code}")
