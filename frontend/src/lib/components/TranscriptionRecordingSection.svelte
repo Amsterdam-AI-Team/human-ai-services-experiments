@@ -66,6 +66,7 @@
 		dir="auto"
 		bind:value={transcriptionText}
 		placeholder={$_("recording.placeholder")}
+		readonly
 	></textarea>
 	<div class="button-container">
 		<div class="record-button-wrapper">
