@@ -265,14 +265,14 @@
 		}
 
 		const message = latestResponse.data.draft;
-		const sentences = message.split(/(?<=\.)\s+/);
-		const title = sentences[0] || message;
-		const description = sentences.slice(1).join(" ").trim() || message;
+		// const sentences = message.split(/(?<=\.)\s+/);
+		// const title = sentences[0] || message;
+		// const description = sentences.slice(1).join(" ").trim() || message;
 
 		return {
 			message,
-			title,
-			description,
+			// title,
+			// description,
 		};
 	});
 
@@ -371,7 +371,7 @@
 				<div class="approval-header">
 					<span class="checkmark">✅</span>
 					<!-- <h3>{result?.title}</h3> -->
-					<h3>Uw subsidie is toegekend</h3>
+					<h3>{$_("subsidy.approved")}</h3>
 				</div>
 				<div class="approval-subtitle">
 					{$_("plan.adjustedDescription")}
