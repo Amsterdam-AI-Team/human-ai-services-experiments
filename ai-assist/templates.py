@@ -7,7 +7,7 @@ from langchain_core.output_parsers.pydantic import PydanticOutputParser
 from models import BaseModel
 from langchain_core.messages import SystemMessage, HumanMessage, AIMessage, BaseMessage
 import socket
-from models import GemeenteTurn, BurgerTurn
+from models import GemeenteTurn, BurgerTurn, create_burger_turn_model, create_gemeente_turn_model
 from langchain.output_parsers import OutputFixingParser
 from i18n import *
 
@@ -307,27 +307,27 @@ GEMEENTE_SYSTEM = """
                 """.strip()
 
 
-async def _yap_generate(role: str, transcript: str, history: list[dict]) -> dict:
+async def _yap_generate(role: str, transcript: str, history: list[dict], language: str = "nl") -> dict:
     # 1. Kies schema + parser
-
     lang_code = normalize_language_code(language)
+
     if role == "burger":
-        parser = PydanticOutputParser(pydantic_object=BurgerTurn)
+        BurgerTurnModel = create_burger_turn_model(lang_code)
+        parser = PydanticOutputParser(pydantic_object=BurgerTurnModel)
         fmt = parser.get_format_instructions()
-        schema_json = json.dumps(BurgerTurn.model_json_schema(),
+        schema_json = json.dumps(BurgerTurnModel.model_json_schema(),
                                  ensure_ascii=False, indent=2)
         schema_json = schema_json.replace("{", "{{").replace("}", "}}")   # accolades escapen
-        sys_template = BURGER_SYSTEM.replace("<schema>", schema_json).replace("<format>", fmt)
+        sys_template = build_burger_system_prompt(transcript, schema_json, fmt, lang_code)
     else:
-        parser = PydanticOutputParser(pydantic_object=GemeenteTurn)
+        GemeenteTurnModel = create_gemeente_turn_model(lang_code)
+        parser = PydanticOutputParser(pydantic_object=GemeenteTurnModel)
         fmt = parser.get_format_instructions()
-        schema_json = json.dumps(GemeenteTurnModel.model_json_schema(),
-                                 ensure_ascii=False, indent=2)
-
+        schema_json = json.dumps(GemeenteTurnModel.model_json_schema(), ensure_ascii=False, indent=2)
         schema_json = schema_json.replace("{", "{{").replace("}", "}}")   # accolades escapen
-        sys_template = GEMEENTE_SYSTEM.replace("<schema>", schema_json).replace("<format>", fmt)
+        sys_template = build_gemeente_system_prompt(schema_json, fmt, lang_code)
 
-    sys_msg = SystemMessage(content=sys_template.replace("{transcript}", transcript))
+    sys_msg = SystemMessage(content=sys_template)
 
     # 2. Bouw berichten met correcte HUMAN/ASSISTANT‑mapping
     msgs = [sys_msg]
@@ -348,7 +348,7 @@ async def _yap_generate(role: str, transcript: str, history: list[dict]) -> dict
     return safe_parser.parse(response.content)
 
 
-def _yap_check_finished(history: list[dict]) -> tuple[bool, str | None]:
+def _yap_check_finished(history: list[dict], language: str = "nl") -> tuple[bool, str | None]:
     """
     Heuristiek: als de laatste gemeente-bericht woorden bevat als 'akkoord' OF 'subsidie'
     en 'samenvatting' of 'hier is het concept', dan beschouwen we het gesprek als afgerond
@@ -363,12 +363,10 @@ def _yap_check_finished(history: list[dict]) -> tuple[bool, str | None]:
     # Get localized keywords for completion detection
     from i18n import get_translation
     lang_code = normalize_language_code(language)
-    keywords = get_translation(lang_code, "responses.yap_check_keywords", [
-                               "akkoord", "goedgekeurd", "subsidie toegekend"])
-
+    keywords = get_translation(lang_code, "responses.yap_check_keywords", ["akkoord", "goedgekeurd", "subsidie toegekend"])
 
     text = last["message"].lower()
-    if any(w in text for w in ("akkoord", "goedgekeurd", "subsidie toegekend")):
+    if any(w in text for w in keywords):
         # draft = laatste gemeente-uitspraak; in praktijk kun je hier nog
         # een aparte 'maak samenvatting' call doen.
         draft = history[-1]["message"]
