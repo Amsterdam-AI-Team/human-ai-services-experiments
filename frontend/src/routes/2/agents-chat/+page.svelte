@@ -376,7 +376,7 @@
 				<div class="approval-subtitle">
 					{$_("plan.adjustedDescription")}
 				</div>
-				<p class="approval-description">{result?.message}</p>
+				<p class="approval-description whitespace-pre">{result?.message}</p>
 
 				<div class="submit-section">
 					<ButtonSketchySmall
@@ -552,6 +552,10 @@
 		line-height: 1.6;
 		color: #166534;
 		font-size: 1.125rem;
+	}
+
+	.whitespace-pre {
+		white-space: pre-line;
 	}
 
 	.submit-section {

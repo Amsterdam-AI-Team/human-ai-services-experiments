@@ -152,10 +152,15 @@ def build_burger_system_prompt(transcript: str, schema: str, format: str, langua
 {prompt_data['context']}
 {transcript_label}
 {transcript}
+
+BELANGRIJK: Je moet reageren op en aanpassen aan wat GEMEENTE_SYSTEM heeft gezegd. Lees de volledige conversatie-geschiedenis en pas je voorstel aan op basis van hun feedback, opmerkingen en vragen.
 </Context>
 
 <Objective>
 {prompt_data['objective']}
+• REAGEER SPECIFIEK op de laatste berichten van GEMEENTE_SYSTEM
+• PAS JE VOORSTEL AAN gebaseerd op hun opmerkingen en vragen
+• Geef concrete antwoorden op hun vragen (bijv. aantal deelnemers, tijden, vergunningen)
 </Objective>
 
 <Style>
@@ -199,6 +204,12 @@ def build_gemeente_system_prompt(schema: str, format: str, language: str = "nl")
 
 <Objective>
 {prompt_data['objective']}
+
+BELANGRIJK VOOR GOEDKEURING:
+• Bij het goedkeuren van een aanvraag, zet 'finished' op true
+• Vul 'draft' met een professionele samenvatting van het goedgekeurde plan
+• Samenvatting moet bevatten: locatie, aantal deelnemers, tijden, activiteiten, veiligheidsmaatregelen, en waarom het is goedgekeurd
+• Maak de 'message' een vriendelijke goedkeuringsboodschap
 </Objective>
 
 <Style>
