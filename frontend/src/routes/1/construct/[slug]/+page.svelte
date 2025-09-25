@@ -169,12 +169,10 @@
 		return latest.data?.checklist || null;
 	});
 
-	// Get the latest draft text from top level of response data
+	// Get the latest draft text from checklist
 	const draftText = $derived(() => {
-		const responses = chatResponses();
-		if (responses.length === 0) return "";
-		const latest = responses[responses.length - 1];
-		return latest.data?.draft || "";
+		const checklist = latestChecklist();
+		return checklist?.draft || "";
 	});
 
 	// Sync checklist state with backend responses
@@ -186,7 +184,7 @@
 			// Add checked items from backend state
 			// The backend now returns keys directly, so we use them as-is
 			Object.entries(backendChecklist).forEach(([key, value]) => {
-				if (value === true) {
+				if (key !== "draft" && value === true) {
 					newCheckedItems.add(key);
 				}
 			});

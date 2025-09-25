@@ -373,7 +373,7 @@ async def chat(
 
         try:
             loop = asyncio.get_running_loop()
-            # user_text = await loop.run_in_executor(None, _transcribe, tmp_path)
+            #user_text = await loop.run_in_executor(None, _transcribe, tmp_path)
             user_text = await loop.run_in_executor(
                 None,
                 _transcribe,
@@ -410,7 +410,7 @@ async def chat(
     # Recreate chain if language changed or doesn't exist
     if "chain" not in session or session.get("language") != lang_code:
         logging.info(f"Creating new chain for language: {lang_code} (previous: {session.get('language')})")
-        session["chain"] = make_chain(StepModel, session, language=lang_code)  # async fn
+        session["chain"] = make_chain(StepModel, session, lang_code)  # async fn
         session["language"] = lang_code
     else:
         logging.info(f"Reusing existing chain for language: {lang_code}")
@@ -435,17 +435,15 @@ async def chat(
     )
 
     # 5️⃣ checklist ---------------------------------------------------------
-    logging.info("step_obj:", step_obj)
-    session["checklist"] = step_obj.model_dump(exclude={"vragen", "draft"}, exclude_none=True)
-    finished = all(v for v in session["checklist"].values())
+    session["checklist"] = step_obj.model_dump(exclude={"vragen"})
+    finished = all(v for k, v in session["checklist"].items() if k != "draft")
 
     return ChatResponse(
         session_id=sid,
         reply=step_obj.vragen[0] if step_obj.vragen else get_translation(lang_code, "responses.all_steps_completed", "Alle stappen zijn afgerond!"),
         checklist=session["checklist"],
         finished=finished,
-        user_text=user_text,
-        draft=step_obj.draft
+        user_text=user_text
     )
 
 
