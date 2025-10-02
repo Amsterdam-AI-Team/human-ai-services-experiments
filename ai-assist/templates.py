@@ -307,7 +307,7 @@ GEMEENTE_SYSTEM = """
                 """.strip()
 
 
-async def _yap_generate(role: str, transcript: str, history: list[dict]) -> dict:
+async def _yap_generate(role: str, transcript: str, history: list[dict], language: str) -> dict:
     # 1. Kies schema + parser
 
     lang_code = normalize_language_code(language)
