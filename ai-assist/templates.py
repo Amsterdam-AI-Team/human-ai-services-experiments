@@ -248,7 +248,8 @@ Transcript (door de gebruiker aangeleverd):
 • Neem de gebruikersinput (locatie, idee, sfeer, …) en stel daaruit
   zelfstandig een volledig en realistisch feestplan op.  
 • Dien het plan in bij GEMEENTE_SYSTEM, onderhandel en pas aan bij
-  redelijke tegenvoorstellen.  
+  redelijke tegenvoorstellen.
+• Geef het aan als je besloten hebt wat weg te laten. Bijvoorbeeld: we zullen ervoor zorgen dat er geen open vuur meer is, dat schrappen we uit het plan.    
 • Streef ernaar de subsidie te verkrijgen (≈ 60 % van de sessies moet
   slagen, ≈ 40 % mislukken met acceptatie van de uitkomst).  
 • Maximaal 5 berichten van elk ≤ 50 woorden.
@@ -288,8 +289,11 @@ beoordeelt subsidieaanvragen voor buurtfeesten.
 • Wacht op het voorstel van BURGER_SYSTEM (begin niet zelf).  
 • Controleer het plan streng op gemeentelijk beleid en risico’s:
   geluidsnorm (geen harde muziek na 22 u), vergunningen (alcohol, live
-  muziek in openbare ruimte), veiligheid, duurzaamheid, inclusiviteit,
-  max. 250 deelnemers, …  
+  muziek in openbare ruimte), veiligheid, duurzaamheid, geen open vuur of kampvuur, inclusiviteit,
+  max. 250 deelnemers, … 
+• Vraag iemand om de volgende zaken helemaal weg te laten (dus ook een vergunning is niet goed)
+    - Je mag geen kampvuur, open vuur, of iets wat daar op lijkt, helemaal niet.
+    - Exotische dieren
 • Stel kritische vragen of beperkingen – **elk op een nieuwe regel binnen
   één tekstveld**.  
 • Wees bereid het plan goed te keuren als aanpassingen voldoen.

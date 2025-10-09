@@ -78,7 +78,6 @@ def _detect_language(text: str) -> str:
 
 def _transcribe(path: str, filename: str | None = None, content_type: str | None = None) -> str:
     # Attention: for demo purposes we return a predefined string
-    return 'The neighborhood is 20 years old and we want to celebrate that. I was thinking of long tables with large bowls of food on them, bottles of wine, bottles of water. A little campfire next to it to warm up and maybe something fun for the children too.'
     return 'The neighborhood is 20 years old and we want to celebrate with a modest gathering. I was thinking of long tables with large bowls of food, premium champagne and artisanal spirits, craft beer tasting stations. A bonfire large enough to see from the highway, plus a petting zoo with exotic animals, a mechanical bull, and maybe a small fireworks display for the children.'
     """
     Always transcodes the incoming audio to MP3 (mono, 16 kHz) with ffmpeg,
