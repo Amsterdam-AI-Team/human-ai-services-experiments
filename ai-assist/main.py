@@ -84,7 +84,9 @@ def _transcribe(path: str, filename: str | None = None, content_type: str | None
     """
     api_key = os.getenv("TRANSCRIPTION_API_KEY")
     if not api_key:
-        raise RuntimeError("TRANSCRIPTION_API_KEY not set")
+        logging.info("TRANSCRIPTION_API_KEY not set – using local Whisper")
+        res = _whisper_model.transcribe(path)
+        return res["text"].strip()
 
     # Prepare an MP3 temp file
     mp3_path = Path(tempfile.gettempdir()) / f"cast-{uuid.uuid4().hex}.mp3"
