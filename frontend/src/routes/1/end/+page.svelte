@@ -6,7 +6,8 @@
 	// Using Svelte 5 effect for the redirect timer
 	$effect(() => {
 		const timer = setTimeout(() => {
-			goto('/1/feedback');
+			// goto('/1/feedback');
+			goto(`/1/final-thanks`);
 		}, 5000);
 
 		return () => clearTimeout(timer);
