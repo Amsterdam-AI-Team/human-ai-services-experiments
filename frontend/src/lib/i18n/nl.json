@@ -1,6 +1,6 @@
 {
   "welcome": {
-    "header": "Welkom bij de AI Services Prototype",
+    "header": "Welkom bij het AI Services Prototype",
     "main": "Ontdek onze experimentele AI-aangedreven gemeentelijke diensten",
     "subtitle": "Kies een concept om te beginnen"
   },
@@ -27,7 +27,8 @@
     "continue": "aanvragen →",
     "submit": "Versturen",
     "back": "Terug",
-    "button": "Button"
+    "button": "Button",
+    "tryAgain": "Nog een keer"
   },
   "progress": {
     "complete": "compleet"
@@ -131,5 +132,8 @@
   },
   "chat": {
     "senderYou": "Jij"
+  },
+  "subsidy": {
+    "approved": "Uw subsidie is toegekend"
   }
 }

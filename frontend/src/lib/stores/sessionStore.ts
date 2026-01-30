@@ -1,4 +1,4 @@
-import { writable } from "svelte/store";
+import { writable, get } from "svelte/store";
 import { browser } from "$app/environment";
 
 interface SessionData {
@@ -7,13 +7,26 @@ interface SessionData {
 }
 
 const STORAGE_KEY = "sessionData";
+const SESSION_TTL = 30 * 60 * 1000; // 30 minutes
 
-// Load from localStorage on initialization
+// Load from localStorage on initialization with TTL check
 const loadFromStorage = (): SessionData => {
   if (!browser) return { sessionId: null, timestamp: 0 };
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : { sessionId: null, timestamp: 0 };
+    if (!stored) return { sessionId: null, timestamp: 0 };
+
+    const data = JSON.parse(stored);
+    const now = Date.now();
+
+    // Check if session has expired
+    if (data.timestamp && (now - data.timestamp) > SESSION_TTL) {
+      // Session expired, clear it
+      localStorage.removeItem(STORAGE_KEY);
+      return { sessionId: null, timestamp: 0 };
+    }
+
+    return data;
   } catch {
     return { sessionId: null, timestamp: 0 };
   }
@@ -36,13 +49,7 @@ export const setSessionId = (sessionId: string) => {
 };
 
 export const getSessionId = (): string | null => {
-  let currentSessionId: string | null = null;
-
-  sessionData.subscribe((data) => {
-    currentSessionId = data.sessionId;
-  })();
-
-  return currentSessionId;
+  return get(sessionData).sessionId;
 };
 
 export const clearSession = () => {

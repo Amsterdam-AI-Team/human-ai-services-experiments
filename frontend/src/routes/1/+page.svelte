@@ -5,9 +5,23 @@
 	import CalloutBubble from "$lib/components/CalloutBubble.svelte";
 	import SingleRecordingSection from "$lib/components/SingleRecordingSection.svelte";
 	import ApiDebugger from "$lib/components/ApiDebugger.svelte";
-	import { apiResponses } from "$lib/stores/apiStore";
+	import { apiResponses, clearApiResponses } from "$lib/stores/apiStore";
+	import { clearSession } from "$lib/stores/sessionStore";
+	import { setLanguage } from "$lib/stores/languageStore";
 	import { configStore } from "$lib/stores/configStore";
 	import { goto } from "$app/navigation";
+
+	let initialized = $state(false);
+
+	// Clear state when entering the flow root (on mount, run once)
+	$effect(() => {
+		if (!initialized) {
+			clearApiResponses();
+			clearSession();
+			setLanguage('nl');
+			initialized = true;
+		}
+	});
 
 	// Watch for analyze responses and redirect based on configurable similarity threshold
 	// To modify the threshold, use: configStore.setSimilarityThreshold(0.7) or update configStore.ts

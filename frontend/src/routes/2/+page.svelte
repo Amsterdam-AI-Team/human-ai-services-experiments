@@ -2,15 +2,21 @@
 	import MainMessage from "$lib/components/MainMessage.svelte";
 	import ButtonSketchy from "$lib/components/ButtonSketchy.svelte";
 	import { _ } from "svelte-i18n";
-	import {
-		apiResponses,
-		addApiResponse,
-		clearApiResponsesForEndpoint,
-	} from "$lib/stores/apiStore";
+	import { clearApiResponses } from "$lib/stores/apiStore";
+	import { clearSession } from "$lib/stores/sessionStore";
+	import { setLanguage } from "$lib/stores/languageStore";
 
-	clearApiResponsesForEndpoint('yap')
-	clearApiResponsesForEndpoint('yapStart')
-	clearApiResponsesForEndpoint('yapNext')
+	let initialized = $state(false);
+
+	// Clear state when entering the flow root (on mount, run once)
+	$effect(() => {
+		if (!initialized) {
+			clearApiResponses();
+			clearSession();
+			setLanguage('nl');
+			initialized = true;
+		}
+	});
 </script>
 
 <main class="app">

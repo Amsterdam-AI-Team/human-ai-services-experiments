@@ -2,20 +2,25 @@
 	import Confetti from "svelte-confetti";
 	import { goto } from '$app/navigation';
 	import { _ } from 'svelte-i18n';
+	import ButtonSketchy from '$lib/components/ButtonSketchy.svelte';
 
 	// Using Svelte 5 effect for the redirect timer
-	$effect(() => {
-		const timer = setTimeout(() => {
-			goto('/1/feedback');
-		}, 5000);
+	// $effect(() => {
+	// 	const timer = setTimeout(() => {
+	// 		// goto('/1/feedback');
+	// 		goto(`/1/final-thanks`);
+	// 	}, 5000);
 
-		return () => clearTimeout(timer);
-	});
+	// 	return () => clearTimeout(timer);
+	// });
 </script>
 
 <main class="app">
 	<div class="content">
 		<h1 class="success-header">{$_('success.requestSent')}</h1>
+		<a href="/1" class="restart-link">
+			<ButtonSketchy text={$_('buttons.tryAgain')} />
+		</a>
 	</div>
 </main>
 
@@ -58,6 +63,8 @@
 		justify-content: center;
 		text-align: center;
 		transform: translateY(-100px);
+		position: relative;
+		z-index: 10;
 	}
 
 	.success-header {
@@ -65,6 +72,11 @@
 		font-weight: bold;
 		color: #333;
 		margin: 0;
+	}
+
+	.restart-link {
+		margin-top: 2rem;
+		text-decoration: none;
 	}
 
 	@media (max-width: 768px) {

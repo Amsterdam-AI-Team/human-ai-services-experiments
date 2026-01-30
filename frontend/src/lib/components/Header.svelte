@@ -140,6 +140,8 @@
 		height: 100px;
 		min-height: 100px;
 		background: transparent;
+		position: relative;
+		z-index: 100;
 	}
 
 	.header-layout {

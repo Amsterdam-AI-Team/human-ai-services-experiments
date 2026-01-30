@@ -6,7 +6,7 @@ interface AppConfig {
 }
 
 const defaultConfig: AppConfig = {
-  similarityThreshold: 0.4, // Default threshold for intent matching
+  similarityThreshold: 0.3, // Default threshold for intent matching
 };
 
 function createConfigStore() {
