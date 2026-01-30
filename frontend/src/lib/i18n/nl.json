@@ -27,7 +27,8 @@
     "continue": "aanvragen →",
     "submit": "Versturen",
     "back": "Terug",
-    "button": "Button"
+    "button": "Button",
+    "tryAgain": "Nog een keer"
   },
   "progress": {
     "complete": "compleet"

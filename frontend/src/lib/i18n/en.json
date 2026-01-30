@@ -27,7 +27,8 @@
     "continue": "submit request →",
     "submit": "Submit",
     "back": "Back",
-    "button": "Button"
+    "button": "Button",
+    "tryAgain": "Try again"
   },
   "progress": {
     "complete": "complete"

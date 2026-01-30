@@ -27,7 +27,8 @@
     "continue": "soumettre la demande →",
     "submit": "Soumettre",
     "back": "Retour",
-    "button": "Bouton"
+    "button": "Bouton",
+    "tryAgain": "Réessayer"
   },
   "progress": {
     "complete": "terminé"
