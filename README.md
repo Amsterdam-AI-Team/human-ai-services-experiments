@@ -4,6 +4,8 @@ We will do some technical experiments here for the Human AI services installatio
 
 ## Background
 
+De groeiende mogelijkheden van AI maken nieuwe vormen van interactie mogelijk. Hoe zien inwoners de interactie met de gemeente voor zich in de toekomst? Blijft er behoefte aan menselijk contact, waarbij technologie een faciliterende rol kan spelen? Of is het mogelijk om met vergaande automatisering toch rekening te houden met de menselijke maat?
+
 ## Folder Structure
 
 * [`data`](./data): Sample data for demo purposes

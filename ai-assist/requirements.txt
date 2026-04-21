@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+openai>=1.0
+numpy
+python-multipart
+sentence-transformers
+openai-whisper
+python-slugify
+langchain-openai
+langchain
+asyncpg>=0.29
+sqlalchemy[asyncio]>=2.0
+psycopg2-binary>=2.9
+langdetect==1.0.9

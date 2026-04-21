@@ -1,0 +1,138 @@
+{
+  "welcome": {
+    "header": "Welkom bij het AI Services Prototype",
+    "main": "Ontdek onze experimentele AI-aangedreven gemeentelijke diensten",
+    "subtitle": "Kies een concept om te beginnen"
+  },
+  "navigation": {
+    "main": "Hoofdnavigatie"
+  },
+  "concepts": {
+    "concept1": {
+      "title": "Concept 1: Intentie-analyse",
+      "description": "AI-gestuurde intentieherkenning en formulierconstructie voor gemeentelijke diensten. Neem je stem op en laat onze AI begrijpen wat je nodig hebt.",
+      "button": "Probeer Concept 1 →"
+    },
+    "concept2": {
+      "title": "Concept 2: Spraakopname",
+      "description": "Spraak-naar-tekst transcriptie en AI-assistentie voor gemeentelijke verzoeken. Perfect voor toegankelijkheid en handsfree interactie.",
+      "button": "Probeer Concept 2 →"
+    }
+  },
+  "footer": {
+    "disclaimer": "Dit is een prototype voor experimentele AI gemeentelijke diensten. Alleen voor testdoeleinden."
+  },
+  "buttons": {
+    "start": "Ja, start →",
+    "continue": "aanvragen →",
+    "submit": "Versturen",
+    "back": "Terug",
+    "button": "Button"
+  },
+  "progress": {
+    "complete": "compleet"
+  },
+  "messages": {
+    "help": "Hoe kunnen we je helpen?",
+    "helpSubtitle": "Comment pouvons-nous vous aider?",
+    "aiMessage": "Inkomend bericht van jouw persoonlijke AI-agent:",
+    "subsidyQuestion": "Misschien heb je wel recht op subsidie voor het buurtfeest, zal ik dit proberen aan te vragen?",
+    "ideas": "Wat voor ideeën heb je al voor het buurtfeest? Dan nemen we die mee.",
+    "callout": "Ons prototype kan je nu alleen helpen met een paar dingen: bezwaar op een parkeerboete, een fout geparkeerde auto melden, iets melden in de openbare ruimte of een evenement vergunning voor een buurtfeest aanvragen. Probeer het gerust!",
+    "yourAgent": "Jouw agent"
+  },
+  "recording": {
+    "startRecording": "Klik om te starten met opnemen",
+    "transcribing": "Bezig met transcriberen...",
+    "addRecording": "Voeg een opname toe of ga door met aanvragen",
+    "placeholder": "Transcriptie verschijnt hier...",
+    "privacyNotice": "Wat je inspreekt, wordt niet bewaard. Het wordt automatisch verwijderd."
+  },
+  "ai": {
+    "processing": "AI is processing your request"
+  },
+  "errors": {
+    "microphoneAccess": "Microfoon toegang",
+    "transcriptionFailed": "Transcriptie is mislukt. Probeer opnieuw op te nemen.",
+    "audioTranscription": "Audio transcriptie",
+    "chatSending": "Transcript naar chat versturen",
+    "apiCall": "API aanroep",
+    "apiConnectionFailed": "API verbinding mislukt",
+    "unknownError": "Onbekende fout opgetreden",
+    "testError": "Dit is een test foutmelding",
+    "testWarning": "Dit is een test waarschuwing",
+    "testInfo": "Dit is een test informatie bericht",
+    "dismissLabel": "Foutmelding sluiten",
+    "recordingAnalysis": "Opname analyse",
+    "transcriptionTimeout": "Transcriberen duurde langer dan 20 seconden, probeer het opnieuw"
+  },
+  "concept1": {
+    "mainHelp": "Hoe kunnen we je helpen?",
+    "helpSubtitle": "Comment pouvons-nous vous aider?",
+    "callout": "Ons prototype kan je nu alleen helpen met een paar dingen: bezwaar op een parkeerboete, een fout geparkeerde auto melden, iets melden in de openbare ruimte of een evenement vergunning voor een buurtfeest aanvragen. Probeer het gerust!",
+    "choose": {
+      "title": "Kies een onderwerp",
+      "subtitle": "We hoorden je zeggen: {transcript}. We weten nog niet precies wat je bedoelt. Dit prototype herkent alleen een paar vaste onderwerpen. Kies een van de volgende onderwerpen om verder te gaan:"
+    },
+    "construct": {
+      "loadingAI": "AI is processing your request",
+      "senderAI": "Gemeente AI-agent",
+      "backButton": "Opnieuw beginnen",
+      "formTitle": "Dit ga je opsturen:",
+      "formLabel": "Betreft: Bezwaar tegen parkeerboete",
+      "formPlaceholder": "Omschrijf je situatie",
+      "formSuffix": "formulier",
+      "subjectLabel": "Betreft:",
+      "checklistSubtitle": "Vermeld de volgende gegevens voor een complete aanvraag:"
+    }
+  },
+  "concept2": {
+    "pageTitle": "Buurtfeest subsidie aanvragen",
+    "firstMessage": "Jouw eerste bericht",
+    "writingResponse": "schrijft antwoord...",
+    "processSteps": {
+      "searchRules": "regels opzoeken",
+      "writeProposal": "voorstel schrijven",
+      "consultAgent": "overleggen met gemeente AI-agent"
+    },
+    "tags": {
+      "people": "50 mensen",
+      "champagne": "Champagnefontijn",
+      "games": "Spelletjesmiddag",
+      "band": "Grote band",
+      "fireworks": "Vuurwerkshow",
+      "bbq": "Sparerib BBQ",
+      "carshow": "Autoshow"
+    }
+  },
+  "feedback": {
+    "title": "Ontwerp mee aan de toekomst!",
+    "subtitle": "In de toekomst wil ik dat AI binnen de gemeente...",
+    "placeholder": "... spreek je idee in",
+    "privacy1": "Vertel geen persoonlijke gegevens, zoals je naam.",
+    "privacy2": "Je idee wordt omgezet in tekst, we slaan geen geluidsopnames op. Zo zorgen we ervoor dat jouw feedback anoniem blijft. We gebruiken deze tekst om te ontdekken wat mensen belangrijk vinden.",
+    "submit": "Verstuur",
+    "submitting": "Versturen...",
+    "errorEmpty": "Voer feedback in voordat je verstuurt.",
+    "errorGeneric": "Er ging iets mis bij het versturen van je feedback.",
+    "errorNetwork": "Netwerkfout. Controleer je internetverbinding en probeer opnieuw."
+  },
+  "finalThanks": {
+    "title": "Bedankt!",
+    "message": "Je feedback is succesvol verstuurd. We waarderen je bijdrage aan de toekomst van AI in de gemeente.",
+    "goHome": "Terug naar home",
+    "autoRedirect": "Je wordt automatisch doorgestuurd naar de startpagina in 5 seconden."
+  },
+  "success": {
+    "requestSent": "Je aanvraag is verstuurd!"
+  },
+  "plan": {
+    "adjustedDescription": "Omschrijving aangepast plan:"
+  },
+  "chat": {
+    "senderYou": "Jij"
+  },
+  "subsidy": {
+    "approved": "Uw subsidie is toegekend"
+  }
+}

@@ -1,0 +1,105 @@
+# Localization Implementation Plan
+
+## Phase 1: Foundation (Day 1)
+[ ] Install svelte-i18n library (`npm install svelte-i18n`)
+[ ] Create language detection store that integrates with Whisper responses
+[ ] Set up basic translation structure with JSON files (nl.json, en.json, fr.json)
+[ ] Create language switching utilities and reactive stores
+
+## Phase 2: Text Extraction & Translation (Day 1-2)
+[ ] Scan all .svelte files for hardcoded text strings
+[ ] Extract text from components:
+  - MainMessage component (headerText, mainText, subtitle)
+  - ButtonSketchy components (text props)
+  - ChatMessage content
+  - Form labels and placeholders
+  - Error messages in errorStore
+  - All page content (home, concept pages, etc.)
+
+[ ] Create translation keys with nested structure:
+  ```json
+  {
+    "welcome": {
+      "header": "Welkom bij de AI Services Prototype",
+      "main": "Ontdek onze experimentele AI-aangedreven gemeentelijke diensten"
+    },
+    "errors": {
+      "microphone": "Microfoon toegang geweigerd",
+      "transcription": "Transcriptie is mislukt"
+    }
+  }
+  ```
+
+## Phase 3: Component Updates (Day 2)
+[ ] Update MainMessage component to accept translation keys
+[ ] Update ButtonSketchy to use translations
+[ ] Update all page components to use $t() function
+[ ] Update error handling to use translated messages
+[ ] Update form components and placeholders
+
+## Phase 4: Dynamic Language Detection (Day 2-3)
+[ ] Integrate Whisper language detection with language store
+[ ] Create language switching logic:
+  - When Whisper detects different language, show confirmation UI
+  - Auto-switch vs manual confirmation options
+  - Fallback to browser language detection
+[ ] Handle mixed language scenarios
+[ ] Add language preference persistence (localStorage)
+
+## Phase 5: Advanced Features (Day 3)
+[ ] Handle pluralization rules for different languages
+[ ] Date/time formatting per locale
+[ ] Number formatting (Dutch vs English decimal separators)
+[ ] Direction support preparation (for future RTL languages)
+
+## Phase 6: API Integration (Day 3)
+[ ] Update API calls to include preferred language
+[ ] Handle server responses in multiple languages
+[ ] Create translation pipeline for dynamic content
+
+## Phase 7: Testing & Polish (Day 4)
+[ ] Test language switching scenarios
+[ ] Review translation quality with native speakers
+[ ] Test edge cases (unclear audio, mixed languages)
+[ ] Add fallback behavior for missing translations
+[ ] Performance testing with multiple languages
+
+## Technical Decisions to Make:
+1. Auto-switch vs confirmation dialog when language detected?
+2. How to handle partial translations (fallback to Dutch/English)?
+3. Should API responses be translated server-side or client-side?
+4. Language detection confidence threshold?
+5. How to handle language switching mid-conversation?
+
+## Files That Need Translation:
+- /routes/+page.svelte (homepage)
+- /routes/1/+page.svelte 
+- /routes/1/choose/+page.svelte
+- /routes/1/construct/[slug]/+page.svelte
+- /routes/2/+page.svelte
+- /routes/2/record/+page.svelte
+- /lib/components/MainMessage.svelte
+- /lib/components/ButtonSketchy.svelte
+- /lib/components/ChatMessage.svelte
+- /lib/components/ChecklistCard.svelte
+- /lib/stores/errorStore.ts
+- All form labels, placeholders, and validation messages
+
+## Implementation Strategy:
+1. Start with proof-of-concept on homepage + one component
+2. Create language detection integration
+3. Gradually migrate all components
+4. Add advanced features last
+
+## Whisper Integration Points:
+- Audio transcription endpoints (/api/analyze, /2/record/transcribe)
+- Language detection from response.language field
+- Confidence scoring for language switches
+- User confirmation flow for language changes
+
+## Success Metrics:
+- Seamless language switching based on speech
+- All UI text properly translated
+- Consistent user experience across languages
+- Performance impact < 100ms for language switches
+- Fallback behavior works correctly
