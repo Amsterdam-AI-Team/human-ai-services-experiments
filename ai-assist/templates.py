@@ -307,7 +307,7 @@ GEMEENTE_SYSTEM = """
                 """.strip()
 
 
-async def _yap_generate(role: str, transcript: str, history: list[dict]) -> dict:
+async def _yap_generate(role: str, transcript: str, history: list[dict], language: str) -> dict:
     # 1. Kies schema + parser
 
     lang_code = normalize_language_code(language)
@@ -321,7 +321,7 @@ async def _yap_generate(role: str, transcript: str, history: list[dict]) -> dict
     else:
         parser = PydanticOutputParser(pydantic_object=GemeenteTurn)
         fmt = parser.get_format_instructions()
-        schema_json = json.dumps(GemeenteTurnModel.model_json_schema(),
+        schema_json = json.dumps(GemeenteTurn.model_json_schema(),
                                  ensure_ascii=False, indent=2)
 
         schema_json = schema_json.replace("{", "{{").replace("}", "}}")   # accolades escapen
