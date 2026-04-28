@@ -1,42 +1,66 @@
-import { AI_API_ENDPOINT } from "$env/static/private";
+import { json, error } from "@sveltejs/kit";
+import { yapGenerate } from "$lib/server/chains";
+import { getYapSession } from "$lib/server/sessions";
+import { normalizeLanguageCode, getTranslation } from "$lib/server/i18n";
 
-export async function POST({ request, url }) {
-  try {
-    const yap_session_id = url.searchParams.get("yap_session_id");
-    const language = url.searchParams.get("language");
+/** @type {import("./$types").RequestHandler} */
+export async function POST({ url }) {
+	try {
+		const yap_session_id = url.searchParams.get("yap_session_id");
+		const language = normalizeLanguageCode(url.searchParams.get("language"));
 
-    if (!yap_session_id) {
-      return new Response(
-        JSON.stringify({ error: "yap_session_id query parameter is required" }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        },
-      );
-    }
+		if (!yap_session_id) {
+			throw error(400, "yap_session_id query parameter is required");
+		}
 
-    let backendUrl = `${AI_API_ENDPOINT}/yap/next?yap_session_id=${encodeURIComponent(yap_session_id)}`;
-    if (language) {
-      backendUrl += `&language=${encodeURIComponent(language)}`;
-    }
+		const sess = getYapSession(yap_session_id);
+		if (!sess) {
+			throw error(
+				404,
+				getTranslation(language, "responses.error_unknown_session", "Unknown yap_session_id"),
+			);
+		}
 
-    const response = await fetch(backendUrl, {
-      method: "POST",
-    });
+		if (sess.finished) {
+			const last = sess.messages[sess.messages.length - 1];
+			return json({
+				yap_session_id,
+				messages: sess.messages,
+				speaker: last.speaker,
+				message: last.message,
+				finished: true,
+				draft: sess.draft,
+			});
+		}
 
-    const result = await response.json();
-    return new Response(JSON.stringify(result), {
-      headers: { "Content-Type": "application/json" },
-    });
-  } catch (error) {
-    return new Response(
-      JSON.stringify({
-        error: error instanceof Error ? error.message : "Unknown error",
-      }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
-  }
+		const lastSpeaker = sess.messages[sess.messages.length - 1].speaker;
+		/** @type {"burger"|"gemeente"} */
+		const role = lastSpeaker === "gemeente" ? "burger" : "gemeente";
+
+		const sessionLang = normalizeLanguageCode(sess.language || language);
+		const turn = await yapGenerate(role, sess.transcript, sess.messages, sessionLang);
+
+		sess.messages.push({ speaker: role, message: turn.message });
+
+		if (role === "gemeente" && "finished" in turn) {
+			sess.finished = Boolean(turn.finished);
+			sess.draft = turn.draft ?? null;
+		}
+
+		return json({
+			yap_session_id,
+			messages: sess.messages,
+			speaker: role,
+			message: turn.message,
+			finished: sess.finished,
+			draft: sess.draft,
+		});
+	} catch (e) {
+		if (e && typeof e === "object" && "status" in e) throw e;
+		const msg = e instanceof Error ? e.message : "Unknown error";
+		return new Response(JSON.stringify({ error: msg }), {
+			status: 500,
+			headers: { "Content-Type": "application/json" },
+		});
+	}
 }
