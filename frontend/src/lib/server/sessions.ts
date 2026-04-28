@@ -33,12 +33,20 @@ export function newSessionId(): string {
 }
 
 export function getOrCreateChatSession(sid: string, intentcode: string): ChatSession {
-	let s = CHAT_SESSIONS.get(sid);
-	if (!s) {
-		s = { history: [], checklist: {}, intentcode, draft: "", language: null };
-		CHAT_SESSIONS.set(sid, s);
-	}
-	return s;
+	const existing = CHAT_SESSIONS.get(sid);
+	// Reset on intent switch: an existing session belongs to its original
+	// intent and its history/checklist would be meaningless for a different
+	// flow. Reusing the session_id is fine; the contents start fresh.
+	if (existing && existing.intentcode === intentcode) return existing;
+	const fresh: ChatSession = {
+		history: [],
+		checklist: {},
+		intentcode,
+		draft: "",
+		language: null,
+	};
+	CHAT_SESSIONS.set(sid, fresh);
+	return fresh;
 }
 
 export function getYapSession(sid: string): YapSession | undefined {

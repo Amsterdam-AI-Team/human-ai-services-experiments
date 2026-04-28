@@ -1,29 +1,33 @@
-import {
-	AZURE_OPENAI_ENDPOINT,
-	AZURE_OPENAI_API_KEY,
-	OPENAI_API_VERSION,
-	AZURE_OPENAI_EMBEDDING_DEPLOYMENT,
-} from "$env/static/private";
+import { env } from "$env/dynamic/private";
 import { INTENTS } from "./intents";
 import type { Intent } from "./i18n";
 
-const API_VERSION = OPENAI_API_VERSION || "2024-10-01-preview";
+const API_VERSION = env.OPENAI_API_VERSION || "2024-10-01-preview";
 
 function embeddingUrl(): string {
-	if (!AZURE_OPENAI_ENDPOINT) throw new Error("AZURE_OPENAI_ENDPOINT not set");
-	if (!AZURE_OPENAI_EMBEDDING_DEPLOYMENT)
-		throw new Error("AZURE_OPENAI_EMBEDDING_DEPLOYMENT not set");
-	const base = AZURE_OPENAI_ENDPOINT.replace(/\/$/, "");
-	return `${base}/openai/deployments/${AZURE_OPENAI_EMBEDDING_DEPLOYMENT}/embeddings?api-version=${API_VERSION}`;
+	const dep = env.AZURE_OPENAI_EMBEDDING_DEPLOYMENT;
+	if (!dep) throw new Error("AZURE_OPENAI_EMBEDDING_DEPLOYMENT not set");
+	// Accept either a deployment name or a full URL.
+	if (/^https?:\/\//.test(dep)) return dep;
+	if (!env.AZURE_OPENAI_ENDPOINT) throw new Error("AZURE_OPENAI_ENDPOINT not set");
+	const base = env.AZURE_OPENAI_ENDPOINT.replace(/\/$/, "");
+	return `${base}/openai/deployments/${dep}/embeddings?api-version=${API_VERSION}`;
+}
+
+function embeddingApiKey(): string {
+	// Embeddings may live on a different Azure resource than chat/transcribe;
+	// allow a separate key, fall back to the main one.
+	const key = env.AZURE_OPENAI_EMBEDDING_API_KEY || env.AZURE_OPENAI_API_KEY;
+	if (!key) throw new Error("AZURE_OPENAI_API_KEY (or AZURE_OPENAI_EMBEDDING_API_KEY) not set");
+	return key;
 }
 
 export async function embed(input: string | string[]): Promise<number[][]> {
-	if (!AZURE_OPENAI_API_KEY) throw new Error("AZURE_OPENAI_API_KEY not set");
 	const r = await fetch(embeddingUrl(), {
 		method: "POST",
 		headers: {
 			"Content-Type": "application/json",
-			"api-key": AZURE_OPENAI_API_KEY,
+			"api-key": embeddingApiKey(),
 		},
 		body: JSON.stringify({ input }),
 	});
