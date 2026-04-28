@@ -22,14 +22,15 @@ from i18n import (get_intents, get_translation, normalize_language_code,
                   extract_language_from_request)
 
 import os
+import shutil
 
 import tempfile
 import asyncio
-import asyncpg
-import re
 import logging
 import requests
-from langdetect import detect
+from langdetect import detect_langs, DetectorFactory
+DetectorFactory.seed = 0
+SUPPORTED_LANGS = ("nl", "en", "fr")
 
 import mimetypes
 import subprocess
@@ -47,7 +48,6 @@ for var in [
     "OPENAI_API_VERSION",
     "AZURE_OPENAI_DEPLOYMENT_NAME",
     "WHISPER_MODEL_NAME",
-    "DATABASE_URL",
     "TRANSCRIPTION_AZ_ENDPOINT",
     "TRANSCRIPTION_AZ_MODEL",
     "TRANSCRIPTION_API_KEY"
@@ -71,12 +71,17 @@ _AZ_KEY = os.getenv("TRANSCRIPTION_API_KEY")
 
 def _detect_language(text: str) -> str:
     """Lightweight n‑gram language ID (ISO‑639‑1)."""
+    if not text or len(text.strip()) < 3:
+        return "und"
     try:
-        return detect(text)          # e.g. 'nl', 'en'
+        for cand in detect_langs(text):
+            if cand.lang in SUPPORTED_LANGS:
+                return cand.lang
+        return "und"
     except Exception:
-        return "und"                 # undefined
+        return "und"
 
-def _transcribe(path: str, filename: str | None = None, content_type: str | None = None) -> str:
+def _transcribe(path: str, filename: str | None = None, content_type: str | None = None, language: str | None = None) -> str:
     """
     Always transcodes the incoming audio to MP3 (mono, 16 kHz) with ffmpeg,
     then sends that MP3 to the Azure endpoint using your existing headers/model.
@@ -88,8 +93,23 @@ def _transcribe(path: str, filename: str | None = None, content_type: str | None
 
     # Prepare an MP3 temp file
     mp3_path = Path(tempfile.gettempdir()) / f"cast-{uuid.uuid4().hex}.mp3"
+    ffmpeg_bin = shutil.which("ffmpeg") or "/usr/bin/ffmpeg"
+    debug_audio = os.getenv("DEBUG_AUDIO") == "1"
+    try:
+        src_size = os.path.getsize(path)
+        with open(path, "rb") as _f:
+            magic = _f.read(16)
+        logging.info("[transcribe] src=%s name=%s ct=%s size=%d magic=%s ffmpeg=%s",
+                     path, filename, content_type, src_size, magic.hex(), ffmpeg_bin)
+        if debug_audio:
+            ext = ".webm" if magic.startswith(b"\x1a\x45\xdf\xa3") else ".bin"
+            dbg_in = Path(tempfile.gettempdir()) / f"last-recording{ext}"
+            shutil.copyfile(path, dbg_in)
+            logging.info("[transcribe] DEBUG_AUDIO original saved at %s", dbg_in)
+    except Exception as _e:
+        logging.warning("[transcribe] failed to inspect src: %s", _e)
     ffmpeg_cmd = [
-        "/usr/bin/ffmpeg", "-y",         # absolute path avoids PATH issues under systemd
+        ffmpeg_bin, "-y",
         "-i", path,                      # source file (any format)
         "-ac", "1",                      # mono
         "-ar", "16000",                  # 16 kHz
@@ -100,7 +120,11 @@ def _transcribe(path: str, filename: str | None = None, content_type: str | None
 
     try:
         # 1) ALWAYS transcode to MP3
-        subprocess.run(ffmpeg_cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        ff = subprocess.run(ffmpeg_cmd, capture_output=True)
+        if ff.returncode != 0:
+            logging.error("[transcribe] ffmpeg failed rc=%d stderr=%s",
+                          ff.returncode, ff.stderr.decode(errors="replace")[-2000:])
+            raise RuntimeError(f"ffmpeg rc={ff.returncode}")
 
         send_path = str(mp3_path)
         send_name = "audio.mp3"
@@ -110,13 +134,19 @@ def _transcribe(path: str, filename: str | None = None, content_type: str | None
             "Transcribe → sending to Azure (forced MP3): name=%s ct=%s size=%d bytes",
             send_name, send_ct, os.path.getsize(send_path)
         )
+        if debug_audio:
+            dbg_mp3 = Path(tempfile.gettempdir()) / "last-converted.mp3"
+            shutil.copyfile(send_path, dbg_mp3)
+            logging.info("[transcribe] DEBUG_AUDIO mp3 saved at %s", dbg_mp3)
 
         # 2) Send MP3 to Azure with your existing headers/model
         with open(send_path, "rb") as f:
             files = {
                 "file": (send_name, f, send_ct),
-                "model": (None, "gpt-4o-transcribe"),  # keep your current behavior
+                "model": (None, _AZ_MODEL or "gpt-4o-transcribe"),
             }
+            if language and language in SUPPORTED_LANGS:
+                files["language"] = (None, language)
             headers = {"Authorization": f"Bearer {api_key}"}
 
             r = requests.post(_AZ_ENDPOINT, files=files, headers=headers, timeout=120)
@@ -128,14 +158,23 @@ def _transcribe(path: str, filename: str | None = None, content_type: str | None
             raise
 
         text = r.json().get("text", "").strip()
-        logging.info("Azure transcription succeeded – text length: %d", len(text))
+        logging.info("[transcribe] Azure OK status=%d text_len=%d preview=%r",
+                     r.status_code, len(text), text[:120])
         return text
 
     except Exception as e:
-        logging.warning("Azure transcription failed (%s) – falling back to local Whisper", e)
-        # If casting failed (e.g., ffmpeg missing), or Azure rejected, use original file locally
-        res = _whisper_model.transcribe(path)
-        return res["text"].strip()
+        logging.warning("[transcribe] Azure path failed (%s) – falling back to local Whisper", e)
+        whisper_src = str(mp3_path) if mp3_path.exists() else path
+        whisper_kwargs = {"language": language} if language and language in SUPPORTED_LANGS else {}
+        try:
+            res = _whisper_model.transcribe(whisper_src, **whisper_kwargs)
+            text = res["text"].strip()
+            logging.info("[transcribe] local Whisper src=%s text_len=%d preview=%r",
+                         whisper_src, len(text), text[:120])
+            return text
+        except Exception as e2:
+            logging.error("[transcribe] local Whisper ALSO failed: %s", e2)
+            return ""
 
     finally:
         # Clean up the temp MP3 if it exists
@@ -177,67 +216,6 @@ def _embed(text: str) -> np.ndarray:
 # Pre‑compute intent embeddings once at startup
 _INTENT_EMBS = np.vstack([_embed(obj["intent"]) for obj in INTENTS])
 
-raw_dsn = os.getenv("DATABASE_URL", "postgresql://myuser:secret@localhost:5432/mydb")
-# strip any dialect (e.g. '+asyncpg', '+psycopg')
-DATABASE_URL = re.sub(r"\+[^:]+://", "://", raw_dsn, count=1)
-
-
-# ensure DB tables exist
-@app.on_event("startup")
-async def _init_db():
-    app.state.pool = await asyncpg.create_pool(DATABASE_URL)
-    async with app.state.pool.acquire() as conn:
-        await conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS chat_log (
-                id SERIAL PRIMARY KEY,
-                session_id UUID NOT NULL,
-                role TEXT NOT NULL,
-                content TEXT NOT NULL,
-                ts TIMESTAMPTZ DEFAULT now()
-            );
-            """
-        )
-        await conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS yap_log (
-                id SERIAL PRIMARY KEY,
-                session_id UUID NOT NULL,
-                speaker TEXT NOT NULL,
-                content TEXT NOT NULL,
-                ts TIMESTAMPTZ DEFAULT now()
-            );
-            """
-        )
-        await conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS feedback_log (
-                id SERIAL PRIMARY KEY,
-                session_id UUID,
-                text TEXT NOT NULL,
-                ts TIMESTAMPTZ DEFAULT now()
-            );
-            """
-        )
-
-
-# --------------------------------------------------------------
-# helper ─ persist a single message
-# --------------------------------------------------------------
-async def _store_message(session_id: str, role: str, content: str):
-    async with app.state.pool.acquire() as conn:
-        await conn.execute(
-            "INSERT INTO chat_log (session_id, role, content) VALUES ($1,$2,$3)",
-            session_id, role, content,
-        )
-
-
-async def _store_yap(session_id: str, speaker: str, content: str) -> None:
-    async with app.state.pool.acquire() as conn:
-        await conn.execute(
-            "INSERT INTO yap_log (session_id, speaker, content) VALUES ($1,$2,$3)",
-            session_id, speaker, content,
-        )
 # ---------------------------------------------------------------------------
 # /analyze route – core pipeline
 # ---------------------------------------------------------------------------
@@ -277,8 +255,9 @@ async def analyze(
         None,
         _transcribe,
         tmp_path,
-        file.filename or "audio",      # <-- pass through
-        (file.content_type or "").lower() or None  # <-- pass through
+        file.filename or "audio",
+        (file.content_type or "").lower() or None,
+        lang_code,
          )
 
         detected_language = _detect_language(text)
@@ -379,7 +358,8 @@ async def chat(
                 _transcribe,
                 tmp_path,
                 audio.filename or "audio",
-                (audio.content_type or "").lower() or None
+                (audio.content_type or "").lower() or None,
+                lang_code,
             )
         finally:
             os.remove(tmp_path)
@@ -427,15 +407,8 @@ async def chat(
         ]
     )
 
-    await _store_message(sid, "user", user_text)
-    await _store_message(
-        sid,
-        "assistant",
-        step_obj.vragen[0] if step_obj.vragen else get_translation(lang_code, "responses.all_steps_completed", "Alle stappen zijn afgerond!"),
-    )
-
     # 5️⃣ checklist ---------------------------------------------------------
-    logging.info("step_obj:", step_obj)
+    logging.info(f"step_obj: {step_obj}")
     session["checklist"] = step_obj.model_dump(exclude={"vragen", "draft"}, exclude_none=True)
     finished = all(v for v in session["checklist"].values())
 
@@ -494,7 +467,8 @@ async def yap_accumulate(
                 _transcribe,
                 tmp_path,
                 audio.filename or "audio",
-                (audio.content_type or "").lower() or None
+                (audio.content_type or "").lower() or None,
+                lang_code,
             )
         finally:
             os.remove(tmp_path)
@@ -517,7 +491,7 @@ async def yap_accumulate(
 
 
 # ---------------------------------------------------------------------------
-#  /yap/start  – bewaar sessie direct in Postgres
+#  /yap/start
 # ---------------------------------------------------------------------------
 @app.post("/yap/start", response_model=YapStartResponse)
 async def yap_start(req: YapStartRequest):
@@ -545,11 +519,6 @@ async def yap_start(req: YapStartRequest):
         "draft": None,
         "language": lang_code,        # <── added language
     }
-
-    # 4. persist two rows + the transcript once
-    await _store_yap(sid, "system", f"TRANSCRIPT::{req.text}")   # optional
-    await _store_yap(sid, "burger", opening)
-    await _store_yap(sid, "gemeente", gemeente_reply.message)
 
     # finished, draft = _yap_check_finished(msgs)
     # if finished:
@@ -619,15 +588,4 @@ async def yap_next(
 async def submit_feedback(
     payload: FeedbackRequest
 ):
-    """
-    Store feedback from UI with optional session_id.
-    """
-    async with app.state.pool.acquire() as conn:
-        await conn.execute(
-            """
-            INSERT INTO feedback_log (session_id, text)
-            VALUES ($1, $2)
-            """,
-            payload.session_id, payload.feedback
-        )
     return {"status": "ok"}

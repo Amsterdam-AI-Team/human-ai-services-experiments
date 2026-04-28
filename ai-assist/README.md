@@ -104,8 +104,6 @@ AZURE_OPENAI_DEPLOYMENT_NAME=gpt-4o
 
 WHISPER_MODEL_NAME=base
 
-DATABASE_URL=url
-
 # Optionally, SSH SOCKS proxy for WSL networking
 
 SSH_SOCKS_PROXY=socks5h://localhost:1080
