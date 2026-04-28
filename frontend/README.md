@@ -30,8 +30,8 @@ A SvelteKit application demonstrating human-AI interaction patterns for municipa
 # Install dependencies
 pnpm install
 
-# Set up environment (optional - defaults to localhost:8000)
-echo "AI_API_ENDPOINT=http://localhost:8000" > .env
+# Configure Azure OpenAI / transcribe credentials in .env (see .env for the
+# full list — AZURE_OPENAI_*, TRANSCRIPTION_AZ_*).
 
 # Start development server
 pnpm dev
